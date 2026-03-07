@@ -1,0 +1,99 @@
+.signup {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 2rem 1rem;
+    padding-top: 100px;
+}
+
+.signup__bg {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    z-index: 0;
+}
+
+.signup__card {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 440px;
+    padding: 2.5rem;
+    text-align: center;
+}
+
+.signup__logo {
+    margin-bottom: 1.5rem;
+}
+
+.signup__logo-img {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto;
+    object-fit: contain;
+    filter: drop-shadow(0 0 15px rgba(139, 92, 246, 0.4));
+}
+
+.signup__title {
+    font-family: var(--font-heading);
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.signup__subtitle {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    margin-bottom: 1.8rem;
+}
+
+.signup__error {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: var(--accent-red);
+    padding: 0.7rem 1rem;
+    border-radius: var(--radius-md);
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+}
+
+.signup__form {
+    text-align: left;
+}
+
+.signup__btn {
+    width: 100%;
+    margin-top: 0.5rem;
+}
+
+.signup__spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+}
+
+.signup__note {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin-top: 1.5rem;
+}
+
+.signup__link {
+    color: var(--accent-purple);
+    font-weight: 600;
+    transition: color var(--transition-base);
+}
+
+.signup__link:hover {
+    color: var(--accent-pink);
+}
