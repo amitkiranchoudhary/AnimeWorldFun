@@ -193,8 +193,36 @@
     box-shadow: 0 0 45px rgba(232, 67, 147, 0.6), 0 8px 25px rgba(0, 0, 0, 0.4);
 }
 
-.btn-anime--explore:hover .btn-anime__icon--hat {
-    animation: hat-wobble 0.5s ease-in-out;
+.btn-anime--explore:hover .btn-anime__icon--compass {
+    animation: compass-shake 0.5s ease-in-out infinite;
+}
+
+/* Chibi character on hero */
+.hero__character {
+    position: absolute;
+    bottom: 20px;
+    right: 5%;
+    z-index: 5;
+}
+
+@keyframes compass-shake {
+
+    0%,
+    100% {
+        transform: rotate(0deg);
+    }
+
+    25% {
+        transform: rotate(-15deg);
+    }
+
+    50% {
+        transform: rotate(15deg);
+    }
+
+    75% {
+        transform: rotate(-10deg);
+    }
 }
 
 /* Track Anime Button - Dark/Red theme with Sharingan */

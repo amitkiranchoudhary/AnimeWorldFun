@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Drop Your Cursor Image Here</title>
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #1a1a2e;
+            color: #fff;
+            font-family: sans-serif;
+        }
+
+        .drop-zone {
+            width: 400px;
+            height: 400px;
+            border: 3px dashed #8b5cf6;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .drop-zone:hover,
+        .drop-zone.over {
+            border-color: #ec4899;
+            background: rgba(139, 92, 246, 0.1);
+        }
+
+        .drop-zone h2 {
+            margin: 0 0 10px;
+        }
+
+        .drop-zone p {
+            color: #aaa;
+            font-size: 14px;
+        }
+
+        .preview {
+            margin-top: 20px;
+            background: #0a0a1a;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            display: none;
+        }
+
+        .preview img {
+            max-width: 200px;
+        }
+
+        .preview canvas {
+            display: none;
+        }
+
+        .btn {
+            margin-top: 15px;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #8b5cf6, #ec4899);
+            border: none;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .status {
+            margin-top: 15px;
+            color: #4ade80;
+            font-weight: bold;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🖐️ Cursor Image Setup</h1>
+    <p style="color:#aaa; margin-bottom: 20px;">Drop your Gojo hand PNG below. White background will be removed
+        automatically.</p>
+
+    <div class="drop-zone" id="dropZone">
+        <h2>📁 Drop Image Here</h2>
+        <p>or click to select</p>
+        <input type="file" accept="image/*" id="fileInput" style="display:none" />
+    </div>
+
+    <div class="preview" id="preview">
+        <p>Original:</p>
+        <img id="origImg" />
+        <p style="margin-top:10px;">Transparent (on dark bg):</p>
+        <img id="resultImg" style="background: #1a1a2e;" />
+        <canvas id="canvas"></canvas>
+        <br />
+        <button class="btn" id="saveBtn">💾 Download as anime-cursor.png</button>
+    </div>
+
+    <div class="status" id="status">✅ Downloaded! Now move it to: frontend/public/images/anime-cursor.png</div>
+
+    <script>
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const preview = document.getElementById('preview');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        dropZone.addEventListener('click', () => fileInput.click());
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('over'); });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('over'));
+        dropZone.addEventListener('drop', (e) => { e.preventDefault(); dropZone.classList.remove('over'); processFile(e.dataTransfer.files[0]); });
+        fileInput.addEventListener('change', (e) => processFile(e.target.files[0]));
+
+        function processFile(file) {
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    document.getElementById('origImg').src = e.target.result;
+
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0);
+
+                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    const data = imageData.data;
+
+                    // Remove white/near-white pixels
+                    for (let i = 0; i < data.length; i += 4) {
+                        const r = data[i], g = data[i + 1], b = data[i + 2];
+                        // If pixel is white or very light
+                        if (r > 230 && g > 230 && b > 230) {
+                            data[i + 3] = 0; // fully transparent
+                        } else if (r > 200 && g > 200 && b > 200) {
+                            // Semi-transparent for edge pixels (anti-aliasing)
+                            const brightness = (r + g + b) / 3;
+                            data[i + 3] = Math.round(255 * (1 - (brightness - 200) / 55));
+                        }
+                    }
+
+                    ctx.putImageData(imageData, 0, 0);
+                    document.getElementById('resultImg').src = canvas.toDataURL('image/png');
+                    preview.style.display = 'block';
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        document.getElementById('saveBtn').addEventListener('click', () => {
+            const link = document.createElement('a');
+            link.download = 'anime-cursor.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+            document.getElementById('status').style.display = 'block';
+        });
+    </script>
+</body>
+
+</html>

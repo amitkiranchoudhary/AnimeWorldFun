@@ -1,0 +1,107 @@
+.anime-char {
+    position: relative;
+    width: 120px;
+    height: 160px;
+    animation: chibi-float 3s ease-in-out infinite;
+    filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.3));
+    z-index: 5;
+}
+
+.anime-char__svg {
+    width: 100%;
+    height: 100%;
+}
+
+/* Eyes overlay */
+.anime-char__eyes {
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    gap: 14px;
+    pointer-events: none;
+}
+
+.anime-char__eye {
+    width: 14px;
+    height: 14px;
+    background: white;
+    border-radius: 50%;
+    position: relative;
+    overflow: hidden;
+    border: 1.5px solid #333;
+}
+
+.anime-char__pupil {
+    width: 8px;
+    height: 8px;
+    background: radial-gradient(circle, #1e40af 40%, #172554 100%);
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-left: -4px;
+    margin-top: -4px;
+    transition: transform 0.1s ease;
+}
+
+.anime-char__pupil::after {
+    content: '';
+    position: absolute;
+    top: 1px;
+    left: 2px;
+    width: 3px;
+    height: 3px;
+    background: white;
+    border-radius: 50%;
+}
+
+/* Speech bubble */
+.anime-char__bubble {
+    position: absolute;
+    top: -5px;
+    right: -80px;
+    background: rgba(255, 255, 255, 0.95);
+    color: #1f2937;
+    padding: 6px 12px;
+    border-radius: 12px 12px 12px 0;
+    font-size: 0.7rem;
+    font-weight: 600;
+    font-family: var(--font-heading);
+    white-space: nowrap;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    opacity: 0;
+    transform: scale(0.8);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.anime-char:hover .anime-char__bubble {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* Float animation */
+@keyframes chibi-float {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .anime-char {
+        width: 80px;
+        height: 110px;
+    }
+
+    .anime-char__bubble {
+        display: none;
+    }
+}

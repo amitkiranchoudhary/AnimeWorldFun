@@ -44,6 +44,12 @@ export const authAPI = {
         apiRequest('/auth/profile', { method: 'PUT', body: data }),
     changePassword: (currentPassword, newPassword) =>
         apiRequest('/auth/change-password', { method: 'PUT', body: { currentPassword, newPassword } }),
+    forgotPassword: (email) =>
+        apiRequest('/auth/forgot-password', { method: 'POST', body: { email } }),
+    verifyOTP: (email, otp) =>
+        apiRequest('/auth/verify-otp', { method: 'POST', body: { email, otp } }),
+    resetPassword: (email, otp, newPassword) =>
+        apiRequest('/auth/reset-password', { method: 'POST', body: { email, otp, newPassword } }),
 };
 
 // ─── Blog API ──────────────────────────────
@@ -108,6 +114,10 @@ export const adminAPI = {
         apiRequest(`/admin/writers/${id}/toggle`, { method: 'PUT' }),
     deleteWriter: (id) =>
         apiRequest(`/admin/writers/${id}`, { method: 'DELETE' }),
+    getAllUsers: () =>
+        apiRequest('/admin/users'),
+    updateUserRole: (id, role) =>
+        apiRequest(`/admin/users/${id}/role`, { method: 'PUT', body: { role } }),
 };
 
 // ─── Anime API ─────────────────────────────

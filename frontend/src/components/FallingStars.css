@@ -1,0 +1,13 @@
+.falling-stars {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.falling-stars canvas {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+}

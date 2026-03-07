@@ -255,3 +255,71 @@ exports.getAllBlogs = async (req, res) => {
         res.status(500).json({ success: false, message: 'Server error.' });
     }
 };
+
+// GET /api/admin/users — get ALL users (not just writers)
+exports.getAllUsers = async (req, res) => {
+    try {
+        const users = await User.find()
+            .sort({ createdAt: -1 })
+            .lean({ virtuals: true });
+
+        // Add blog count for writers
+        const usersWithStats = await Promise.all(
+            users.map(async (u) => {
+                let blogCount = 0;
+                if (u.role === 'writer' || u.role === 'admin') {
+                    blogCount = await Blog.countDocuments({ author: u._id });
+                }
+                return { ...u, blogCount };
+            })
+        );
+
+        res.json({ success: true, data: { users: usersWithStats } });
+    } catch (error) {
+        logger.error(`getAllUsers error: ${error.message}`);
+        res.status(500).json({ success: false, message: 'Server error.' });
+    }
+};
+
+// PUT /api/admin/users/:id/role — change a user's role
+exports.updateUserRole = async (req, res) => {
+    try {
+        const { role } = req.body;
+
+        if (!role || !['admin', 'writer', 'visitor'].includes(role)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Valid role is required (admin, writer, visitor).'
+            });
+        }
+
+        // Prevent admin from demoting themselves
+        if (req.params.id === req.user._id.toString()) {
+            return res.status(400).json({
+                success: false,
+                message: 'You cannot change your own role.'
+            });
+        }
+
+        const user = await User.findByIdAndUpdate(
+            req.params.id,
+            { role },
+            { new: true }
+        );
+
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found.' });
+        }
+
+        logger.info(`Role updated: ${user.email} → ${role} (by ${req.user.email})`);
+
+        res.json({
+            success: true,
+            message: `${user.name}'s role changed to ${role}`,
+            data: { user }
+        });
+    } catch (error) {
+        logger.error(`updateUserRole error: ${error.message}`);
+        res.status(500).json({ success: false, message: 'Server error.' });
+    }
+};

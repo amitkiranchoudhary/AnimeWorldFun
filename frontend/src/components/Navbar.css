@@ -51,9 +51,94 @@
 .navbar__links {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.8rem;
 }
 
+/* ─── Glassmorphic Pill Navigation ─────── */
+.navbar__pill-nav {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.navbar__pill-glass {
+    position: absolute;
+    inset: -6px;
+    background: rgba(139, 92, 246, 0.08);
+    border-radius: 30px;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow:
+        rgba(50, 50, 93, 0.15) 0px 15px 30px -8px,
+        rgba(0, 0, 0, 0.2) 0px 8px 20px -10px,
+        rgba(139, 92, 246, 0.15) 0px -1px 4px 0px inset;
+    z-index: 0;
+}
+
+.navbar__pill-glass-inner {
+    width: 100%;
+    height: 100%;
+    border: 2px solid rgba(255, 255, 255, 0.08);
+    border-radius: 28px;
+}
+
+.navbar__pill-items {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    z-index: 1;
+}
+
+.navbar__pill-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0.5rem 1.2rem;
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 24px;
+    z-index: 1;
+}
+
+.navbar__pill-item:hover {
+    color: var(--text-primary);
+}
+
+.navbar__pill-item--active {
+    color: white;
+}
+
+.navbar__pill-emoji {
+    font-size: 1rem;
+    transition: transform 0.3s ease;
+}
+
+.navbar__pill-item:hover .navbar__pill-emoji {
+    transform: scale(1.2);
+}
+
+/* Sliding indicator ball */
+.navbar__pill-indicator {
+    position: absolute;
+    z-index: 0;
+    height: calc(100% - 4px);
+    width: calc(100% / var(--pill-count) - 2px);
+    top: 2px;
+    left: calc(var(--pill-index) * (100% / var(--pill-count)) + 1px);
+    background: var(--gradient-primary);
+    border-radius: 22px;
+    transition: left 0.5s cubic-bezier(1, -0.3, 0, 1.3);
+    box-shadow:
+        0 0 20px rgba(139, 92, 246, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+/* Dashboard link */
 .navbar__link {
     padding: 0.5rem 1rem;
     font-family: var(--font-heading);
@@ -62,24 +147,10 @@
     color: var(--text-muted);
     transition: all var(--transition-base);
     border-radius: var(--radius-full);
-    position: relative;
 }
 
-.navbar__link:hover,
-.navbar__link.active {
+.navbar__link:hover {
     color: var(--text-primary);
-}
-
-.navbar__link.active::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 20px;
-    height: 2px;
-    background: var(--gradient-primary);
-    border-radius: 1px;
 }
 
 .navbar__link--dashboard {
@@ -90,6 +161,34 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
+}
+
+.navbar__user-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.3rem 0.8rem;
+    background: rgba(139, 92, 246, 0.08);
+    border: 1px solid rgba(139, 92, 246, 0.15);
+    border-radius: var(--radius-full);
+}
+
+.navbar__badge {
+    font-size: 0.75rem;
+    font-weight: 600;
+    font-family: var(--font-heading);
+    color: var(--accent-gold);
+    white-space: nowrap;
+}
+
+.navbar__username {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 /* Burger menu */
@@ -147,7 +246,23 @@
         pointer-events: all;
     }
 
-    .navbar__link {
+    .navbar__pill-nav {
+        flex-direction: column;
+    }
+
+    .navbar__pill-items {
+        flex-direction: column;
+    }
+
+    .navbar__pill-glass {
+        display: none;
+    }
+
+    .navbar__pill-indicator {
+        display: none;
+    }
+
+    .navbar__pill-item {
         font-size: 1.2rem;
     }
 

@@ -331,6 +331,35 @@ select {
   color: var(--text-muted);
 }
 
+/* Password field with toggle */
+.input-password-wrap {
+  position: relative;
+}
+
+.input-password-wrap .input-field {
+  padding-right: 3rem;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 0.6rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.3rem;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  transition: color var(--transition-base);
+  background: none;
+  border: none;
+}
+
+.password-toggle:hover {
+  color: var(--accent-purple);
+}
+
 textarea.input-field {
   resize: vertical;
   min-height: 100px;

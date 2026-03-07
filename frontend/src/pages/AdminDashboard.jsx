@@ -12,6 +12,7 @@ export default function AdminDashboard() {
     const [writers, setWriters] = useState([]);
     const [blogs, setBlogs] = useState([]);
     const [pendingComments, setPendingComments] = useState([]);
+    const [allUsers, setAllUsers] = useState([]);
     const [loading, setLoading] = useState(true);
 
     // Writer form
@@ -23,6 +24,10 @@ export default function AdminDashboard() {
     const [editingBlog, setEditingBlog] = useState(null);
     const [blogMsg, setBlogMsg] = useState('');
 
+    // User role management
+    const [roleMsg, setRoleMsg] = useState('');
+    const [userSearch, setUserSearch] = useState('');
+
     useEffect(() => {
         if (!isAdmin) { navigate('/login'); return; }
         fetchAll();
@@ -31,16 +36,18 @@ export default function AdminDashboard() {
     const fetchAll = async () => {
         setLoading(true);
         try {
-            const [statsRes, writersRes, blogsRes, commentsRes] = await Promise.all([
+            const [statsRes, writersRes, blogsRes, commentsRes, usersRes] = await Promise.allSettled([
                 adminAPI.getStats(),
                 adminAPI.getWriters(),
                 adminAPI.getAllBlogs(),
-                commentAPI.getPending()
+                commentAPI.getPending(),
+                adminAPI.getAllUsers()
             ]);
-            setStats(statsRes.data.stats);
-            setWriters(writersRes.data.writers);
-            setBlogs(blogsRes.data.blogs);
-            setPendingComments(commentsRes.data.comments);
+            if (statsRes.status === 'fulfilled') setStats(statsRes.value.data.stats);
+            if (writersRes.status === 'fulfilled') setWriters(writersRes.value.data.writers);
+            if (blogsRes.status === 'fulfilled') setBlogs(blogsRes.value.data.blogs);
+            if (commentsRes.status === 'fulfilled') setPendingComments(commentsRes.value.data.comments);
+            if (usersRes.status === 'fulfilled') setAllUsers(usersRes.value.data.users);
         } catch (err) { console.error(err); }
         finally { setLoading(false); }
     };
@@ -124,7 +131,30 @@ export default function AdminDashboard() {
         fetchAll();
     };
 
+    const handleRoleChange = async (userId, newRole) => {
+        setRoleMsg('');
+        try {
+            const res = await adminAPI.updateUserRole(userId, newRole);
+            setRoleMsg(`✅ ${res.message}`);
+            fetchAll();
+        } catch (err) {
+            setRoleMsg(`❌ ${err.message}`);
+        }
+    };
+
     const categories = ['General', 'Reviews', 'Top Lists', 'News', 'Guides', 'Analysis', 'Recommendations'];
+
+    const filteredUsers = allUsers.filter(u => {
+        if (!userSearch) return true;
+        const q = userSearch.toLowerCase();
+        return u.name?.toLowerCase().includes(q) || u.email?.toLowerCase().includes(q);
+    });
+
+    const getRoleBadgeClass = (role) => {
+        if (role === 'admin') return 'badge-red';
+        if (role === 'writer') return 'badge-purple';
+        return 'badge-green';
+    };
 
     if (loading && !stats) {
         return <div className="dashboard"><div className="container"><p style={{ padding: '6rem 0', textAlign: 'center' }}>Loading dashboard...</p></div></div>;
@@ -134,15 +164,16 @@ export default function AdminDashboard() {
         <div className="dashboard" id="admin-dashboard">
             <div className="dashboard__sidebar">
                 <div className="dashboard__sidebar-header">
-                    <span className="navbar__logo-icon" style={{ width: 32, height: 32, fontSize: '1rem' }}>鬼</span>
+                    <img src="/images/logo.png" alt="AnimeWorldFun" style={{ width: 32, height: 32, objectFit: 'contain' }} />
                     <span className="dashboard__sidebar-title">Admin</span>
                 </div>
                 <nav className="dashboard__nav">
                     {[
-                        { id: 'overview', label: '📊 Overview', },
+                        { id: 'overview', label: '📊 Overview' },
                         { id: 'blogs', label: '✍️ Blogs' },
                         { id: 'comments', label: '💬 Comments' },
                         { id: 'writers', label: '👥 Writers' },
+                        { id: 'users', label: '🛡️ User Management' },
                     ].map(item => (
                         <button
                             key={item.id}
@@ -153,11 +184,17 @@ export default function AdminDashboard() {
                             {item.id === 'comments' && pendingComments.length > 0 && (
                                 <span className="dashboard__badge">{pendingComments.length}</span>
                             )}
+                            {item.id === 'users' && (
+                                <span className="dashboard__badge" style={{ background: 'var(--accent-purple)' }}>{allUsers.length}</span>
+                            )}
                         </button>
                     ))}
                 </nav>
                 <div className="dashboard__sidebar-footer">
                     <span className="dashboard__user-name">{user?.name}</span>
+                    {user?.loyaltyBadge && (
+                        <span className="badge badge-gold" style={{ fontSize: '0.7rem' }}>{user.loyaltyBadge.emoji} {user.loyaltyBadge.tier}</span>
+                    )}
                     <button className="btn btn-secondary btn-sm" onClick={() => { logout(); navigate('/'); }}>Logout</button>
                 </div>
             </div>
@@ -175,6 +212,7 @@ export default function AdminDashboard() {
                                 { label: 'Total Views', value: stats.totalViews, color: 'blue' },
                                 { label: 'Pending Comments', value: stats.pendingComments, color: 'pink' },
                                 { label: 'Active Writers', value: stats.activeWriters, color: 'purple' },
+                                { label: 'Total Users', value: allUsers.length, color: 'blue' },
                             ].map(s => (
                                 <div key={s.label} className={`dashboard__stat-card dashboard__stat-card--${s.color}`}>
                                     <span className="dashboard__stat-value">{s.value}</span>
@@ -332,6 +370,82 @@ export default function AdminDashboard() {
                                     </div>
                                 </div>
                             ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* ─── User Management ─────────────────────── */}
+                {activeSection === 'users' && (
+                    <div className="dashboard__section" id="admin-users">
+                        <h2 className="dashboard__heading">🛡️ User Management</h2>
+                        <p style={{ color: 'var(--text-muted)', marginBottom: '1rem', fontSize: '0.9rem' }}>
+                            Manage all registered users. Assign roles directly by email. Roles: <span className="badge badge-red">admin</span> <span className="badge badge-purple">writer</span> <span className="badge badge-green">visitor</span>
+                        </p>
+
+                        {roleMsg && <div className={`forgot__${roleMsg.startsWith('✅') ? 'success' : 'error'}`} style={{ marginBottom: '1rem' }}>{roleMsg}</div>}
+
+                        <div className="input-group" style={{ maxWidth: 400, marginBottom: '1.5rem' }}>
+                            <input
+                                className="input-field"
+                                placeholder="🔍 Search by name or email..."
+                                value={userSearch}
+                                onChange={e => setUserSearch(e.target.value)}
+                            />
+                        </div>
+
+                        <div className="dashboard__table-wrap">
+                            <table className="dashboard__table">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Role</th>
+                                        <th>Badge</th>
+                                        <th>Joined</th>
+                                        <th>Status</th>
+                                        <th>Change Role</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {filteredUsers.map(u => (
+                                        <tr key={u._id}>
+                                            <td>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                                    <div className="dashboard__writer-avatar" style={{ width: 28, height: 28, fontSize: '0.7rem' }}>{u.name?.[0]}</div>
+                                                    {u.name}
+                                                </div>
+                                            </td>
+                                            <td style={{ fontSize: '0.8rem', opacity: 0.8 }}>{u.email}</td>
+                                            <td><span className={`badge ${getRoleBadgeClass(u.role)}`}>{u.role}</span></td>
+                                            <td>
+                                                {u.loyaltyBadge && (
+                                                    <span className="badge badge-gold" title={u.loyaltyBadge.label}>
+                                                        {u.loyaltyBadge.emoji} {u.loyaltyBadge.tier}
+                                                    </span>
+                                                )}
+                                            </td>
+                                            <td style={{ fontSize: '0.8rem' }}>{new Date(u.createdAt).toLocaleDateString()}</td>
+                                            <td><span className={`badge ${u.isActive ? 'badge-green' : 'badge-red'}`}>{u.isActive ? 'Active' : 'Inactive'}</span></td>
+                                            <td>
+                                                {u._id !== user?.id ? (
+                                                    <select
+                                                        className="input-field"
+                                                        value={u.role}
+                                                        onChange={e => handleRoleChange(u._id, e.target.value)}
+                                                        style={{ width: 'auto', minWidth: 100, padding: '0.3rem 0.5rem', fontSize: '0.8rem' }}
+                                                    >
+                                                        <option value="visitor">Visitor</option>
+                                                        <option value="writer">Writer</option>
+                                                        <option value="admin">Admin</option>
+                                                    </select>
+                                                ) : (
+                                                    <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>You (locked)</span>
+                                                )}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 )}

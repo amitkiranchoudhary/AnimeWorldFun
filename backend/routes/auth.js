@@ -6,6 +6,9 @@ const auth = require('../middleware/auth');
 // Public
 router.post('/login', authController.login);
 router.post('/signup', authController.signup);
+router.post('/forgot-password', authController.forgotPassword);
+router.post('/verify-otp', authController.verifyOTP);
+router.post('/reset-password', authController.resetPassword);
 
 // Protected
 router.get('/me', auth, authController.getMe);

@@ -15,4 +15,8 @@ router.put('/writers/:id/assign', adminController.assignTopics);
 router.put('/writers/:id/toggle', adminController.toggleWriter);
 router.delete('/writers/:id', adminController.deleteWriter);
 
+// User management (all users — not just writers)
+router.get('/users', adminController.getAllUsers);
+router.put('/users/:id/role', adminController.updateUserRole);
+
 module.exports = router;

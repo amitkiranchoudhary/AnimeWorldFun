@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import useMouseParallax from '../hooks/useMouseParallax';
+import { fireConfetti } from '../utils/confetti';
 import './HeroSection.css';
 
 export default function HeroSection() {
@@ -89,16 +90,12 @@ export default function HeroSection() {
                     </p>
 
                     <div className="hero__actions">
-                        <Link to="/blogs" className="btn btn-anime btn-anime--explore btn-lg" id="hero-explore-btn">
-                            {/* Luffy's Straw Hat */}
-                            <svg className="btn-anime__icon btn-anime__icon--hat" width="28" height="28" viewBox="0 0 64 64" fill="none">
-                                <ellipse cx="32" cy="38" rx="28" ry="10" fill="#f5d442" stroke="#c9a832" strokeWidth="2" />
-                                <path d="M8 38c0-14 10.7-28 24-28s24 14 24 28" fill="#f5d442" stroke="#c9a832" strokeWidth="2" />
-                                <rect x="4" y="35" width="56" height="8" rx="4" fill="#c9231b" />
-                            </svg>
+                        <Link to="/blogs" className="btn btn-anime btn-anime--explore btn-lg" id="hero-explore-btn" onClick={fireConfetti}>
+                            {/* Compass Icon - shakes on hover */}
+                            <img src="/images/compass.png" alt="" className="btn-anime__icon btn-anime__icon--compass" width="30" height="30" />
                             Explore Blogs
                         </Link>
-                        <Link to="/anime-tracker" className="btn btn-anime btn-anime--track btn-lg" id="hero-tracker-btn">
+                        <Link to="/anime-tracker" className="btn btn-anime btn-anime--track btn-lg" id="hero-tracker-btn" onClick={fireConfetti}>
                             {/* Sharingan Eye */}
                             <svg className="btn-anime__icon btn-anime__icon--sharingan" width="28" height="28" viewBox="0 0 64 64" fill="none">
                                 <circle cx="32" cy="32" r="28" fill="#c0392b" />

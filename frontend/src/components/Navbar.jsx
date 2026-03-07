@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { fireConfetti } from '../utils/confetti';
 import './Navbar.css';
 
 export default function Navbar() {
@@ -20,7 +21,8 @@ export default function Navbar() {
         setMenuOpen(false);
     }, [location]);
 
-    const handleLogout = () => {
+    const handleLogout = (e) => {
+        fireConfetti(e);
         logout();
         navigate('/');
     };
@@ -31,6 +33,15 @@ export default function Navbar() {
         return '/';
     };
 
+    const navItems = [
+        { path: '/', label: 'Home', emoji: '🏠' },
+        { path: '/blogs', label: 'Blogs', emoji: '📚' },
+        { path: '/anime-tracker', label: 'Tracker', emoji: '🎯' },
+    ];
+
+    // Find active index for pill indicator
+    const activeIndex = navItems.findIndex(item => item.path === location.pathname);
+
     return (
         <nav className={`navbar ${scrolled ? 'navbar--scrolled' : ''}`} id="main-navbar">
             <div className="navbar__inner container">
@@ -39,15 +50,48 @@ export default function Navbar() {
                 </Link>
 
                 <div className={`navbar__links ${menuOpen ? 'navbar__links--open' : ''}`}>
-                    <Link to="/" className={`navbar__link ${location.pathname === '/' ? 'active' : ''}`}>Home</Link>
-                    <Link to="/blogs" className={`navbar__link ${location.pathname === '/blogs' ? 'active' : ''}`}>Blogs</Link>
-                    <Link to="/anime-tracker" className={`navbar__link ${location.pathname === '/anime-tracker' ? 'active' : ''}`}>Tracker</Link>
+                    {/* Glassmorphic pill nav */}
+                    <div className="navbar__pill-nav">
+                        <div className="navbar__pill-glass">
+                            <div className="navbar__pill-glass-inner" />
+                        </div>
+                        <div className="navbar__pill-items">
+                            {navItems.map((item, i) => (
+                                <Link
+                                    key={item.path}
+                                    to={item.path}
+                                    className={`navbar__pill-item ${location.pathname === item.path ? 'navbar__pill-item--active' : ''}`}
+                                >
+                                    <span className="navbar__pill-emoji">{item.emoji}</span>
+                                    {item.label}
+                                </Link>
+                            ))}
+                            {/* Sliding indicator ball */}
+                            {activeIndex >= 0 && (
+                                <div
+                                    className="navbar__pill-indicator"
+                                    style={{ '--pill-index': activeIndex, '--pill-count': navItems.length }}
+                                />
+                            )}
+                        </div>
+                    </div>
 
                     {isAuthenticated ? (
                         <>
                             <Link to={getDashboardPath()} className="navbar__link navbar__link--dashboard">
-                                {isAdmin ? '⚡ Admin' : '✏️ Writer'}
+                                {isAdmin ? '⚡ Admin' : isWriter ? '✏️ Writer' : '🏠 Dashboard'}
                             </Link>
+
+                            {/* User info with loyalty badge */}
+                            <div className="navbar__user-info">
+                                {user?.loyaltyBadge && (
+                                    <span className="navbar__badge" title={`${user.loyaltyBadge.tier} — ${user.loyaltyBadge.label}`}>
+                                        {user.loyaltyBadge.emoji} {user.loyaltyBadge.tier}
+                                    </span>
+                                )}
+                                <span className="navbar__username">{user?.name}</span>
+                            </div>
+
                             <button onClick={handleLogout} className="btn btn-secondary btn-sm" id="nav-logout-btn">
                                 Logout
                             </button>

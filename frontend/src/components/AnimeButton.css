@@ -1,0 +1,227 @@
+/* ─── AnimeButton ─────────────────────── */
+.anime-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--text-primary);
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: 1rem;
+    outline: none;
+}
+
+/* Background */
+.anime-btn__bg {
+    position: absolute;
+    inset: 0;
+    background: var(--gradient-primary);
+    border-radius: 22px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.anime-btn:hover .anime-btn__bg {
+    opacity: 1;
+}
+
+/* Splash lines */
+.anime-btn__splash {
+    position: absolute;
+    inset: 50% auto auto 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.anime-btn__splash path {
+    stroke: var(--accent-purple);
+    stroke-dasharray: 2 60;
+    stroke-dashoffset: 0;
+}
+
+.anime-btn:hover .anime-btn__splash {
+    opacity: 1;
+}
+
+.anime-btn:hover .anime-btn__splash path {
+    animation: btn-splash 0.8s ease forwards;
+}
+
+/* Wrap */
+.anime-btn__wrap {
+    position: relative;
+    padding: 12px 32px;
+    z-index: 1;
+}
+
+/* Animated border path */
+.anime-btn__path {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.anime-btn__path path {
+    stroke: rgba(139, 92, 246, 0.4);
+    stroke-dasharray: 480;
+    stroke-dashoffset: 0;
+    transition: stroke 0.3s ease;
+}
+
+.anime-btn:hover .anime-btn__path path {
+    stroke: white;
+    animation: btn-path 1.5s linear infinite;
+}
+
+/* Outline glow */
+.anime-btn__outline {
+    position: absolute;
+    inset: 0;
+    border: 2px solid rgba(139, 92, 246, 0.3);
+    border-radius: 22px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.anime-btn:hover .anime-btn__outline {
+    border-color: rgba(139, 92, 246, 0.8);
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.3), inset 0 0 20px rgba(139, 92, 246, 0.1);
+}
+
+/* Content */
+.anime-btn__content {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    overflow: hidden;
+}
+
+/* Character animation */
+.anime-btn__chars {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    white-space: nowrap;
+}
+
+.anime-btn__chars span {
+    display: inline-block;
+    transition: transform 0.3s ease, opacity 0.3s ease, filter 0.3s ease;
+    transition-delay: calc(var(--i, 0) * 0.03s);
+}
+
+.anime-btn__chars--default span {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.anime-btn:hover .anime-btn__chars--default span {
+    transform: translateY(-70%);
+    opacity: 0;
+    filter: blur(3px);
+}
+
+.anime-btn__chars--hover {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.anime-btn__chars--hover span {
+    transform: translateY(50%);
+    opacity: 0;
+    filter: blur(20px);
+}
+
+.anime-btn:hover .anime-btn__chars--hover span {
+    transform: translateY(0);
+    opacity: 1;
+    filter: blur(0);
+    transition-delay: calc(var(--i, 0) * 0.04s + 0.1s);
+}
+
+/* Icon inside button */
+.anime-btn__icon {
+    display: inline-flex;
+    align-items: center;
+    margin-right: 6px;
+    font-size: 1.2em;
+}
+
+/* Arrow */
+.anime-btn__arrow {
+    position: relative;
+    width: 16px;
+    height: 16px;
+    margin-left: 8px;
+    display: none;
+}
+
+.anime-btn:hover .anime-btn__arrow {
+    display: block;
+}
+
+.anime-btn__arrow div {
+    width: 100%;
+    height: 2px;
+    background: white;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    animation: btn-swingArrow 1s ease-in-out infinite;
+}
+
+.anime-btn__arrow div::before,
+.anime-btn__arrow div::after {
+    content: '';
+    position: absolute;
+    right: -1px;
+    width: 8px;
+    height: 2px;
+    background: white;
+    transform-origin: right center;
+}
+
+.anime-btn__arrow div::before {
+    transform: rotate(40deg);
+}
+
+.anime-btn__arrow div::after {
+    transform: rotate(-40deg);
+}
+
+/* ─── Keyframes ─────────────────────── */
+@keyframes btn-splash {
+    to {
+        stroke-dasharray: 2 60;
+        stroke-dashoffset: -60;
+    }
+}
+
+@keyframes btn-path {
+    from {
+        stroke: white;
+    }
+
+    to {
+        stroke-dashoffset: -480;
+        stroke: #c084fc;
+    }
+}
+
+@keyframes btn-swingArrow {
+    50% {
+        transform: translateX(5px) translateY(-50%) scale(0.9);
+    }
+}

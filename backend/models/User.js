@@ -46,7 +46,24 @@ const userSchema = new mongoose.Schema({
         default: true
     }
 }, {
-    timestamps: true
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
+});
+
+// Virtual: loyalty badge based on account age
+userSchema.virtual('loyaltyBadge').get(function () {
+    if (!this.createdAt) return { tier: 'Genin', label: 'Beginner', emoji: '🌱' };
+    const now = new Date();
+    const created = new Date(this.createdAt);
+    const daysDiff = Math.floor((now - created) / (1000 * 60 * 60 * 24));
+
+    if (daysDiff >= 365) return { tier: 'Hokage', label: 'Legendary', emoji: '🏆' };
+    if (daysDiff >= 180) return { tier: 'Kage', label: 'Extreme Loyal', emoji: '👑' };
+    if (daysDiff >= 90) return { tier: 'ANBU', label: 'Super Loyal', emoji: '🗡️' };
+    if (daysDiff >= 30) return { tier: 'Jonin', label: 'Loyal', emoji: '🔥' };
+    if (daysDiff >= 7) return { tier: 'Chunin', label: 'Intermediate', emoji: '⚡' };
+    return { tier: 'Genin', label: 'Beginner', emoji: '🌱' };
 });
 
 // Hash password before saving
