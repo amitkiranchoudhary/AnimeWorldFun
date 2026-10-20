@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, useSyncExternalStore } from "react";
+import { Suspense, useState, useSyncExternalStore } from "react";
 import { LogoMark } from "./Logo";
 import { STORAGE_KEY, TOGGLE_EVENT } from "./StrawHatCursor";
 
@@ -49,11 +49,40 @@ function CursorToggle() {
   );
 }
 
-export default function Navbar() {
-  const pathname = usePathname();
-  const [open, setOpen] = useState(false);
+type LinkStyle = (active: boolean) => string;
 
-  const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
+function NavLinks({ pathname, linkClass, onNavigate }: { pathname: string | null; linkClass: LinkStyle; onNavigate?: () => void }) {
+  const isActive = (href: string) =>
+    pathname !== null && (href === "/" ? pathname === "/" : pathname.startsWith(href));
+  return LINKS.map((l) => (
+    <li key={l.href}>
+      <Link href={l.href} onClick={onNavigate} className={linkClass(isActive(l.href))}>
+        {l.label}
+      </Link>
+    </li>
+  ));
+}
+
+// Reading the URL on dynamic routes has to stream in, so the links render
+// un-highlighted first (Suspense fallback) and light up once the path is known.
+function ActiveNavLinks(props: { linkClass: LinkStyle; onNavigate?: () => void }) {
+  return <NavLinks pathname={usePathname()} {...props} />;
+}
+
+function Links(props: { linkClass: LinkStyle; onNavigate?: () => void }) {
+  return (
+    <Suspense fallback={<NavLinks pathname={null} {...props} />}>
+      <ActiveNavLinks {...props} />
+    </Suspense>
+  );
+}
+
+const desktopLink: LinkStyle = (active) =>
+  `rounded-full px-4 py-2 text-sm font-bold transition ${active ? "bg-straw text-ink" : "text-text hover:bg-white/10"}`;
+const mobileLink: LinkStyle = (active) => `block rounded-lg px-3 py-3 font-bold ${active ? "text-straw" : "text-text"}`;
+
+export default function Navbar() {
+  const [open, setOpen] = useState(false);
 
   return (
     <header className="sticky top-0 z-50 border-b border-card-border bg-black/65 backdrop-blur-md">
@@ -63,18 +92,7 @@ export default function Navbar() {
         </Link>
 
         <ul className="hidden items-center gap-1 md:flex">
-          {LINKS.map((l) => (
-            <li key={l.href}>
-              <Link
-                href={l.href}
-                className={`rounded-full px-4 py-2 text-sm font-bold transition ${
-                  isActive(l.href) ? "bg-straw text-ink" : "text-text hover:bg-white/10"
-                }`}
-              >
-                {l.label}
-              </Link>
-            </li>
-          ))}
+          <Links linkClass={desktopLink} />
         </ul>
 
         <div className="flex items-center gap-2">
@@ -95,17 +113,7 @@ export default function Navbar() {
 
       {open && (
         <ul className="border-t border-card-border px-4 pb-4 md:hidden">
-          {LINKS.map((l) => (
-            <li key={l.href}>
-              <Link
-                href={l.href}
-                onClick={() => setOpen(false)}
-                className={`block rounded-lg px-3 py-3 font-bold ${isActive(l.href) ? "text-straw" : "text-text"}`}
-              >
-                {l.label}
-              </Link>
-            </li>
-          ))}
+          <Links linkClass={mobileLink} onNavigate={() => setOpen(false)} />
         </ul>
       )}
     </header>

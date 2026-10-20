@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { type AnimeCard, displayTitle } from "@/lib/anilist";
 
 export function AnimeRowSkeleton() {
@@ -24,8 +25,9 @@ export default function AnimeRow({ items }: { items: AnimeCard[] }) {
     <ul className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-4 [scrollbar-color:var(--straw)_transparent] [scrollbar-width:thin] sm:-mx-6 sm:px-6">
       {items.map((a, i) => (
         <li key={a.id} className="w-[160px] shrink-0 snap-start sm:w-[180px]">
-          <article
-            className="group relative overflow-hidden rounded-2xl border-2 border-ink shadow-[4px_4px_0_var(--ink)] transition duration-200 hover:-translate-y-1.5 hover:rotate-[-1deg]"
+          <Link
+            href={`/anime/${a.id}`}
+            className="group relative block overflow-hidden rounded-2xl border-2 border-ink shadow-[4px_4px_0_var(--ink)] transition duration-200 hover:-translate-y-1.5 hover:rotate-[-1deg] focus-visible:outline-2 focus-visible:outline-straw"
             style={{ background: a.coverImage.color ?? "#1d2c5e" }}
           >
             <div className="relative aspect-[2/3]">
@@ -61,7 +63,7 @@ export default function AnimeRow({ items }: { items: AnimeCard[] }) {
                 </span>
               ))}
             </div>
-          </article>
+          </Link>
         </li>
       ))}
     </ul>
