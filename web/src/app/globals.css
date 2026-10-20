@@ -1,0 +1,143 @@
+@import "tailwindcss";
+
+/* ── Grand Line palette ─────────────────────────────── */
+:root {
+  --sky-top: #0a1430;
+  --sky-mid: #1d2c5e;
+  --sky-low: #e0735a;
+  --sea-deep: #061224;
+  --sea: #0d2f57;
+  --sea-light: #1f5f8f;
+  --foam: #cfe8ff;
+
+  --straw: #f2c94c;
+  --straw-dark: #c9962a;
+  --sash: #e63946;
+  --gold: #ffc23d;
+  --parchment: #f6e7c8;
+  --parchment-dark: #d9c193;
+  --ink: #1b1410;
+
+  --text: #f4f1ea;
+  --text-muted: #b9c3d6;
+  --card: rgba(9, 20, 44, 0.72);
+  --card-border: rgba(242, 201, 76, 0.22);
+}
+
+@theme inline {
+  --color-sky-top: var(--sky-top);
+  --color-sea: var(--sea);
+  --color-sea-deep: var(--sea-deep);
+  --color-sea-light: var(--sea-light);
+  --color-foam: var(--foam);
+  --color-straw: var(--straw);
+  --color-straw-dark: var(--straw-dark);
+  --color-sash: var(--sash);
+  --color-gold: var(--gold);
+  --color-parchment: var(--parchment);
+  --color-parchment-dark: var(--parchment-dark);
+  --color-ink: var(--ink);
+  --color-text: var(--text);
+  --color-muted: var(--text-muted);
+  --color-card: var(--card);
+  --color-card-border: var(--card-border);
+  --font-display: var(--font-bangers);
+  --font-sans: var(--font-nunito);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--sea-deep);
+  color: var(--text);
+  font-family: var(--font-nunito), system-ui, sans-serif;
+}
+
+::selection {
+  background: var(--straw);
+  color: var(--ink);
+}
+
+/* Hide the system cursor only where our custom cursor is running */
+html.awf-cursor,
+html.awf-cursor * {
+  cursor: none !important;
+}
+
+/* ── Reusable bits ──────────────────────────────────── */
+.card {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 1.25rem;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.title-stroke {
+  font-family: var(--font-bangers);
+  letter-spacing: 0.04em;
+  color: var(--straw);
+  -webkit-text-stroke: 2px var(--ink);
+  paint-order: stroke fill;
+  text-shadow: 4px 4px 0 var(--ink);
+}
+
+.parchment {
+  background:
+    radial-gradient(ellipse at 20% 10%, rgba(255, 255, 255, 0.35), transparent 50%),
+    radial-gradient(ellipse at 80% 90%, rgba(120, 80, 30, 0.25), transparent 55%),
+    var(--parchment);
+  color: var(--ink);
+}
+
+/* ── Background animations ──────────────────────────── */
+@keyframes wave-drift {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@keyframes cloud-drift {
+  from { transform: translateX(-30vw); }
+  to { transform: translateX(130vw); }
+}
+
+@keyframes ship-bob {
+  0%, 100% { transform: translateY(0) rotate(-1.5deg); }
+  50% { transform: translateY(-6px) rotate(1.5deg); }
+}
+
+@keyframes ship-sail {
+  from { left: -12%; }
+  to { left: 108%; }
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 1; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+/* ── Cursor animations ──────────────────────────────── */
+@keyframes hat-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes hat-hop {
+  0% { transform: translateY(0); }
+  40% { transform: translateY(-22px); }
+  100% { transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
