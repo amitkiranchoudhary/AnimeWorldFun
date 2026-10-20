@@ -56,10 +56,10 @@ export default function Navbar() {
   const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
 
   return (
-    <header className="sticky top-0 z-50 border-b border-card-border bg-sea-deep/70 backdrop-blur-md">
-      <nav className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
+    <header className="sticky top-0 z-50 border-b border-card-border bg-black/65 backdrop-blur-md">
+      <nav className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-1.5 sm:px-6">
         <Link href="/" className="shrink-0" aria-label="Anime World Fun home">
-          <LogoMark />
+          <LogoMark className="h-16 w-auto transition hover:scale-105" />
         </Link>
 
         <ul className="hidden items-center gap-1 md:flex">

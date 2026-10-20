@@ -99,64 +99,38 @@ export default function StrawHatCursor() {
       className="awf-cursor-root pointer-events-none fixed left-0 top-0 z-[9999] opacity-0 transition-opacity duration-150"
       aria-hidden
     >
-      {/* Offset so the fingertip (not the hand's corner) is the hotspot */}
-      <div className="relative" style={{ transform: "translate(-12px, -1px)" }}>
-        {/* Hat sitting on the fingertip, tilted to read as a spinning disc */}
-        <div ref={hopRef} className="absolute" style={{ left: -9, top: -22 }}>
-          <div style={{ transform: "perspective(120px) rotateX(64deg)" }}>
-            <svg
-              className="awf-hat"
-              viewBox="0 0 40 40"
-              width="40"
-              height="40"
-              style={{ animation: "hat-spin 0.9s linear infinite" }}
-            >
-              <defs>
-                <radialGradient id="awf-brim" cx="50%" cy="50%" r="50%">
-                  <stop offset="55%" stopColor="#f6d264" />
-                  <stop offset="100%" stopColor="#c9962a" />
-                </radialGradient>
-              </defs>
-              <circle cx="20" cy="20" r="19" fill="url(#awf-brim)" stroke="#7a5414" strokeWidth="1" />
-              {/* straw weave spokes make the spin visible */}
-              {Array.from({ length: 12 }, (_, i) => (
-                <line
-                  key={i}
-                  x1="20"
-                  y1="8"
-                  x2="20"
-                  y2="1.5"
-                  stroke="#a8781e"
-                  strokeWidth="1"
-                  transform={`rotate(${i * 30} 20 20)`}
-                />
-              ))}
-              <circle cx="20" cy="20" r="11.5" fill="#e63946" />
-              <circle cx="20" cy="20" r="9" fill="#f2c94c" />
-              <circle cx="16.5" cy="16.5" r="3" fill="#fff4c2" opacity="0.8" />
-              {/* a frayed straw on the brim */}
-              <path d="M36 14 L 39.5 12.5" stroke="#7a5414" strokeWidth="1.2" strokeLinecap="round" />
-            </svg>
-          </div>
+      {/* Offset so the fingertip (not the image corner) is the hotspot */}
+      <div className="relative" style={{ transform: "translate(-2px, -2px)" }}>
+        {/* Straw hat (cut from the logo) spinning on the fingertip */}
+        <div ref={hopRef} className="absolute" style={{ left: -16, top: -24, perspective: 140 }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/images/straw-hat.png"
+            alt=""
+            width={38}
+            height={28}
+            className="awf-hat block drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)]"
+            style={{ animation: "hat-spin 1s linear infinite" }}
+            draggable={false}
+          />
         </div>
 
-        {/* Pointing hand */}
-        <svg className="awf-finger" viewBox="0 0 26 34" width="26" height="34">
-          <path
-            d="M9.5 2.5c0-1.4 1.1-2.3 2.3-2.3s2.3.9 2.3 2.3v10.2c.3-.9 1.2-1.5 2.2-1.5 1.3 0 2.2 1 2.2 2.3v.6c.4-.7 1.1-1.1 2-1.1 1.2 0 2.1 1 2.1 2.2v1c.4-.5 1-.8 1.7-.8 1.1 0 1.9.9 1.9 2v6.8c0 5.6-4.1 9.6-9.6 9.6h-1.2c-3.1 0-5.6-1.3-7.4-3.7L1.3 21.4c-.8-1-.6-2.4.4-3.1 1-.7 2.3-.5 3.1.4l2.6 3V2.5z"
-            fill="#fff2df"
-            stroke="#1b1410"
-            strokeWidth="1.6"
-            strokeLinejoin="round"
-          />
-          <path d="M14.1 13v5M18.5 14v4.4M22.6 15.6v3.4" stroke="#1b1410" strokeWidth="1.2" strokeLinecap="round" />
-        </svg>
+        {/* Saitama-glove pointing finger from the old site */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/images/glove-cursor.png"
+          alt=""
+          width={44}
+          height={45}
+          className="awf-finger block drop-shadow-[2px_3px_2px_rgba(0,0,0,0.45)]"
+          draggable={false}
+        />
       </div>
 
       <style>{`
-        .awf-cursor-root .awf-finger { transition: transform .15s ease; transform-origin: 12px 2px; }
+        .awf-cursor-root .awf-finger { transition: transform .15s ease; transform-origin: 2px 2px; }
         .awf-cursor-root[data-hover="1"] .awf-finger { transform: scale(1.12) rotate(-6deg); }
-        .awf-cursor-root[data-hover="1"] .awf-hat { animation-duration: .35s !important; }
+        .awf-cursor-root[data-hover="1"] .awf-hat { animation-duration: .4s !important; }
       `}</style>
     </div>
   );

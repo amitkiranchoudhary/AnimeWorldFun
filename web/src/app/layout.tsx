@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Bangers, Nunito } from "next/font/google";
 import "./globals.css";
-import OceanBackground from "@/components/OceanBackground";
+import SiteBackground from "@/components/SiteBackground";
 import StrawHatCursor from "@/components/StrawHatCursor";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -30,7 +30,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${bangers.variable} ${nunito.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
-        <OceanBackground />
+        <SiteBackground />
         <StrawHatCursor />
         <Navbar />
         <main className="flex-1">{children}</main>

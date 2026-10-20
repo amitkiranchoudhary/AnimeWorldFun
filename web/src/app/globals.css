@@ -20,7 +20,7 @@
 
   --text: #f4f1ea;
   --text-muted: #b9c3d6;
-  --card: rgba(9, 20, 44, 0.72);
+  --card: rgba(16, 16, 22, 0.78);
   --card-border: rgba(242, 201, 76, 0.22);
 }
 
@@ -50,7 +50,7 @@ html {
 }
 
 body {
-  background: var(--sea-deep);
+  background: #121212;
   color: var(--text);
   font-family: var(--font-nunito), system-ui, sans-serif;
 }
@@ -93,29 +93,9 @@ html.awf-cursor * {
 }
 
 /* ── Background animations ──────────────────────────── */
-@keyframes wave-drift {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
-}
-
-@keyframes cloud-drift {
-  from { transform: translateX(-30vw); }
-  to { transform: translateX(130vw); }
-}
-
-@keyframes ship-bob {
-  0%, 100% { transform: translateY(0) rotate(-1.5deg); }
-  50% { transform: translateY(-6px) rotate(1.5deg); }
-}
-
-@keyframes ship-sail {
-  from { left: -12%; }
-  to { left: 108%; }
-}
-
-@keyframes twinkle {
-  0%, 100% { opacity: 0.2; }
-  50% { opacity: 1; }
+@keyframes bg-drift {
+  from { transform: scale(1) translate(0, 0); }
+  to { transform: scale(1.06) translate(-2%, -1.5%); }
 }
 
 @keyframes float {
@@ -123,9 +103,14 @@ html.awf-cursor * {
   50% { transform: translateY(-12px); }
 }
 
+@keyframes compass-wobble {
+  0%, 100% { transform: rotate(-8deg); }
+  50% { transform: rotate(8deg); }
+}
+
 /* ── Cursor animations ──────────────────────────────── */
 @keyframes hat-spin {
-  to { transform: rotate(360deg); }
+  to { transform: rotateY(360deg); }
 }
 
 @keyframes hat-hop {

@@ -1,14 +1,15 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
-import { LogoHero } from "@/components/Logo";
-import Mascot from "@/components/Mascot";
+import heroBanner from "../../public/images/hero-landing.png";
+import compass from "../../public/images/compass.png";
 import AnimeRow, { AnimeRowSkeleton } from "@/components/AnimeRow";
 import WhereToWatchDemo from "@/components/WhereToWatchDemo";
 import { getAllTimeGreats, getTrending } from "@/lib/anilist";
 
 const FEATURES = [
   {
-    icon: "🧭",
+    icon: "compass",
     title: "Explore every anime",
     body: "Thousands of titles you can filter by A–Z, genre, sub or dub, language, platform, year and more.",
     href: "/explore",
@@ -65,18 +66,39 @@ function SectionHeading({ kicker, title, href, cta }: { kicker: string; title: s
 
 export default function Home() {
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6">
-      {/* ── Hero ── */}
-      <section className="grid items-center gap-10 pb-16 pt-20 sm:pt-24 lg:grid-cols-[1.25fr_1fr]">
-        <div>
-          <LogoHero />
-          <p className="mt-8 max-w-xl text-lg leading-relaxed text-text/90 sm:text-xl">
-            Set sail for your next anime. Find <strong className="text-straw">where to watch it</strong>,{" "}
-            <strong className="text-straw">in which language</strong>, keep track of every episode — and read tales
-            from the crew.
+    <>
+      {/* ── Hero: the original banner, full width ── */}
+      <section className="relative">
+        <div
+          className="relative h-[clamp(300px,46vw,620px)] w-full overflow-hidden"
+          style={{
+            maskImage: "linear-gradient(to bottom, #000 60%, transparent 100%)",
+            WebkitMaskImage: "linear-gradient(to bottom, #000 60%, transparent 100%)",
+          }}
+        >
+          <Image
+            src={heroBanner}
+            alt="Anime World Fun — heroes from Naruto, Dragon Ball, One Piece, Jujutsu Kaisen and more"
+            fill
+            priority
+            sizes="100vw"
+            quality={90}
+            className="object-cover object-center"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/50" />
+        </div>
+
+        <div className="relative z-10 mx-auto -mt-16 max-w-3xl px-4 text-center sm:-mt-24">
+          <p className="text-lg font-semibold leading-relaxed text-text/95 [text-shadow:0_2px_8px_#000] sm:text-xl">
+            Find <strong className="text-straw">where to watch</strong> any anime,{" "}
+            <strong className="text-straw">in which language</strong>, track every episode — and read tales from the
+            crew.
           </p>
 
-          <form action="/explore" className="mt-8 flex max-w-xl overflow-hidden rounded-2xl border-2 border-ink bg-parchment shadow-[5px_5px_0_var(--ink)]">
+          <form
+            action="/explore"
+            className="mx-auto mt-6 flex max-w-2xl overflow-hidden rounded-2xl border-2 border-ink bg-parchment shadow-[5px_5px_0_var(--ink)]"
+          >
             <label htmlFor="hero-search" className="sr-only">Search anime</label>
             <input
               id="hero-search"
@@ -89,24 +111,18 @@ export default function Home() {
             </button>
           </form>
 
-          <div className="mt-6 flex flex-wrap gap-3">
+          <div className="mt-6 flex flex-wrap justify-center gap-3">
             <Link href="/explore" className="rounded-full bg-straw px-6 py-3 font-extrabold text-ink shadow-[4px_4px_0_var(--ink)] transition hover:-translate-y-0.5">
               Explore the database
             </Link>
-            <Link href="/my-list" className="rounded-full border-2 border-straw px-6 py-3 font-extrabold text-straw transition hover:bg-straw/10">
+            <Link href="/my-list" className="rounded-full border-2 border-straw bg-black/40 px-6 py-3 font-extrabold text-straw transition hover:bg-straw/10">
               Start my watchlist
             </Link>
           </div>
         </div>
-
-        <div className="relative mx-auto w-full max-w-[380px]">
-          <div className="parchment absolute -top-6 right-0 z-10 rounded-2xl border-2 border-ink px-4 py-2 text-sm font-extrabold shadow-[3px_3px_0_var(--ink)] sm:-right-4">
-            Ahoy! What are we watching today?
-            <span className="absolute -bottom-2.5 left-10 h-4 w-4 rotate-45 border-b-2 border-r-2 border-ink bg-parchment" />
-          </div>
-          <Mascot className="aspect-[260/300] w-full" />
-        </div>
       </section>
+
+    <div className="mx-auto max-w-7xl px-4 pt-8 sm:px-6">
 
       {/* ── Trending ── */}
       <section className="py-10">
@@ -131,7 +147,11 @@ export default function Home() {
               href={f.href}
               className="card group p-6 transition hover:-translate-y-1 hover:border-straw/60"
             >
-              <span className="text-4xl" aria-hidden>{f.icon}</span>
+              {f.icon === "compass" ? (
+                <Image src={compass} alt="" className="h-11 w-auto transition group-hover:rotate-12" />
+              ) : (
+                <span className="text-4xl" aria-hidden>{f.icon}</span>
+              )}
               <h3 className="mt-3 font-display text-2xl tracking-wide text-straw">{f.title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-muted">{f.body}</p>
             </Link>
@@ -180,5 +200,6 @@ export default function Home() {
         </div>
       </section>
     </div>
+    </>
   );
 }

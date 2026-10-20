@@ -29,10 +29,10 @@ const COLUMNS = [
 
 export default function Footer() {
   return (
-    <footer className="relative mt-24 border-t border-card-border bg-sea-deep/85 backdrop-blur-md">
+    <footer className="relative mt-24 border-t border-card-border bg-black/80 backdrop-blur-md">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-[2fr_1fr_1fr]">
         <div>
-          <LogoMark />
+          <LogoMark className="h-28 w-auto" />
           <p className="mt-4 max-w-sm text-sm leading-relaxed text-muted">
             A fan-made harbour for anime lovers: find where to watch, in which language, track what you&apos;ve seen,
             and read stories from the crew.
