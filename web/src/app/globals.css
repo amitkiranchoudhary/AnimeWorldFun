@@ -110,7 +110,7 @@ html.awf-cursor * {
 
 /* ── Cursor animations ──────────────────────────────── */
 @keyframes hat-spin {
-  to { transform: rotateY(360deg); }
+  to { transform: rotate(360deg); }
 }
 
 @keyframes hat-hop {

@@ -100,37 +100,37 @@ export default function StrawHatCursor() {
       aria-hidden
     >
       {/* Offset so the fingertip (not the image corner) is the hotspot */}
-      <div className="relative" style={{ transform: "translate(-2px, -2px)" }}>
-        {/* Straw hat (cut from the logo) spinning on the fingertip */}
-        <div ref={hopRef} className="absolute" style={{ left: -16, top: -24, perspective: 140 }}>
+      <div className="awf-finger relative" style={{ transform: "translate(-9px, 0)" }}>
+        {/* Luffy-style: the hat lies flat on the fingertip and spins like a plate */}
+        <div ref={hopRef} className="absolute" style={{ left: -15, top: -43 }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/images/straw-hat.png"
+            src="/images/cursor-hat.png"
             alt=""
-            width={38}
-            height={28}
-            className="awf-hat block drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)]"
-            style={{ animation: "hat-spin 1s linear infinite" }}
+            width={48}
+            height={48}
+            className="awf-hat block drop-shadow-[0_3px_3px_rgba(0,0,0,0.55)]"
+            style={{ animation: "hat-spin .8s linear infinite" }}
             draggable={false}
           />
         </div>
 
-        {/* Saitama-glove pointing finger from the old site */}
+        {/* Pointing hand, index finger straight up */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/images/glove-cursor.png"
+          src="/images/cursor-hand.png"
           alt=""
-          width={44}
-          height={45}
-          className="awf-finger block drop-shadow-[2px_3px_2px_rgba(0,0,0,0.45)]"
+          width={38}
+          height={63}
+          className="block drop-shadow-[2px_3px_2px_rgba(0,0,0,0.5)]"
           draggable={false}
         />
       </div>
 
       <style>{`
-        .awf-cursor-root .awf-finger { transition: transform .15s ease; transform-origin: 2px 2px; }
-        .awf-cursor-root[data-hover="1"] .awf-finger { transform: scale(1.12) rotate(-6deg); }
-        .awf-cursor-root[data-hover="1"] .awf-hat { animation-duration: .4s !important; }
+        .awf-cursor-root .awf-finger { transition: scale .15s ease; transform-origin: 9px 0; }
+        .awf-cursor-root[data-hover="1"] .awf-finger { scale: 1.12; }
+        .awf-cursor-root[data-hover="1"] .awf-hat { animation-duration: .35s !important; }
       `}</style>
     </div>
   );
