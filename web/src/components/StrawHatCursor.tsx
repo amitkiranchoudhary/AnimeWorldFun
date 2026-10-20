@@ -102,7 +102,7 @@ export default function StrawHatCursor() {
       {/* Offset so the fingertip (not the image corner) is the hotspot */}
       <div className="awf-finger relative" style={{ transform: "translate(-7px, 0)" }}>
         {/* Luffy-style: the hat balances on the fingertip and flips over and over */}
-        <div ref={hopRef} className="absolute" style={{ left: -11, top: -32, perspective: 120 }}>
+        <div ref={hopRef} className="absolute" style={{ left: -11, top: -38, perspective: 120 }}>
           {/* speed lines either side of the flipping hat */}
           <svg
             className="awf-streaks absolute"

@@ -79,12 +79,6 @@ export default function Navbar() {
 
         <div className="flex items-center gap-2">
           <CursorToggle />
-          <Link
-            href="/login"
-            className="hidden rounded-full bg-sash px-4 py-2 text-sm font-extrabold text-white shadow-[3px_3px_0_var(--ink)] transition hover:-translate-y-0.5 sm:inline-block"
-          >
-            Join the Crew
-          </Link>
           <button
             type="button"
             className="rounded-lg p-2 text-text md:hidden"
@@ -101,7 +95,7 @@ export default function Navbar() {
 
       {open && (
         <ul className="border-t border-card-border px-4 pb-4 md:hidden">
-          {[...LINKS, { href: "/login", label: "Join the Crew" }].map((l) => (
+          {LINKS.map((l) => (
             <li key={l.href}>
               <Link
                 href={l.href}

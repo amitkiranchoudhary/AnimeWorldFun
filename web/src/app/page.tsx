@@ -190,12 +190,12 @@ export default function Home() {
       {/* ── Join ── */}
       <section className="py-10">
         <div className="card flex flex-col items-center gap-5 px-6 py-12 text-center">
-          <h2 className="title-stroke text-4xl sm:text-6xl">Join the crew — it&apos;s free</h2>
+          <h2 className="title-stroke text-4xl sm:text-6xl">Free for every fan, forever</h2>
           <p className="max-w-lg text-muted">
-            Save your watchlist, get dub alerts and comment on blogs. No subscriptions, no treasure required.
+            No subscriptions, no treasure required. Watchlists, dub alerts and comments are on their way.
           </p>
-          <Link href="/login" className="rounded-full bg-sash px-8 py-3.5 font-display text-2xl tracking-wider text-white shadow-[4px_4px_0_var(--ink)] transition hover:-translate-y-0.5">
-            Hop aboard
+          <Link href="/explore" className="rounded-full bg-sash px-8 py-3.5 font-display text-2xl tracking-wider text-white shadow-[4px_4px_0_var(--ink)] transition hover:-translate-y-0.5">
+            Start exploring
           </Link>
         </div>
       </section>

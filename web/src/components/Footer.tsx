@@ -61,7 +61,10 @@ export default function Footer() {
         ))}
       </div>
       <div className="border-t border-card-border py-5 text-center text-xs text-muted">
-        © <Year /> Anime World Fun · Made with 🍖 by a fan, for fans
+        © <Year /> Anime World Fun · Made with 🍖 by a fan, for fans ·{" "}
+        <Link href="/login" className="underline-offset-2 hover:text-text hover:underline">
+          Captain&apos;s login
+        </Link>
       </div>
     </footer>
   );

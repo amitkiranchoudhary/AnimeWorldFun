@@ -5,6 +5,7 @@ import SiteBackground from "@/components/SiteBackground";
 import StrawHatCursor from "@/components/StrawHatCursor";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { SITE_URL } from "@/lib/site";
 
 const bangers = Bangers({
   variable: "--font-bangers",
@@ -18,6 +19,13 @@ const nunito = Nunito({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
+  openGraph: {
+    siteName: "Anime World Fun",
+    type: "website",
+    images: [{ url: "/images/hero-landing.png", width: 1024, height: 434 }],
+  },
+  twitter: { card: "summary_large_image" },
   title: {
     default: "Anime World Fun — find, track & read about anime",
     template: "%s · Anime World Fun",
