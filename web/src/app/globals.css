@@ -109,8 +109,13 @@ html.awf-cursor * {
 }
 
 /* ── Cursor animations ──────────────────────────────── */
-@keyframes hat-spin {
-  to { transform: rotate(360deg); }
+@keyframes hat-flip {
+  to { transform: rotateY(360deg); }
+}
+
+@keyframes hat-streak {
+  from { opacity: 0.15; }
+  to { opacity: 0.9; }
 }
 
 @keyframes hat-hop {

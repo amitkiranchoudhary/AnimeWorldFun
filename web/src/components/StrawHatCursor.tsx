@@ -100,17 +100,30 @@ export default function StrawHatCursor() {
       aria-hidden
     >
       {/* Offset so the fingertip (not the image corner) is the hotspot */}
-      <div className="awf-finger relative" style={{ transform: "translate(-9px, 0)" }}>
-        {/* Luffy-style: the hat lies flat on the fingertip and spins like a plate */}
-        <div ref={hopRef} className="absolute" style={{ left: -15, top: -43 }}>
+      <div className="awf-finger relative" style={{ transform: "translate(-7px, 0)" }}>
+        {/* Luffy-style: the hat balances on the fingertip and flips over and over */}
+        <div ref={hopRef} className="absolute" style={{ left: -11, top: -32, perspective: 120 }}>
+          {/* speed lines either side of the flipping hat */}
+          <svg
+            className="awf-streaks absolute"
+            viewBox="0 0 56 40"
+            width={56}
+            height={40}
+            style={{ left: -10, top: -2 }}
+          >
+            <path d="M8 6 Q 0 20 8 34" />
+            <path d="M3 12 Q -1 20 3 28" />
+            <path d="M48 6 Q 56 20 48 34" />
+            <path d="M53 12 Q 57 20 53 28" />
+          </svg>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/images/cursor-hat.png"
             alt=""
-            width={48}
-            height={48}
-            className="awf-hat block drop-shadow-[0_3px_3px_rgba(0,0,0,0.55)]"
-            style={{ animation: "hat-spin .8s linear infinite" }}
+            width={36}
+            height={36}
+            className="awf-hat relative block drop-shadow-[0_3px_3px_rgba(0,0,0,0.55)]"
+            style={{ animation: "hat-flip .8s linear infinite" }}
             draggable={false}
           />
         </div>
@@ -120,17 +133,23 @@ export default function StrawHatCursor() {
         <img
           src="/images/cursor-hand.png"
           alt=""
-          width={38}
-          height={63}
+          width={28}
+          height={47}
           className="block drop-shadow-[2px_3px_2px_rgba(0,0,0,0.5)]"
           draggable={false}
         />
       </div>
 
       <style>{`
-        .awf-cursor-root .awf-finger { transition: scale .15s ease; transform-origin: 9px 0; }
+        .awf-cursor-root .awf-finger { transition: scale .15s ease; transform-origin: 7px 0; }
         .awf-cursor-root[data-hover="1"] .awf-finger { scale: 1.12; }
         .awf-cursor-root[data-hover="1"] .awf-hat { animation-duration: .35s !important; }
+        .awf-cursor-root .awf-streaks path {
+          fill: none; stroke: #fff; stroke-width: 1.6; stroke-linecap: round;
+          animation: hat-streak .4s ease-in-out infinite alternate;
+        }
+        .awf-cursor-root .awf-streaks path:nth-child(even) { animation-delay: .2s; }
+        .awf-cursor-root[data-hover="1"] .awf-streaks path { animation-duration: .18s; }
       `}</style>
     </div>
   );
