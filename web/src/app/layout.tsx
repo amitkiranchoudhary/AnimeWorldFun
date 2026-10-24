@@ -5,6 +5,8 @@ import SiteBackground from "@/components/SiteBackground";
 import StrawHatCursor from "@/components/StrawHatCursor";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import AmbientSky from "@/components/ambient/AmbientSky";
+import SmoothScroll from "@/components/motion/SmoothScroll";
 import { SITE_URL } from "@/lib/site";
 
 const bangers = Bangers({
@@ -38,11 +40,18 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${bangers.variable} ${nunito.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
+        {/* without JavaScript, scroll reveals would stay hidden — show everything */}
+        <noscript>
+          <style>{`.reveal,.split-piece{opacity:1!important;transform:none!important;filter:none!important}`}</style>
+        </noscript>
         <SiteBackground />
+        <AmbientSky />
+        <SmoothScroll />
         <StrawHatCursor />
         <Navbar />
         <main className="flex-1">{children}</main>
         <Footer />
+        <div className="film-grain" aria-hidden />
       </body>
     </html>
   );
