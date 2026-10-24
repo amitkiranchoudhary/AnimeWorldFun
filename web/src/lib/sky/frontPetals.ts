@@ -1,11 +1,9 @@
-import { createHangingBlossoms } from "./hangingBlossoms";
 import { createPaintedCanopy, loadCanopyImage } from "./paintedCanopy";
 import type { Wind } from "./wind";
 
-// The front 2D layer, over the page content: cherry blossom branches hanging
-// into the top of the page, and sakura petals falling over and between the tiles.
-// The branches are the hand-painted artwork (see paintedCanopy.ts) when it's in
-// /public/images, otherwise the code-drawn branches (hangingBlossoms.ts).
+// The front 2D layer, over the page content: a painted cherry blossom canopy
+// along the top of the page (paintedCanopy.ts), and sakura petals falling over
+// and between the tiles.
 //
 // Petals fall the way real ones do (a falling-leaf motion): each rocks side to
 // side like a pendulum, dropping fastest mid-swing and almost hanging at each
@@ -75,15 +73,14 @@ function paintPetal(stops: string[], dpr: number) {
 export function startFrontPetals(canvas: HTMLCanvasElement, count: number, wind: Wind) {
   const g = canvas.getContext("2d");
   if (!g) return { update() {}, resize() {}, dispose() {}, blossomSpot: () => null };
-  // code-drawn branches first; swapped for the painted artwork as soon as it loads
-  type Branches = { resize(w: number, h: number, dpr: number): void; draw(g: CanvasRenderingContext2D, t: number): void; spot(rand: () => number): { x: number; y: number } | null };
-  let blossoms: Branches = createHangingBlossoms(wind);
+  // the canopy painted in code, swapped for a dropped-in painting if there is one
+  let blossoms = createPaintedCanopy(null, wind);
   let disposed = false;
   loadCanopyImage().then((img) => {
     if (!img || disposed) return;
     const art = createPaintedCanopy(img, wind);
-    art.resize(w, h);
-    blossoms = { resize: (W, H) => art.resize(W, H), draw: art.draw, spot: art.spot };
+    art.resize(w, h, dpr);
+    blossoms = art;
   });
 
   let w = 0;
