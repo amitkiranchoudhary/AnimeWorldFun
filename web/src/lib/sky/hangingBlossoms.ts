@@ -29,7 +29,18 @@ type Spray = {
   flowers: Pt[];
 };
 
-type Corner = { wood: HTMLCanvasElement; width: number; height: number; sprays: Spray[] };
+type Corner = {
+  /** the in-focus limbs */
+  wood: HTMLCanvasElement;
+  /** a blurred, dimmed branch (with its blossom) behind, for depth */
+  back: HTMLCanvasElement;
+  /** both images extend this far past the corner (local px) */
+  pad: Pt;
+  W: number;
+  H: number;
+  height: number;
+  sprays: Spray[];
+};
 
 function rng(seed: number) {
   let s = seed;
@@ -301,57 +312,103 @@ function paintSpray(attach: Pt, length: number, droop: number, S: number, dpr: n
 
 /* ── A whole corner ──────────────────────────────────────── */
 
-/** Painted as the LEFT corner; the right one is a different seed, drawn mirrored. */
+/**
+ * Grows one corner's tree like a real one: a thick limb forks into branches,
+ * those fork into thinner shoots, and the finest twigs end in blossom. Behind
+ * it, a second smaller branch is painted slightly blurred and dimmed, like the
+ * out-of-focus background in a photo, for depth.
+ * Painted as the LEFT corner; the right one is a different seed, drawn mirrored.
+ */
 function paintCorner(w: number, h: number, side: -1 | 1, seed: number, dpr: number): Corner {
   const rand = rng(seed);
   const reach = w * (side < 0 ? 0.46 : 0.38);
   const height = Math.min(h * 0.42, reach * 0.75);
   const S = reach / 600; // design units → px
-  const width = reach * 1.15;
 
-  const wood = document.createElement("canvas");
-  wood.width = Math.ceil(width * dpr);
-  wood.height = Math.ceil(height * 1.4 * dpr);
-  const g = wood.getContext("2d")!;
-  g.scale(dpr, dpr);
+  // drawing area (local px), with room for wood that starts beyond the corner
+  const pad = { x: 70 * S, y: 50 * S };
+  const W = reach * 1.2 + pad.x;
+  const H = height * 1.45 + pad.y;
+  const canvasFor = () => {
+    const c = document.createElement("canvas");
+    c.width = Math.ceil(W * dpr);
+    c.height = Math.ceil(H * dpr);
+    const g = c.getContext("2d")!;
+    g.scale(dpr, dpr);
+    g.translate(pad.x, pad.y);
+    return { c, g };
+  };
 
-  // main limb sweeping in from beyond the corner and drooping at its tip,
-  // a thinner limb above it for depth, and a few side shoots
-  const main = makeLimb({ x: -40 * S, y: 8 * S }, { x: 280 * S, y: 34 * S }, { x: 600 * S, y: 172 * S }, 54 * S, 8 * S, 4 * S, rand);
-  const upper = makeLimb({ x: -30 * S, y: -14 * S }, { x: 200 * S, y: -14 * S }, { x: 430 * S, y: 38 * S }, 30 * S, 5 * S, 3 * S, rand);
-  const shoots: Limb[] = [];
-  for (const [l, t, dx, dy, w0] of [
-    [main, 0.42, 120, -30, 18],
-    [main, 0.62, 90, 70, 14],
-    [upper, 0.55, 110, 10, 12],
-  ] as const) {
-    const p = limbAt(l, t);
-    shoots.push(makeLimb(p, { x: p.x + dx * 0.5 * S, y: p.y + dy * 0.3 * S }, { x: p.x + dx * S, y: p.y + dy * S }, w0 * S, 2.5 * S, 2 * S, rand, 14));
-  }
-  for (const l of [upper, ...shoots, main]) drawBark(g, l, rand);
-  for (const t of [0.42, 0.62]) drawKnot(g, limbAt(main, t), 10 * S);
-
-  // sprays hanging from every limb, plus small sprigs sitting on the wood
-  const sprays: Spray[] = [];
-  const hang = (l: Limb, from: number, to: number, count: number, len: [number, number]) => {
-    for (let i = 0; i < count; i++) {
-      const t = from + ((to - from) * (i + rand() * 0.6)) / count;
+  /* grow the branch structure */
+  type Grown = { l: Limb; depth: number };
+  const grow = (out: Grown[], from: Pt, angle: number, length: number, width: number, depth: number, maxDepth: number, maxY: number) => {
+    // branches arc gently and sag a little under their own weight
+    const bend = (rand() - 0.5) * 0.45 + 0.12 * (1 + depth * 0.4);
+    const ctrl = { x: from.x + Math.cos(angle - bend * 0.3) * length * 0.5, y: from.y + Math.sin(angle - bend * 0.3) * length * 0.5 };
+    const tip = { x: from.x + Math.cos(angle + bend) * length, y: from.y + Math.sin(angle + bend) * length };
+    tip.y = Math.min(tip.y, maxY - rand() * 30 * S);
+    tip.x = Math.min(tip.x, reach * 1.15);
+    const l = makeLimb(from, ctrl, tip, width, Math.max(1.4 * S, width * 0.35), Math.max(0.6 * S, width * 0.09), rand, Math.max(8, Math.round(length / (14 * S))));
+    out.push({ l, depth });
+    if (depth >= maxDepth || width < 5 * S) return;
+    const kids = depth === 0 ? 4 : 2 + Math.floor(rand() * 2);
+    for (let k = 0; k < kids; k++) {
+      const t = 0.25 + (0.7 * (k + 0.3 + rand() * 0.5)) / kids;
       const p = limbAt(l, t);
-      const length = (len[0] + rand() * (len[1] - len[0])) * S;
-      const droop = 1.0 + rand() * 0.9; // radians below horizontal
-      // join on the underside of the limb so the flowers hang below the wood
-      sprays.push(paintSpray({ x: p.x, y: p.y + p.w * 0.4 }, length, droop, S, dpr, rand));
+      const along = Math.atan2(-p.nx, p.ny); // direction of the parent at this point
+      let a = along + (rand() < 0.55 ? 1 : -1) * (0.35 + rand() * 0.6);
+      a = Math.max(-0.75, Math.min(1.35, a)); // never straight up, rarely straight down
+      grow(out, p, a, length * (0.42 + rand() * 0.25) * (1 - t * 0.25), p.w * (0.5 + rand() * 0.15), depth + 1, maxDepth, maxY);
     }
   };
-  hang(main, 0.15, 1, 10, [55, 150]);
-  hang(upper, 0.25, 1, 5, [40, 100]);
-  shoots.forEach((l) => hang(l, 0.3, 1, 2, [35, 80]));
-  for (let i = 0; i < 6; i++) {
-    const p = limbAt(main, 0.25 + i * 0.12);
-    sprays.push(paintSpray({ x: p.x, y: p.y - p.w * 0.2 }, 0, 0, S, dpr, rand, true));
-  }
 
-  return { wood, width, height, sprays };
+  /* blossom for a grown tree */
+  const blossom = (limbs: Grown[], sprays: Spray[], density: number) => {
+    for (const { l, depth } of limbs) {
+      if (depth === 0) continue;
+      const len = Math.hypot(l.pts[l.pts.length - 1].x - l.pts[0].x, l.pts[l.pts.length - 1].y - l.pts[0].y);
+      // like a real cherry, most flowers sit in clusters right along the wood…
+      const sitters = Math.round((len / (48 * S)) * density * (depth >= 2 ? 1 : 0.6));
+      // …with a few short bunches dangling from the finer twigs
+      const hangers = Math.round((len / (130 * S)) * density * (depth >= 2 ? 1 : 0.3));
+      for (let i = 0; i < hangers; i++) {
+        const p = limbAt(l, 0.4 + 0.6 * ((i + rand() * 0.7) / Math.max(1, hangers)));
+        const length = (18 + rand() * 38) * S;
+        sprays.push(paintSpray({ x: p.x, y: p.y + p.w * 0.4 }, length, 0.8 + rand() * 0.8, S, dpr, rand));
+      }
+      for (let i = 0; i < sitters; i++) {
+        const p = limbAt(l, 0.3 + 0.7 * rand());
+        sprays.push(paintSpray({ x: p.x, y: p.y - p.w * 0.25 }, 0, 0, S, dpr, rand, true));
+      }
+    }
+  };
+
+  /* the soft, out-of-focus branch behind */
+  const backLimbs: Grown[] = [];
+  grow(backLimbs, { x: 60 * S, y: -40 * S }, 0.45, 330 * S, 22 * S, 0, 3, height * 0.85);
+  const backSprays: Spray[] = [];
+  blossom(backLimbs, backSprays, 0.8);
+  const sharpBack = canvasFor();
+  backLimbs.sort((a, b) => b.depth - a.depth).forEach(({ l }) => drawBark(sharpBack.g, l, rand));
+  for (const sp of backSprays) sharpBack.g.drawImage(sp.img, sp.attach.x - sp.pivot.x, sp.attach.y - sp.pivot.y, sp.w, sp.h);
+  const back = document.createElement("canvas");
+  back.width = sharpBack.c.width;
+  back.height = sharpBack.c.height;
+  const bg = back.getContext("2d")!;
+  bg.filter = `blur(${(2.2 * S * dpr).toFixed(1)}px) brightness(0.78) saturate(0.8)`;
+  bg.drawImage(sharpBack.c, 0, 0);
+
+  /* the main tree, in focus */
+  const limbs: Grown[] = [];
+  grow(limbs, { x: -50 * S, y: 10 * S }, 0.08, 640 * S, 58 * S, 0, 4, height * 0.78);
+  const sprays: Spray[] = [];
+  blossom(limbs, sprays, 1);
+  const wood = canvasFor();
+  // thin first, so every limb covers the base of the shoots growing out of it
+  limbs.sort((a, b) => b.depth - a.depth).forEach(({ l }) => drawBark(wood.g, l, rand));
+  limbs.filter((g) => g.depth === 1).forEach(({ l }) => drawKnot(wood.g, l.pts[0], l.widths[0] * 0.45));
+
+  return { wood: wood.c, back, pad, W, H, height, sprays };
 }
 
 /* ── Animation ───────────────────────────────────────────── */
@@ -389,7 +446,12 @@ export function createHangingBlossoms(wind: Wind) {
         // the whole limb gives a little under the wind (its tip dips), and tips up as it lifts away
         const bend = (0.006 + 0.018 * s) * (0.7 + 0.3 * Math.sin(t * 0.8 + phase));
         g.rotate(bend - ease() * 0.08);
-        g.drawImage(c.wood, 0, 0, c.width, c.height * 1.4);
+        // the far branch sways a touch more slowly, then the near limbs on top
+        g.save();
+        g.rotate(Math.sin(t * 0.55 + phase) * 0.008 * (0.5 + s));
+        g.drawImage(c.back, -c.pad.x, -c.pad.y, c.W, c.H);
+        g.restore();
+        g.drawImage(c.wood, -c.pad.x, -c.pad.y, c.W, c.H);
 
         for (const sp of c.sprays) {
           // swing from the joint: pushed downwind by the gust, rocking back and forth,
