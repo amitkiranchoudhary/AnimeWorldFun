@@ -1,8 +1,10 @@
-// Sakura petals drifting in FRONT of the page (over and between the tiles),
-// drawn on a lightweight 2D canvas. New petals fall from the cherry trees
-// (`source` gives a spot in a canopy, in screen pixels), then ride a gentle
-// swirling wind inward, so they wander and loop instead of only falling, and
-// get pushed along when you scroll.
+import { createHangingBlossoms } from "./hangingBlossoms";
+
+// The front 2D layer, over the page content: cherry blossom branches hanging
+// into the top corners, and sakura petals drifting over and between the tiles.
+// New petals fall from the blossoms (or from the top edge once the branches
+// have scrolled away), then ride a gentle swirling wind, so they wander and
+// loop instead of only falling, and get pushed along when you scroll.
 
 type Petal = {
   x: number;
@@ -42,9 +44,10 @@ function drawPetal(g: CanvasRenderingContext2D, size: number, tint: string) {
   g.stroke();
 }
 
-export function startFrontPetals(canvas: HTMLCanvasElement, count: number, source?: () => { x: number; y: number }) {
+export function startFrontPetals(canvas: HTMLCanvasElement, count: number) {
   const g = canvas.getContext("2d");
-  if (!g) return { update() {}, resize() {}, dispose() {} };
+  if (!g) return { update() {}, resize() {}, dispose() {}, blossomSpot: () => null };
+  const blossoms = createHangingBlossoms();
 
   let w = 0;
   let h = 0;
@@ -55,6 +58,7 @@ export function startFrontPetals(canvas: HTMLCanvasElement, count: number, sourc
     h = window.innerHeight;
     canvas.width = w * dpr;
     canvas.height = h * dpr;
+    blossoms.resize(w, h, dpr);
   };
   resize();
 
@@ -72,9 +76,9 @@ export function startFrontPetals(canvas: HTMLCanvasElement, count: number, sourc
     tint: TINTS[Math.floor(Math.random() * TINTS.length)],
     ...p,
   });
-  // fall from a tree: start in a canopy and drift toward the middle of the screen
+  // fall from a blossom and drift toward the middle of the screen
   const fromTree = () => {
-    const at = source?.();
+    const at = blossoms.spot(Math.random);
     if (!at) return spawn({ y: -20, x: Math.random() * w });
     return spawn({ x: at.x, y: at.y, dir: at.x < w / 2 ? 1 : -1 });
   };
@@ -86,6 +90,7 @@ export function startFrontPetals(canvas: HTMLCanvasElement, count: number, sourc
     update(t: number, dt: number, wind: number) {
       g.setTransform(dpr, 0, 0, dpr, 0, 0);
       g.clearRect(0, 0, w, h);
+      blossoms.draw(g, t);
       for (const p of petals) {
         // a slow swirling wind field: petals drift sideways, curl and loop
         const swirlX = Math.sin(p.y * 0.006 + t * 0.4 + p.phase) * 38 + Math.cos(t * 0.17 + p.phase) * 18;
@@ -110,6 +115,8 @@ export function startFrontPetals(canvas: HTMLCanvasElement, count: number, sourc
         g.restore();
       }
     },
+    /** a blossom spot on screen (CSS px) for other petal layers, or null when scrolled away */
+    blossomSpot: (rand: () => number) => blossoms.spot(rand),
     dispose() {
       g.clearRect(0, 0, w, h);
     },

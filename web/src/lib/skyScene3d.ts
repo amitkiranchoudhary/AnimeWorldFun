@@ -2,13 +2,13 @@ import * as THREE from "three";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { startFrontPetals } from "./sky/frontPetals";
 import { buildLanterns } from "./sky/lanterns";
-import { buildSakuraTrees } from "./sky/sakuraTrees";
 import { outlineGeometry, rng, toonRamp } from "./sky/toon";
 
 // Background 3D layer for the Home page, drawn cel-shaded so it reads as anime:
 //  • the Flying Nimbus glides between the page's open spaces as you scroll
-//  • two cherry blossom trees at the screen edges shed sakura petals, which drift
-//    behind the page, plus a light layer of petals flowing in front of it
+//  • sakura petals drift behind the page; a light front layer adds cherry
+//    blossom branches hanging into the top corners (they shed the petals and
+//    lift away as you scroll) plus petals flowing over the tiles
 //  • box-shaped paper lanterns rise far back along the sides
 // The 3D canvas sits behind the page content, so posters and tiles cover it and
 // it only shows in the gaps. Loaded on demand by <SkyScene />.
@@ -272,22 +272,21 @@ export function startSkyScene(canvas: HTMLCanvasElement, frontCanvas?: HTMLCanva
   scene.add(petals.mesh);
   const lanterns = buildLanterns(phone ? 4 : 8);
   scene.add(lanterns.group);
-  const trees = buildSakuraTrees(ramp);
-  scene.add(trees.group);
+  const front = frontCanvas ? startFrontPetals(frontCanvas, phone ? 10 : 22) : null;
 
-  // petals are born in a random spot of either canopy (projected to the screen)
+  // back petals are born at a blossom on the hanging branches, or along the
+  // top edge once the branches have scrolled away
   const petalRand = rng(83);
-  const spawnAt = new THREE.Vector3();
   const petalSource = (out: { x: number; y: number }) => {
-    trees.canopyPoint(spawnAt, petalRand).project(camera);
-    out.x = spawnAt.x;
-    out.y = spawnAt.y;
+    const at = front?.blossomSpot(petalRand);
+    if (at) {
+      out.x = (at.x / window.innerWidth) * 2 - 1;
+      out.y = 1 - (at.y / window.innerHeight) * 2;
+    } else {
+      out.x = petalRand() * 2 - 1;
+      out.y = 1.12;
+    }
   };
-  const frontSource = () => {
-    trees.canopyPoint(spawnAt, petalRand).project(camera);
-    return { x: ((spawnAt.x + 1) / 2) * window.innerWidth, y: ((1 - spawnAt.y) / 2) * window.innerHeight };
-  };
-  const front = frontCanvas ? startFrontPetals(frontCanvas, phone ? 10 : 22, frontSource) : null;
 
   let halfW = 1;
   let halfH = 1;
@@ -305,7 +304,6 @@ export function startSkyScene(canvas: HTMLCanvasElement, frontCanvas?: HTMLCanva
     // Nimbus about a quarter of the screen wide (a bit more on phones)
     baseScale = THREE.MathUtils.clamp((halfW * 2 * (narrow ? 0.3 : 0.25)) / 4.4, 0.18, 0.85);
     edgeBias = narrow ? 1.15 : 1;
-    trees.layout(halfW, halfH, narrow);
     front?.resize();
   };
   resize();
@@ -380,7 +378,6 @@ export function startSkyScene(canvas: HTMLCanvasElement, frontCanvas?: HTMLCanva
     }
     trail.update(dt, baseScale * 1.6);
 
-    trees.update(t);
     petals.update(t, dt, halfW, halfH, wind, petalSource);
     lanterns.update(t, dt, halfW, halfH, scrollP * 2);
     renderer.render(scene, camera);
@@ -397,7 +394,6 @@ export function startSkyScene(canvas: HTMLCanvasElement, frontCanvas?: HTMLCanva
     trail.dispose();
     petals.dispose();
     lanterns.dispose();
-    trees.dispose();
     front?.dispose();
     ramp.dispose();
     renderer.dispose();
