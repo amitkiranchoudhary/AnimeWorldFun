@@ -1,44 +1,17 @@
 import * as THREE from "three";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
+import { startFrontPetals } from "./sky/frontPetals";
+import { buildLanterns } from "./sky/lanterns";
+import { buildSakuraTrees } from "./sky/sakuraTrees";
+import { outlineGeometry, rng, toonRamp } from "./sky/toon";
 
 // Background 3D layer for the Home page, drawn cel-shaded so it reads as anime:
-//  • Goku's Flying Nimbus travels between sections as you scroll
-//  • sakura petals drift down through the open spaces
-//  • sky lanterns float up along the sides
-// The canvas sits behind the page content, so posters and tiles cover it and it
-// only shows in the gaps. Loaded on demand by <SkyScene />.
-
-/* ── Shared look ──────────────────────────────────────────── */
-
-function toonRamp() {
-  // three hard light steps = flat anime shading
-  const data = new Uint8Array([70, 70, 70, 255, 150, 150, 150, 255, 245, 245, 245, 255]);
-  const tex = new THREE.DataTexture(data, 3, 1, THREE.RGBAFormat);
-  tex.minFilter = tex.magFilter = THREE.NearestFilter;
-  tex.needsUpdate = true;
-  return tex;
-}
-
-function glowTexture(inner: string) {
-  const c = document.createElement("canvas");
-  c.width = c.height = 128;
-  const g = c.getContext("2d")!;
-  const grad = g.createRadialGradient(64, 64, 0, 64, 64, 64);
-  grad.addColorStop(0, inner);
-  grad.addColorStop(0.35, "rgba(255,140,60,0.35)");
-  grad.addColorStop(1, "rgba(255,120,40,0)");
-  g.fillStyle = grad;
-  g.fillRect(0, 0, 128, 128);
-  const tex = new THREE.CanvasTexture(c);
-  tex.colorSpace = THREE.SRGBColorSpace;
-  return tex;
-}
-
-// Deterministic randomness so the scene looks the same each visit
-function rng(seed: number) {
-  let s = seed;
-  return () => ((s = (s * 16807) % 2147483647) / 2147483647);
-}
+//  • the Flying Nimbus glides between the page's open spaces as you scroll
+//  • two cherry blossom trees at the screen edges shed sakura petals, which drift
+//    behind the page, plus a light layer of petals flowing in front of it
+//  • box-shaped paper lanterns rise far back along the sides
+// The 3D canvas sits behind the page content, so posters and tiles cover it and
+// it only shows in the gaps. Loaded on demand by <SkyScene />.
 
 /* ── Flying Nimbus ────────────────────────────────────────── */
 
@@ -79,14 +52,7 @@ function buildNimbus(ramp: THREE.Texture) {
 
   const geo = mergeGeometries(puffs);
   puffs.forEach((p) => p.dispose());
-
-  // ink outline = the same shape pushed out along its normals, drawn inside-out
-  const hull = geo.clone();
-  const hp = hull.attributes.position;
-  const hn = hull.attributes.normal;
-  for (let i = 0; i < hp.count; i++) {
-    hp.setXYZ(i, hp.getX(i) + hn.getX(i) * 0.045, hp.getY(i) + hn.getY(i) * 0.045, hp.getZ(i) + hn.getZ(i) * 0.045);
-  }
+  const hull = outlineGeometry(geo, 0.045);
 
   const body = new THREE.MeshToonMaterial({ color: "#ffc93c", gradientMap: ramp });
   const ink = new THREE.MeshBasicMaterial({ color: "#3a2206", side: THREE.BackSide });
@@ -133,7 +99,7 @@ function buildTrail(ramp: THREE.Texture, count: number) {
   };
 }
 
-/* ── Sakura petals ────────────────────────────────────────── */
+/* ── Sakura petals (behind the page) ──────────────────────── */
 
 function petalGeometry() {
   // a petal with the little notch at the tip
@@ -151,7 +117,9 @@ function petalGeometry() {
   return g;
 }
 
-type Petal = { x: number; y: number; z: number; vy: number; sway: number; phase: number; spin: THREE.Vector3; size: number };
+type Petal = { x: number; y: number; z: number; dir: number; speed: number; phase: number; spin: THREE.Vector3; size: number };
+/** where a new petal appears, as a fraction of the screen (-1…1); from a tree canopy */
+type PetalSource = (out: { x: number; y: number }) => void;
 
 function buildPetals(count: number, ramp: THREE.Texture) {
   const rand = rng(29);
@@ -167,9 +135,9 @@ function buildPetals(count: number, ramp: THREE.Texture) {
       x: rand() * 2 - 1,
       y: rand() * 2 - 1,
       z: -3 + rand() * 4,
-      vy: 0.05 + rand() * 0.07,
-      sway: 0.05 + rand() * 0.12,
-      phase: rand() * Math.PI * 2,
+      dir: rand() < 0.5 ? 1 : -1,
+      speed: 0.6 + rand() * 0.8,
+      phase: rand() * 100,
       spin: new THREE.Vector3(rand() * 2 - 1, rand() * 2 - 1, rand() * 2 - 1).multiplyScalar(1.6),
       size: 0.09 + rand() * 0.08,
     });
@@ -184,15 +152,19 @@ function buildPetals(count: number, ramp: THREE.Texture) {
   return {
     mesh,
     /** wind: scroll speed pushes petals around */
-    update(t: number, dt: number, halfW: number, halfH: number, wind: number) {
+    update(t: number, dt: number, halfW: number, halfH: number, wind: number, source: PetalSource) {
       for (let i = 0; i < count; i++) {
         const p = petals[i];
-        p.y -= (p.vy + Math.abs(wind) * 0.02) * dt;
-        p.x += (Math.sin(t * 0.6 + p.phase) * p.sway * 0.12 + wind * 0.01) * dt;
-        if (p.y < -1.15) { p.y = 1.15; p.x = Math.random() * 2 - 1; }
-        if (p.y > 1.2) p.y = -1.15;
-        if (p.x < -1.15) p.x = 1.15;
-        if (p.x > 1.15) p.x = -1.15;
+        const respawn = () => {
+          source(p);
+          p.dir = p.x < 0 ? 1 : -1; // drift in from whichever tree it fell from
+        };
+        // the same swirling wind as the front petals: sideways drifts and loops, not just falling
+        const swirlX = Math.sin(p.y * 2.2 + t * 0.4 + p.phase) * 0.11 + Math.cos(t * 0.17 + p.phase) * 0.05;
+        const swirlY = Math.cos(p.x * 2.0 + t * 0.3 + p.phase) * 0.05;
+        p.x += (swirlX + 0.06 * p.dir + wind * 0.01) * p.speed * dt;
+        p.y += (-0.08 + swirlY + wind * 0.02) * p.speed * dt;
+        if (p.y < -1.15 || p.y > 1.3 || p.x < -1.2 || p.x > 1.2) respawn();
         // further petals cover more world space, so scale by depth to fill the screen
         const depth = (10 - p.z) / 10;
         e.set(t * p.spin.x + p.phase, t * p.spin.y, t * p.spin.z);
@@ -205,64 +177,6 @@ function buildPetals(count: number, ramp: THREE.Texture) {
       mesh.instanceMatrix.needsUpdate = true;
     },
     dispose: () => [geo, mat].forEach((d) => d.dispose()),
-  };
-}
-
-/* ── Sky lanterns (sides only) ────────────────────────────── */
-
-function buildLanterns(count: number) {
-  const rand = rng(53);
-  const paper = new THREE.LatheGeometry(
-    [[0.16, -0.36], [0.27, -0.3], [0.32, -0.05], [0.3, 0.2], [0.22, 0.36], [0.12, 0.4]].map(([x, y]) => new THREE.Vector2(x, y)),
-    20,
-  );
-  const paperMat = new THREE.MeshBasicMaterial({ color: "#ffb24d" });
-  const rimMat = new THREE.MeshBasicMaterial({ color: "#7a2e0e" });
-  const rim = new THREE.TorusGeometry(0.165, 0.025, 6, 20);
-  const glowTex = glowTexture("rgba(255,214,120,0.95)");
-  const glowMat = new THREE.SpriteMaterial({ map: glowTex, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true });
-
-  const group = new THREE.Group();
-  const lanterns = Array.from({ length: count }, (_, i) => {
-    const l = new THREE.Group();
-    l.add(new THREE.Mesh(paper, paperMat));
-    const r = new THREE.Mesh(rim, rimMat);
-    r.rotation.x = Math.PI / 2;
-    r.position.y = -0.36;
-    l.add(r);
-    const glow = new THREE.Sprite(glowMat);
-    glow.scale.setScalar(1.9);
-    l.add(glow);
-    group.add(l);
-    return {
-      obj: l,
-      side: i % 2 === 0 ? -1 : 1,
-      edge: 0.82 + rand() * 0.14, // stay near the screen edges
-      y: rand() * 2 - 1,
-      z: -2.5 - rand() * 3,
-      speed: 0.03 + rand() * 0.03,
-      phase: rand() * Math.PI * 2,
-      size: 0.6 + rand() * 0.5,
-    };
-  });
-
-  return {
-    group,
-    update(t: number, dt: number, halfW: number, halfH: number, scrollDrift: number) {
-      for (const L of lanterns) {
-        L.y += L.speed * dt;
-        if (L.y > 1.25) L.y = -1.25;
-        const depth = (10 - L.z) / 10;
-        // a touch of parallax: lanterns slide gently against the scroll
-        const y = ((((L.y - scrollDrift * 0.35) % 2.5) + 3.75) % 2.5) - 1.25;
-        L.obj.position.set(L.side * L.edge * halfW * depth + Math.sin(t * 0.5 + L.phase) * 0.12, y * halfH * depth, L.z);
-        L.obj.rotation.z = Math.sin(t * 0.8 + L.phase) * 0.08;
-        L.obj.scale.setScalar(L.size * (halfH / 3.15));
-        // flicker
-        (L.obj.children[2] as THREE.Sprite).material.opacity = 0.75 + Math.sin(t * 7 + L.phase * 3) * 0.08;
-      }
-    },
-    dispose: () => [paper, paperMat, rimMat, rim, glowTex, glowMat].forEach((d) => d.dispose()),
   };
 }
 
@@ -330,7 +244,7 @@ function pathAt(p: number) {
 
 /* ── Scene ────────────────────────────────────────────────── */
 
-export function startSkyScene(canvas: HTMLCanvasElement) {
+export function startSkyScene(canvas: HTMLCanvasElement, frontCanvas?: HTMLCanvasElement) {
   const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: "low-power" });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -346,7 +260,9 @@ export function startSkyScene(canvas: HTMLCanvasElement) {
 
   const ramp = toonRamp();
   const phone = window.innerWidth < 768;
+
   const { nimbus, dispose: disposeNimbus } = buildNimbus(ramp);
+
   const holder = new THREE.Group();
   holder.add(nimbus);
   scene.add(holder);
@@ -356,6 +272,22 @@ export function startSkyScene(canvas: HTMLCanvasElement) {
   scene.add(petals.mesh);
   const lanterns = buildLanterns(phone ? 4 : 8);
   scene.add(lanterns.group);
+  const trees = buildSakuraTrees(ramp);
+  scene.add(trees.group);
+
+  // petals are born in a random spot of either canopy (projected to the screen)
+  const petalRand = rng(83);
+  const spawnAt = new THREE.Vector3();
+  const petalSource = (out: { x: number; y: number }) => {
+    trees.canopyPoint(spawnAt, petalRand).project(camera);
+    out.x = spawnAt.x;
+    out.y = spawnAt.y;
+  };
+  const frontSource = () => {
+    trees.canopyPoint(spawnAt, petalRand).project(camera);
+    return { x: ((spawnAt.x + 1) / 2) * window.innerWidth, y: ((1 - spawnAt.y) / 2) * window.innerHeight };
+  };
+  const front = frontCanvas ? startFrontPetals(frontCanvas, phone ? 10 : 22, frontSource) : null;
 
   let halfW = 1;
   let halfH = 1;
@@ -370,9 +302,11 @@ export function startSkyScene(canvas: HTMLCanvasElement) {
     halfH = camera.position.z * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
     halfW = halfH * camera.aspect;
     const narrow = camera.aspect < 0.8;
-    // Nimbus about a fifth of the screen wide (a quarter on phones)
+    // Nimbus about a quarter of the screen wide (a bit more on phones)
     baseScale = THREE.MathUtils.clamp((halfW * 2 * (narrow ? 0.3 : 0.25)) / 4.4, 0.18, 0.85);
     edgeBias = narrow ? 1.15 : 1;
+    trees.layout(halfW, halfH, narrow);
+    front?.resize();
   };
   resize();
 
@@ -380,7 +314,8 @@ export function startSkyScene(canvas: HTMLCanvasElement) {
   let lastScrollY = window.scrollY;
   let wind = 0; // scroll speed, decays over time
   const mouse = { x: 0, y: 0 };
-  const cur = { x: 0, y: 0, yaw: 0, bank: 0, lean: 0 };
+  // face: +1 flying right, -1 flying left (the cloud mirrors rather than turning away)
+  const cur = { x: 0, y: 0, face: 1, bank: 0, lean: 0 };
   let first = true;
 
   const onScroll = () => {
@@ -426,13 +361,15 @@ export function startSkyScene(canvas: HTMLCanvasElement) {
     cur.x += vx;
     cur.y += (target.y - cur.y) * k;
     const speed = vx / Math.max(dt, 1e-3);
-    if (Math.abs(speed) > 0.05) cur.yaw += ((speed > 0 ? 0 : Math.PI) - cur.yaw) * (1 - Math.exp(-dt * 3));
+    if (Math.abs(speed) > 0.05) cur.face += ((speed > 0 ? 1 : -1) - cur.face) * (1 - Math.exp(-dt * 4));
     cur.bank += (THREE.MathUtils.clamp(-speed * 0.25, -0.35, 0.35) - cur.bank) * (1 - Math.exp(-dt * 4));
     cur.lean += (mouse.x * 0.15 - cur.lean) * (1 - Math.exp(-dt * 3));
 
     holder.position.set(cur.x * halfW, cur.y * halfH + Math.sin(t * 1.2) * 0.12, 0);
-    holder.scale.setScalar(baseScale);
-    nimbus.rotation.set(0.18 + mouse.y * 0.08, cur.yaw + cur.lean, cur.bank + Math.sin(t * 0.9) * 0.04);
+    // mirroring instead of turning around keeps the cloud's good side toward us
+    const face = Math.sign(cur.face || 1) * Math.max(0.08, Math.abs(cur.face));
+    holder.scale.set(baseScale * face, baseScale, baseScale);
+    nimbus.rotation.set(0.18 + mouse.y * 0.08, -0.3 + cur.lean * face, cur.bank * face + Math.sin(t * 0.9) * 0.04);
 
     // puffs fall out of the tail while it's moving
     trailTimer -= dt;
@@ -443,9 +380,11 @@ export function startSkyScene(canvas: HTMLCanvasElement) {
     }
     trail.update(dt, baseScale * 1.6);
 
-    petals.update(t, dt, halfW, halfH, wind);
+    trees.update(t);
+    petals.update(t, dt, halfW, halfH, wind, petalSource);
     lanterns.update(t, dt, halfW, halfH, scrollP * 2);
     renderer.render(scene, camera);
+    front?.update(t, dt, wind);
   };
   tick();
 
@@ -458,6 +397,8 @@ export function startSkyScene(canvas: HTMLCanvasElement) {
     trail.dispose();
     petals.dispose();
     lanterns.dispose();
+    trees.dispose();
+    front?.dispose();
     ramp.dispose();
     renderer.dispose();
   };
