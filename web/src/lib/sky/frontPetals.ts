@@ -1,10 +1,12 @@
 import { createHangingBlossoms } from "./hangingBlossoms";
+import type { Wind } from "./wind";
 
 // The front 2D layer, over the page content: cherry blossom branches hanging
 // into the top corners, and sakura petals drifting over and between the tiles.
 // New petals fall from the blossoms (or from the top edge once the branches
 // have scrolled away), then ride a gentle swirling wind, so they wander and
-// loop instead of only falling, and get pushed along when you scroll.
+// loop instead of only falling. Gusts of the shared wind tear a burst of
+// petals off the blossoms and blow everything toward the right.
 
 type Petal = {
   x: number;
@@ -44,10 +46,10 @@ function drawPetal(g: CanvasRenderingContext2D, size: number, tint: string) {
   g.stroke();
 }
 
-export function startFrontPetals(canvas: HTMLCanvasElement, count: number) {
+export function startFrontPetals(canvas: HTMLCanvasElement, count: number, wind: Wind) {
   const g = canvas.getContext("2d");
   if (!g) return { update() {}, resize() {}, dispose() {}, blossomSpot: () => null };
-  const blossoms = createHangingBlossoms();
+  const blossoms = createHangingBlossoms(wind);
 
   let w = 0;
   let h = 0;
@@ -86,8 +88,8 @@ export function startFrontPetals(canvas: HTMLCanvasElement, count: number) {
 
   return {
     resize,
-    /** wind = recent scroll speed (positive while scrolling down) */
-    update(t: number, dt: number, wind: number) {
+    /** scroll = recent scroll speed (positive while scrolling down) */
+    update(t: number, dt: number, scroll: number) {
       g.setTransform(dpr, 0, 0, dpr, 0, 0);
       g.clearRect(0, 0, w, h);
       blossoms.draw(g, t);
@@ -95,8 +97,10 @@ export function startFrontPetals(canvas: HTMLCanvasElement, count: number) {
         // a slow swirling wind field: petals drift sideways, curl and loop
         const swirlX = Math.sin(p.y * 0.006 + t * 0.4 + p.phase) * 38 + Math.cos(t * 0.17 + p.phase) * 18;
         const swirlY = Math.cos(p.x * 0.005 + t * 0.3 + p.phase) * 16;
-        p.x += (swirlX + 22 * p.dir) * p.speed * dt;
-        p.y += (28 + swirlY - wind * 6) * p.speed * dt;
+        // gusts carry petals sideways and hold them up a little
+        p.x += (swirlX + 22 * p.dir + wind.gust * 150) * p.speed * dt;
+        p.y += (28 + swirlY - scroll * 6 - wind.gust * 14) * p.speed * dt;
+        p.flip += wind.gust * 6 * dt; // tumble faster in a gust
         p.rot += p.spin * dt;
         p.flip += p.flipSpeed * dt;
 
@@ -104,6 +108,8 @@ export function startFrontPetals(canvas: HTMLCanvasElement, count: number) {
         // (wide side margins: canopies reach a little past the screen edges)
         const m = 20;
         if (p.y > h + m || p.y < -m * 6 || p.x > w + 120 || p.x < -120) Object.assign(p, fromTree());
+        // a strong gust tears fresh petals off the blossoms
+        else if (wind.gust > 0.45 && Math.random() < dt * wind.gust * 1.2) Object.assign(p, fromTree());
 
         g.save();
         g.translate(p.x, p.y);

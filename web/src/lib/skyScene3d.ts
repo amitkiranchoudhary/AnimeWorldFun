@@ -3,6 +3,7 @@ import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { startFrontPetals } from "./sky/frontPetals";
 import { buildLanterns } from "./sky/lanterns";
 import { outlineGeometry, rng, toonRamp } from "./sky/toon";
+import { createWind } from "./sky/wind";
 
 // Background 3D layer for the Home page, drawn cel-shaded so it reads as anime:
 //  • the Flying Nimbus glides between the page's open spaces as you scroll
@@ -152,7 +153,7 @@ function buildPetals(count: number, ramp: THREE.Texture) {
   return {
     mesh,
     /** wind: scroll speed pushes petals around */
-    update(t: number, dt: number, halfW: number, halfH: number, wind: number, source: PetalSource) {
+    update(t: number, dt: number, halfW: number, halfH: number, wind: number, gust: number, source: PetalSource) {
       for (let i = 0; i < count; i++) {
         const p = petals[i];
         const respawn = () => {
@@ -162,7 +163,7 @@ function buildPetals(count: number, ramp: THREE.Texture) {
         // the same swirling wind as the front petals: sideways drifts and loops, not just falling
         const swirlX = Math.sin(p.y * 2.2 + t * 0.4 + p.phase) * 0.11 + Math.cos(t * 0.17 + p.phase) * 0.05;
         const swirlY = Math.cos(p.x * 2.0 + t * 0.3 + p.phase) * 0.05;
-        p.x += (swirlX + 0.06 * p.dir + wind * 0.01) * p.speed * dt;
+        p.x += (swirlX + 0.06 * p.dir + wind * 0.01 + gust * 0.35) * p.speed * dt;
         p.y += (-0.08 + swirlY + wind * 0.02) * p.speed * dt;
         if (p.y < -1.15 || p.y > 1.3 || p.x < -1.2 || p.x > 1.2) respawn();
         // further petals cover more world space, so scale by depth to fill the screen
@@ -272,7 +273,8 @@ export function startSkyScene(canvas: HTMLCanvasElement, frontCanvas?: HTMLCanva
   scene.add(petals.mesh);
   const lanterns = buildLanterns(phone ? 4 : 8);
   scene.add(lanterns.group);
-  const front = frontCanvas ? startFrontPetals(frontCanvas, phone ? 10 : 22) : null;
+  const air = createWind();
+  const front = frontCanvas ? startFrontPetals(frontCanvas, phone ? 10 : 22, air) : null;
 
   // back petals are born at a blossom on the hanging branches, or along the
   // top edge once the branches have scrolled away
@@ -349,6 +351,7 @@ export function startSkyScene(canvas: HTMLCanvasElement, frontCanvas?: HTMLCanva
     const k = first ? 1 : 1 - Math.exp(-dt * 2.6);
     first = false;
     wind *= Math.exp(-dt * 2.5);
+    air.update(t, dt, wind);
 
     // Nimbus: glide to the open spot, face the way it's flying, bank into turns
     const stop = findStop();
@@ -378,7 +381,7 @@ export function startSkyScene(canvas: HTMLCanvasElement, frontCanvas?: HTMLCanva
     }
     trail.update(dt, baseScale * 1.6);
 
-    petals.update(t, dt, halfW, halfH, wind, petalSource);
+    petals.update(t, dt, halfW, halfH, wind, air.gust, petalSource);
     lanterns.update(t, dt, halfW, halfH, scrollP * 2);
     renderer.render(scene, camera);
     front?.update(t, dt, wind);
