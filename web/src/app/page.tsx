@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import heroBanner from "../../public/images/hero-landing.png";
 import compass from "../../public/images/compass.png";
 import AnimeRow, { AnimeRowSkeleton } from "@/components/AnimeRow";
+import FloatingHat from "@/components/FloatingHat";
 import WhereToWatchDemo from "@/components/WhereToWatchDemo";
 import { getAllTimeGreats, getTrending } from "@/lib/anilist";
 
@@ -67,6 +68,8 @@ function SectionHeading({ kicker, title, href, cta }: { kicker: string; title: s
 export default function Home() {
   return (
     <>
+      <FloatingHat />
+
       {/* ── Hero: the original banner, full width ── */}
       <section className="relative">
         <div
