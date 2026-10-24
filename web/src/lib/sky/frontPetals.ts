@@ -1,8 +1,11 @@
 import { createHangingBlossoms } from "./hangingBlossoms";
+import { createPaintedCanopy, loadCanopyImage } from "./paintedCanopy";
 import type { Wind } from "./wind";
 
 // The front 2D layer, over the page content: cherry blossom branches hanging
-// into the top corners, and sakura petals falling over and between the tiles.
+// into the top of the page, and sakura petals falling over and between the tiles.
+// The branches are the hand-painted artwork (see paintedCanopy.ts) when it's in
+// /public/images, otherwise the code-drawn branches (hangingBlossoms.ts).
 //
 // Petals fall the way real ones do (a falling-leaf motion): each rocks side to
 // side like a pendulum, dropping fastest mid-swing and almost hanging at each
@@ -72,7 +75,16 @@ function paintPetal(stops: string[], dpr: number) {
 export function startFrontPetals(canvas: HTMLCanvasElement, count: number, wind: Wind) {
   const g = canvas.getContext("2d");
   if (!g) return { update() {}, resize() {}, dispose() {}, blossomSpot: () => null };
-  const blossoms = createHangingBlossoms(wind);
+  // code-drawn branches first; swapped for the painted artwork as soon as it loads
+  type Branches = { resize(w: number, h: number, dpr: number): void; draw(g: CanvasRenderingContext2D, t: number): void; spot(rand: () => number): { x: number; y: number } | null };
+  let blossoms: Branches = createHangingBlossoms(wind);
+  let disposed = false;
+  loadCanopyImage().then((img) => {
+    if (!img || disposed) return;
+    const art = createPaintedCanopy(img, wind);
+    art.resize(w, h);
+    blossoms = { resize: (W, H) => art.resize(W, H), draw: art.draw, spot: art.spot };
+  });
 
   let w = 0;
   let h = 0;
@@ -159,6 +171,7 @@ export function startFrontPetals(canvas: HTMLCanvasElement, count: number, wind:
     /** a blossom spot on screen (CSS px) for other petal layers, or null when scrolled away */
     blossomSpot: (rand: () => number) => blossoms.spot(rand),
     dispose() {
+      disposed = true;
       g.clearRect(0, 0, w, h);
     },
   };
