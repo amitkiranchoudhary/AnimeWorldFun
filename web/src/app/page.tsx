@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import heroBanner from "../../public/images/hero-landing.png";
 import compass from "../../public/images/compass.png";
 import AnimeRow, { AnimeRowSkeleton } from "@/components/AnimeRow";
-import FloatingHat from "@/components/FloatingHat";
+import SkyScene from "@/components/SkyScene";
 import WhereToWatchDemo from "@/components/WhereToWatchDemo";
 import { getAllTimeGreats, getTrending } from "@/lib/anilist";
 
@@ -49,9 +49,22 @@ async function GreatsRow() {
   return <AnimeRow items={await getAllTimeGreats()} />;
 }
 
-function SectionHeading({ kicker, title, href, cta }: { kicker: string; title: string; href?: string; cta?: string }) {
+// An invisible "landing spot" in an open area; the Flying Nimbus rests at the one nearest mid-screen
+function SkyStop({ className }: { className: string }) {
+  return <span data-sky-stop aria-hidden className={`pointer-events-none absolute ${className}`} />;
+}
+
+function SectionHeading({ kicker, title, href, cta, skyAt }: {
+  kicker: string;
+  title: string;
+  href?: string;
+  cta?: string;
+  /** Tailwind left-* class for where the Nimbus lands in this heading's empty space */
+  skyAt: string;
+}) {
   return (
-    <div className="mb-5 flex items-end justify-between gap-4">
+    <div className="relative mb-5 flex items-end justify-between gap-4">
+      <SkyStop className={`top-0 h-full w-24 -translate-x-1/2 ${skyAt}`} />
       <div>
         <p className="font-display text-lg tracking-wider text-sash">{kicker}</p>
         <h2 className="title-stroke text-4xl sm:text-5xl">{title}</h2>
@@ -68,7 +81,7 @@ function SectionHeading({ kicker, title, href, cta }: { kicker: string; title: s
 export default function Home() {
   return (
     <>
-      <FloatingHat />
+      <SkyScene />
 
       {/* ── Hero: the original banner, full width ── */}
       <section className="relative">
@@ -123,13 +136,14 @@ export default function Home() {
             </Link>
           </div>
         </div>
+        <SkyStop className="bottom-[2%] right-[6%] h-24 w-48 sm:right-[9%]" />
       </section>
 
     <div className="mx-auto max-w-7xl px-4 pt-8 sm:px-6">
 
       {/* ── Trending ── */}
       <section className="py-10">
-        <SectionHeading kicker="Sailing this season" title="Trending now" href="/explore" cta="See all" />
+        <SectionHeading kicker="Sailing this season" title="Trending now" href="/explore" cta="See all" skyAt="left-[58%]" />
         <Suspense fallback={<AnimeRowSkeleton />}>
           <TrendingRow />
         </Suspense>
@@ -142,7 +156,7 @@ export default function Home() {
 
       {/* ── Features ── */}
       <section className="py-10">
-        <SectionHeading kicker="Your ship, your rules" title="What's on board" />
+        <SectionHeading kicker="Your ship, your rules" title="What's on board" skyAt="left-[68%]" />
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {FEATURES.map((f) => (
             <Link
@@ -164,7 +178,7 @@ export default function Home() {
 
       {/* ── All-time greats ── */}
       <section className="py-10">
-        <SectionHeading kicker="Legends of the sea" title="All-time greats" href="/explore" cta="Browse more" />
+        <SectionHeading kicker="Legends of the sea" title="All-time greats" href="/explore" cta="Browse more" skyAt="left-[56%]" />
         <Suspense fallback={<AnimeRowSkeleton />}>
           <GreatsRow />
         </Suspense>
@@ -172,7 +186,7 @@ export default function Home() {
 
       {/* ── Blog ── */}
       <section className="py-10">
-        <SectionHeading kicker="From the galley" title="Captain's Log" href="/blog" cta="All posts" />
+        <SectionHeading kicker="From the galley" title="Captain's Log" href="/blog" cta="All posts" skyAt="left-[62%]" />
         <div className="grid gap-5 md:grid-cols-3">
           {BLOG_TEASERS.map((b, i) => (
             <article

@@ -2,10 +2,11 @@
 
 import { useEffect, useRef, useState } from "react";
 
-// Full-screen, click-through canvas holding the 3D straw hat.
-// Three.js is loaded only after the page is up, and the hat is skipped
-// entirely for "reduce motion" users or browsers without WebGL.
-export default function FloatingHat() {
+// Click-through 3D layer (Flying Nimbus, sakura petals, sky lanterns).
+// It sits between the chibi background and the page content, so posters and
+// tiles cover it and it only shows in open spaces. Three.js loads after the
+// page is up; "reduce motion" users and browsers without WebGL skip it.
+export default function SkyScene() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [ready, setReady] = useState(false);
 
@@ -17,14 +18,14 @@ export default function FloatingHat() {
     let stop: (() => void) | undefined;
     let cancelled = false;
 
-    import("@/lib/strawHat3d")
-      .then(({ startFloatingHat }) => {
+    import("@/lib/skyScene3d")
+      .then(({ startSkyScene }) => {
         if (cancelled) return;
         try {
-          stop = startFloatingHat(canvas);
+          stop = startSkyScene(canvas);
           requestAnimationFrame(() => setReady(true));
         } catch {
-          // no WebGL: the page simply has no floating hat
+          // no WebGL: the page simply has no sky layer
         }
       })
       .catch(() => {});
@@ -39,7 +40,7 @@ export default function FloatingHat() {
     <canvas
       ref={canvasRef}
       aria-hidden
-      className={`pointer-events-none fixed inset-0 z-40 h-full w-full transition-opacity duration-1000 ${
+      className={`pointer-events-none fixed inset-0 -z-[5] h-full w-full transition-opacity duration-1000 ${
         ready ? "opacity-100" : "opacity-0"
       }`}
     />
