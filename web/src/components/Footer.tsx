@@ -44,6 +44,22 @@ export default function Footer() {
             </a>
             . All anime titles and artwork belong to their respective owners.
           </p>
+          <p className="mt-2 text-xs text-muted/80">
+            Cherry blossom photo:{" "}
+            <a
+              href="https://commons.wikimedia.org/wiki/File:Sakura_branch_(52013006346).jpg"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline hover:text-straw"
+            >
+              &ldquo;Sakura branch&rdquo; by Raita Futo
+            </a>
+            ,{" "}
+            <a href="https://creativecommons.org/licenses/by/2.0/" target="_blank" rel="noopener noreferrer" className="underline hover:text-straw">
+              CC BY 2.0
+            </a>
+            , background removed.
+          </p>
         </div>
         {COLUMNS.map((col) => (
           <div key={col.title}>
