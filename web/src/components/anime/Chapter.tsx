@@ -11,12 +11,10 @@ export default function Chapter({
   n,
   title,
   caption,
-  size = "lg",
 }: {
   n: number;
   title: string;
   caption?: ReactNode;
-  size?: "lg" | "md";
 }) {
   return (
     <header className="mb-6 sm:mb-8">
@@ -34,9 +32,7 @@ export default function Chapter({
             text={title}
             stagger={60}
             delay={120}
-            className={`mt-1 font-display leading-[0.92] tracking-wide text-text text-glow-pink ${
-              size === "lg" ? "text-[2.6rem] sm:text-6xl lg:text-7xl" : "text-4xl sm:text-5xl"
-            }`}
+            className="mt-1 font-display text-[2.6rem] leading-[0.92] tracking-wide text-text text-glow-pink sm:text-6xl lg:text-7xl"
           />
         </div>
       </div>

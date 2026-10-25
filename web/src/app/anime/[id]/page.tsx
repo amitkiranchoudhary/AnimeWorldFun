@@ -184,7 +184,7 @@ async function AnimeContent({ params }: { params: Props["params"] }) {
       <HeroBanner banner={anime.bannerImage} cover={anime.coverImage.large}>
         {studio && (
           <div className="mx-auto max-w-7xl px-4 pt-[12%] sm:px-6 sm:pt-[7%]">
-            <p className="text-[10px] font-extrabold uppercase text-white/80 [text-shadow:0_1px_8px_#000] sm:text-xs">
+            <p className="text-xs font-extrabold uppercase text-white/85 [text-shadow:0_1px_8px_#000] sm:text-sm">
               {studio} <span className="text-[#ff8fc0]">presents</span>
             </p>
           </div>
@@ -380,16 +380,14 @@ async function AnimeContent({ params }: { params: Props["params"] }) {
             {related.length >= 4 ? (
               <PosterCarousel label="Seasons and related anime" items={related.slice(0, 12).map((r) => toPoster(r, r.relation))} />
             ) : (
-              <Reveal>
-                <AnimeGrid items={related} />
-              </Reveal>
+              <AnimeGrid items={related} />
             )}
           </section>
         )}
 
         {recs.length > 0 && (
           <section className="mt-20 sm:mt-28">
-            <Chapter n={next()} title="If you liked this" caption={recs.length >= 4 ? "Drag the reel, or just keep scrolling." : undefined} />
+            <Chapter n={next()} title="If you liked this" caption={recs.length >= 4 ? "Drag, swipe or use the arrows to browse the reel." : undefined} />
             {recs.length >= 4 ? (
               <PosterCarousel
                 label="Recommended anime"
@@ -398,9 +396,7 @@ async function AnimeContent({ params }: { params: Props["params"] }) {
                 )}
               />
             ) : (
-              <Reveal>
-                <AnimeGrid items={recs} />
-              </Reveal>
+              <AnimeGrid items={recs} />
             )}
           </section>
         )}
@@ -419,11 +415,12 @@ async function AnimeContent({ params }: { params: Props["params"] }) {
 
 function DetailSkeleton() {
   return (
-    <div aria-busy="true" aria-label="Loading anime">
-      <div className="h-[54vh] max-h-[660px] min-h-[340px] w-full animate-pulse bg-gradient-to-b from-white/[0.06] to-transparent sm:h-[64vh]" />
+    <div role="status" aria-busy="true">
+      <span className="sr-only">Loading anime…</span>
+      <div aria-hidden className="h-[54vh] max-h-[660px] min-h-[340px] w-full animate-pulse bg-gradient-to-b from-white/[0.06] to-transparent sm:h-[64vh]" />
       <div className="mx-auto -mt-40 grid max-w-7xl gap-8 px-4 sm:-mt-48 sm:px-6 md:grid-cols-[260px_1fr]">
-        <div className="mx-auto aspect-[2/3] w-48 animate-pulse rounded-2xl bg-white/10 sm:w-56 md:w-full" />
-        <div className="space-y-4 md:pt-36">
+        <div aria-hidden className="mx-auto aspect-[2/3] w-48 animate-pulse rounded-2xl bg-white/10 sm:w-56 md:w-full" />
+        <div aria-hidden className="space-y-4 md:pt-36">
           <div className="h-3 w-40 animate-pulse rounded bg-white/10" />
           <div className="h-14 w-3/4 animate-pulse rounded-xl bg-white/10" />
           <div className="flex gap-2">

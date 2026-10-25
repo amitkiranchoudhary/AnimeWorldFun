@@ -43,7 +43,7 @@ function Select({ name, label, value, options, any = "Any" }: {
  */
 export function FilterPanel({ f }: { f: ExploreFilters }) {
   return (
-    <Form action="/explore" className={`glass ${s.panel} space-y-6 p-4 sm:p-7`}>
+    <Form action="/explore" scroll={false} className={`glass ${s.panel} space-y-6 p-4 sm:p-7`}>
       <AutoSubmit />
       <div className="flex flex-col gap-3 sm:flex-row">
         <div className="relative min-w-0 flex-1">
@@ -94,11 +94,13 @@ export function FilterPanel({ f }: { f: ExploreFilters }) {
         <Select name="platform" label="Streams on" value={f.platform} any="Any platform" options={PLATFORM_OPTIONS} />
       </div>
 
-      <fieldset>
+      {/* min-w-0: a fieldset is min-content wide by default, which would stretch the
+          phone chip strip to all 18 chips instead of letting it scroll */}
+      <fieldset className="min-w-0">
         <legend className={s.label}>
           Genres <span className="normal-case tracking-normal">(shows anime with all selected)</span>
         </legend>
-        <div className="mt-1 flex flex-wrap gap-2">
+        <div className={`${s.chipStrip} mt-1 -mx-4 flex snap-x gap-2 overflow-x-auto px-4 pb-2 pt-1 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:p-0`}>
           {GENRES.map((g) => (
             <label key={g} className={s.chip}>
               <input type="checkbox" name="genre" value={g} defaultChecked={f.genres?.includes(g)} className={`${s.chipInput} sr-only`} />
@@ -131,11 +133,11 @@ export function ActiveFilters({ f }: { f: ExploreFilters }) {
   return (
     <div className="mt-5 flex flex-wrap items-center gap-2">
       {chips.map((c) => (
-        <Link key={c.label} href={c.href} className={s.activePill} aria-label={`Remove filter ${c.label}`}>
+        <Link key={c.label} href={c.href} scroll={false} className={s.activePill} aria-label={`Remove filter ${c.label}`}>
           {c.label} <span aria-hidden>✕</span>
         </Link>
       ))}
-      <Link href={toQuery({ sort: f.sort })} className={`${s.textLink} px-2 text-xs font-bold text-muted underline underline-offset-4 hover:text-text`}>
+      <Link href={toQuery({ sort: f.sort })} scroll={false} className={`${s.textLink} px-2 text-xs font-bold text-muted underline underline-offset-4 hover:text-text`}>
         Clear all
       </Link>
     </div>
@@ -157,7 +159,7 @@ export function SearchDock({ f }: { f: ExploreFilters }) {
   ];
   return (
     <FilterDock watchId="explore-filters" endId="explore-end">
-      <Form action="/explore" role="search" aria-label="Quick search" className="flex min-w-0 flex-1 items-center gap-1.5">
+      <Form action="/explore" scroll={false} role="search" aria-label="Quick search" className="flex min-w-0 flex-1 items-center gap-1.5">
         <AutoSubmit />
         {keep.map(([k, v]) => (
           <input key={`${k}=${v}`} type="hidden" name={k} value={v} />

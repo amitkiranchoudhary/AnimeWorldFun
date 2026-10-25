@@ -59,15 +59,33 @@
   animation: leak 16s var(--ease-in-out) infinite;
 }
 @keyframes credit-in {
-  from { opacity: 0; letter-spacing: 0.05em; filter: blur(6px); }
-  to { opacity: 1; letter-spacing: 0.42em; filter: blur(0); }
+  from { opacity: 0; transform: translate3d(0, 8px, 0) scale(0.96); }
+  to { opacity: 1; transform: none; }
 }
 .credits {
   opacity: calc(1 - var(--hero-out, 0) * 2.2);
 }
 .credits > * {
+  letter-spacing: 0.42em;
   animation: credit-in 2.2s var(--ease-out) 0.9s both;
 }
+/* letterbox bars that open like a cinema screen after the opening shot */
+@keyframes letterbox-open {
+  from { transform: scaleY(1); }
+  to { transform: scaleY(0); }
+}
+.letterbox {
+  pointer-events: none;
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  height: 11%;
+  background: #000;
+  animation: letterbox-open 1.6s var(--ease-out) 0.6s both;
+}
+.letterboxTop { top: 0; transform-origin: top; }
+.letterboxBottom { bottom: 0; transform-origin: bottom; }
 
 /* ── Floating cover ───────────────────────────────────────── */
 @keyframes hover-float {
@@ -233,13 +251,14 @@
   overflow: hidden;
   overflow: clip;
 }
-.logline[data-static] {
-  height: auto;
-}
-.logline[data-static] .loglinePin {
-  position: relative;
-  height: auto;
-  padding: 6rem 0;
+/* reduce motion: no scroll scene, just a plain, fully lit quote (no JS needed) */
+@media (prefers-reduced-motion: reduce) {
+  .logline { height: auto; }
+  .logline .loglinePin {
+    position: relative;
+    height: auto;
+    padding: 6rem 0;
+  }
 }
 .word {
   display: inline-block;
@@ -400,8 +419,12 @@
   .coverGlow,
   .rec,
   .playRing,
-  .platformCard {
+  .platformCard,
+  .letterbox {
     animation: none;
+  }
+  .letterbox {
+    display: none;
   }
   .ringArc,
   .posterImg {

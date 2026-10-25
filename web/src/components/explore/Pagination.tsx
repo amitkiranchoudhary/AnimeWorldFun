@@ -12,7 +12,7 @@ export default function Pagination({ f, hasNextPage }: { f: ExploreFilters; hasN
     <nav className="mt-14 flex items-center justify-center gap-3 sm:gap-6" aria-label="Pagination">
       {page > 1 ? (
         <Magnetic strength={0.3}>
-          <Link href={toQuery(f, { page: page - 1 })} className={`${s.pageBtn} ${s.pagePrev}`}>
+          <Link href={`${toQuery(f, { page: page - 1 })}#explore-results`} className={`${s.pageBtn} ${s.pagePrev}`}>
             <span aria-hidden className={s.pageArrow}>←</span> Previous
           </Link>
         </Magnetic>
@@ -23,7 +23,7 @@ export default function Pagination({ f, hasNextPage }: { f: ExploreFilters; hasN
       </p>
       {hasNextPage ? (
         <Magnetic strength={0.3}>
-          <Link href={toQuery(f, { page: page + 1 })} className={`${s.pageBtn} ${s.pageNext} shimmer`}>
+          <Link href={`${toQuery(f, { page: page + 1 })}#explore-results`} className={`${s.pageBtn} ${s.pageNext} shimmer`}>
             Next <span aria-hidden className={s.pageArrow}>→</span>
           </Link>
         </Magnetic>

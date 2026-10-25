@@ -18,13 +18,8 @@ export default function Logline({ text, credit }: { text: string; credit?: strin
 
   useEffect(() => {
     const el = ref.current;
-    if (!el) return;
-    if (prefersReducedMotion()) {
-      el.dataset.static = "";
-      return () => {
-        delete el.dataset.static;
-      };
-    }
+    // reduce motion: the CSS already lays it out as a plain quote
+    if (!el || prefersReducedMotion()) return;
     const spans = [...el.querySelectorAll<HTMLElement>("[data-w]")];
     const last = spans.map(() => -1);
     el.dataset.live = "";

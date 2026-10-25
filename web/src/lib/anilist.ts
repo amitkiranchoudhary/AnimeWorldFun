@@ -33,24 +33,24 @@ const CARD_FIELDS = `
   studios(isMain: true) { nodes { name } }
 `;
 
+// Throws when AniList is unreachable or errors. "use cache" never stores a thrown
+// error, so a hiccup isn't remembered for hours: the cached functions below let it
+// throw and their exported wrappers fall back, which retries on the next request.
 async function query<T>(gql: string, variables: Record<string, unknown> = {}): Promise<T | null> {
-  try {
-    const res = await fetch(ENDPOINT, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Accept: "application/json" },
-      body: JSON.stringify({ query: gql, variables }),
-    });
-    if (!res.ok) return null;
-    const json = await res.json();
-    return (json.data as T) ?? null;
-  } catch {
-    return null;
-  }
+  const res = await fetch(ENDPOINT, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Accept: "application/json" },
+    body: JSON.stringify({ query: gql, variables }),
+  });
+  // a missing id is a 404 with { data: { Media: null } }: a real answer, fine to cache
+  if (!res.ok && res.status !== 404) throw new Error(`AniList responded ${res.status}`);
+  const json = await res.json();
+  return (json.data as T) ?? null;
 }
 
 /* ── Home page rows ───────────────────────────────────────── */
 
-async function list(sort: string, extra = ""): Promise<AnimeCard[]> {
+async function cachedList(sort: string, extra: string): Promise<AnimeCard[]> {
   "use cache";
   cacheLife("hours");
   const data = await query<{ Page: { media: AnimeCard[] } }>(
@@ -58,6 +58,8 @@ async function list(sort: string, extra = ""): Promise<AnimeCard[]> {
   );
   return data?.Page.media ?? [];
 }
+
+const list = (sort: string, extra = ""): Promise<AnimeCard[]> => cachedList(sort, extra).catch(() => []);
 
 export const getTrending = () => list("TRENDING_DESC", ", status: RELEASING");
 export const getAllTimeGreats = () => list("SCORE_DESC", ", popularity_greater: 100000");
@@ -125,7 +127,10 @@ export type ExploreResult = {
 
 export const PER_PAGE = 30;
 
-export async function exploreAnime(f: ExploreFilters): Promise<ExploreResult> {
+export const exploreAnime = (f: ExploreFilters): Promise<ExploreResult> =>
+  cachedExplore(f).catch(() => ({ items: [], page: f.page ?? 1, hasNextPage: false, ok: false }));
+
+async function cachedExplore(f: ExploreFilters): Promise<ExploreResult> {
   "use cache";
   cacheLife("hours");
 
@@ -160,7 +165,7 @@ export async function exploreAnime(f: ExploreFilters): Promise<ExploreResult> {
     variables,
   );
 
-  if (!data) return { items: [], page: variables.page, hasNextPage: false, ok: false };
+  if (!data) throw new Error("AniList returned no data");
   return {
     items: data.Page.media,
     page: data.Page.pageInfo.currentPage,
@@ -208,7 +213,10 @@ export type AnimeDetail = AnimeCard & {
   recommendations: { nodes: { mediaRecommendation: AnimeCard | null }[] };
 };
 
-export async function getAnime(id: number): Promise<AnimeDetail | null> {
+// A failed fetch falls back to null (the page's not-found) without being cached
+export const getAnime = (id: number): Promise<AnimeDetail | null> => cachedAnime(id).catch(() => null);
+
+async function cachedAnime(id: number): Promise<AnimeDetail | null> {
   "use cache";
   cacheLife("hours");
 

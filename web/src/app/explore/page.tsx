@@ -57,7 +57,7 @@ async function Explore({ searchParams }: { searchParams: Promise<RawParams> }) {
         <ActiveFilters f={f} />
       </section>
 
-      <section aria-label="Results" className="mt-16 sm:mt-20">
+      <section id="explore-results" aria-label="Results" className="mt-16 scroll-mt-28 sm:mt-20">
         <Chapter num="02" kicker="Chapter two · 獲物" title="The catch" />
         <div aria-live="polite">
           <Suspense key={key} fallback={<AnimeGridSkeleton />}>

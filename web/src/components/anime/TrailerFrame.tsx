@@ -22,6 +22,8 @@ export default function TrailerFrame({ videoId, title, still }: { videoId: strin
             className="absolute inset-0 h-full w-full"
             allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
+            // keep keyboard users in place: the play button they pressed is gone now
+            ref={(el) => el?.focus()}
             data-lenis-prevent
             // the smooth-scroll stylesheet disables pointer events on iframes; the player needs them
             style={{ pointerEvents: "auto" }}
@@ -66,7 +68,7 @@ export default function TrailerFrame({ videoId, title, still }: { videoId: strin
             </span>
 
             <span aria-hidden className="absolute inset-x-0 bottom-6 px-6 text-center text-sm sm:bottom-9 sm:text-base">
-              <span className={s.subtitle}>[ Press play ] {title}</span>
+              <span className={`${s.subtitle} line-clamp-1`}>[ Press play ] {title}</span>
             </span>
           </button>
         )}

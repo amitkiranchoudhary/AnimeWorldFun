@@ -5,7 +5,7 @@ import { useEffect, useRef, type CSSProperties } from "react";
 import { hasFinePointer, prefersReducedMotion } from "@/lib/motion/inView";
 import s from "./explore.module.css";
 
-export type RingPoster = { id: number; src: string; color: string | null };
+type RingPoster = { id: number; src: string; color: string | null };
 
 /**
  * A curved wall of anime posters on the inside of a slowly turning cylinder

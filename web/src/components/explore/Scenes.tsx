@@ -63,6 +63,7 @@ export function EmptyScene({ clearHref }: { clearHref?: string }) {
       {clearHref && (
         <Link
           href={clearHref}
+          scroll={false}
           className={`${s.pageBtn} ${s.pageNext} shimmer mt-7`}
         >
           Clear all filters
@@ -78,7 +79,7 @@ export function ErrorScene({ retryHref }: { retryHref: string }) {
       <p className="mx-auto mt-3 max-w-md text-muted" role="alert">
         The seas are rough — couldn&apos;t reach the anime database right now. Try again in a moment.
       </p>
-      {/* a full reload, so we really ask again */}
+      {/* a plain full reload of the same URL; failures aren't cached, so this really asks again */}
       <a href={retryHref} className={`${s.pageBtn} ${s.pagePrev} mt-7`}>
         <span aria-hidden>↻</span> Try again
       </a>

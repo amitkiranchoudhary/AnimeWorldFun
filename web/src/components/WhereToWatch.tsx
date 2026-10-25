@@ -100,7 +100,7 @@ export default function WhereToWatch({ animeId, links }: { animeId: number; link
 
             {/* touch screens: tap to open the same details inline */}
             <details className={s.platformMore}>
-              <summary>Sub &amp; dub ▾</summary>
+              <summary>Sub &amp; dub <span aria-hidden>▾</span></summary>
               <div className="parchment mt-2 w-60 max-w-[calc(100vw-4rem)] rounded-xl border-2 border-ink p-3 shadow-[3px_3px_0_var(--ink)]">
                 <Details site={site} region={info?.region} langs={linkLangs} info={info} />
               </div>

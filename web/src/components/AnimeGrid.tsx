@@ -22,7 +22,7 @@ export function AnimeGridSkeleton() {
   );
 }
 
-function Card({ a, priority }: { a: AnimeCard; priority: boolean }) {
+function Card({ a }: { a: AnimeCard }) {
   const title = displayTitle(a);
   const studio = a.studios?.nodes?.[0]?.name;
   const genres = a.genres?.slice(0, 3) ?? [];
@@ -40,11 +40,10 @@ function Card({ a, priority }: { a: AnimeCard; priority: boolean }) {
         <div className={g.media}>
           <Image
             src={a.coverImage.large}
-            alt={`${title} cover`}
+            alt=""
             fill
             sizes="(min-width: 1280px) 16vw, (min-width: 1024px) 20vw, (min-width: 640px) 30vw, 50vw"
             className={`${g.cover} object-cover`}
-            priority={priority}
           />
         </div>
         {a.nextAiringEpisode && <span className={g.airing}>Airing</span>}
@@ -53,7 +52,7 @@ function Card({ a, priority }: { a: AnimeCard; priority: boolean }) {
           <h3 className="line-clamp-2 text-sm font-extrabold leading-tight text-white">{title}</h3>
           {meta && <p className="mt-1 line-clamp-1 text-[11px] text-white/75">{meta}</p>}
           {(genres.length > 0 || studio) && (
-            <div className={g.more}>
+            <div aria-hidden className={g.more}>
               <div className={g.moreInner}>
                 {genres.length > 0 && (
                   <ul className="flex flex-wrap gap-1 pt-2" aria-label="Genres">
@@ -85,7 +84,7 @@ export default function AnimeGrid({ items }: { items: AnimeCard[] }) {
     <ul className={GRID}>
       {items.map((a, i) => (
         <Reveal as="li" key={a.id} delay={(i % 6) * 70} y={36} blur={6} scale={0.96}>
-          <Card a={a} priority={i < 6} />
+          <Card a={a} />
         </Reveal>
       ))}
     </ul>
