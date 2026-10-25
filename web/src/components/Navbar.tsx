@@ -35,6 +35,44 @@ const EXTRA_LINKS = [
 const isActive = (pathname: string | null, href: string) =>
   pathname !== null && (href === "/" ? pathname === "/" : pathname.startsWith(href));
 
+// Decorative sakura blossom (5 petals) for the mobile menu
+function Blossom({ className = "", style }: { className?: string; style?: CSSProperties }) {
+  return (
+    <svg viewBox="0 0 40 40" className={className} style={style} aria-hidden focusable="false">
+      {[0, 72, 144, 216, 288].map((r) => (
+        <path
+          key={r}
+          d="M20 20 C 14 12, 15 4, 20 2 C 25 4, 26 12, 20 20 Z"
+          fill="#ffc1dc"
+          fillOpacity="0.9"
+          transform={`rotate(${r} 20 20)`}
+        />
+      ))}
+      <circle cx="20" cy="20" r="2.6" fill="#f2c94c" />
+    </svg>
+  );
+}
+
+/* ── "Back to the top" (rendered by the footer) ────────────────────────── */
+
+// Glides up with Lenis when it's on, then hands keyboard focus to the logo
+// link in the visible bar (the mobile menu's links come first in the DOM but
+// are hidden or inert, so a generic "header a" query would focus nothing).
+export function BackToTop({ className = "", children }: { className?: string; children: ReactNode }) {
+  const onClick = (e: MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (window.__lenis) window.__lenis.scrollTo(0, reduce ? { immediate: true } : { duration: 1.8 });
+    else window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
+    document.querySelector<HTMLElement>("[data-home-link]")?.focus({ preventScroll: true });
+  };
+  return (
+    <a href="#top" onClick={onClick} className={className}>
+      {children}
+    </a>
+  );
+}
+
 /* ── Straw-hat cursor toggle (desktop mice only) ───────────────────────── */
 
 function subscribeCursorPref(onChange: () => void) {
@@ -190,24 +228,6 @@ function MenuLinks({ pathname, onNavigate }: { pathname: string | null; onNaviga
         );
       })}
     </ul>
-  );
-}
-
-// Decorative sakura blossom (5 petals); the footer uses it too
-export function Blossom({ className = "", style }: { className?: string; style?: CSSProperties }) {
-  return (
-    <svg viewBox="0 0 40 40" className={className} style={style} aria-hidden focusable="false">
-      {[0, 72, 144, 216, 288].map((r) => (
-        <path
-          key={r}
-          d="M20 20 C 14 12, 15 4, 20 2 C 25 4, 26 12, 20 20 Z"
-          fill="#ffc1dc"
-          fillOpacity="0.9"
-          transform={`rotate(${r} 20 20)`}
-        />
-      ))}
-      <circle cx="20" cy="20" r="2.6" fill="#f2c94c" />
-    </svg>
   );
 }
 
@@ -367,6 +387,7 @@ export default function Navbar() {
         <Magnetic strength={0.22}>
           <Link
             href="/"
+            data-home-link
             className="block shrink-0 rounded-2xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-straw"
             aria-label="Anime World Fun home"
             onClick={() => open && close(false)}
@@ -403,24 +424,6 @@ export default function Navbar() {
   );
 }
 
-/* ── Back to top (used by the footer): glides with Lenis when it's on ──── */
-
-export function BackToTop({ className = "", children }: { className?: string; children: ReactNode }) {
-  const onClick = (e: MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (window.__lenis) window.__lenis.scrollTo(0, { duration: 1.8 });
-    else window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
-    // keyboard users land back at the start of the page
-    document.querySelector<HTMLElement>("header a[href]")?.focus({ preventScroll: true });
-  };
-  return (
-    <a href="#top" onClick={onClick} className={className}>
-      {children}
-    </a>
-  );
-}
-
 /* Page-specific styles. All motion is transform/opacity; the global
    reduced-motion rule in globals.css turns the transitions off. */
 const NAV_CSS = `
@@ -445,9 +448,17 @@ const NAV_CSS = `
     0 0 40px -12px rgba(255, 120, 180, 0.22),
     inset 0 1px 0 rgba(255, 255, 255, 0.07);
 }
-/* tuck away while scrolling down, unless the menu is open or a link has focus */
-.nb-header[data-hidden]:not([data-open]):not(:focus-within) .nb-bar {
+/* tuck away while scrolling down, unless the menu is open or a keyboard user
+   is focused inside the bar (:focus-visible, so a mouse-clicked link that keeps
+   focus after navigating doesn't pin the bar open) */
+.nb-header[data-hidden]:not([data-open]):not(:has(:focus-visible)) .nb-bar {
   transform: translate3d(0, calc(-100% - 1.5rem), 0);
+}
+/* browsers without :has() drop the rule above; fall back to :focus-within */
+@supports not selector(:has(*)) {
+  .nb-header[data-hidden]:not([data-open]):not(:focus-within) .nb-bar {
+    transform: translate3d(0, calc(-100% - 1.5rem), 0);
+  }
 }
 .nb-header[data-open] .nb-bar {
   background: transparent;

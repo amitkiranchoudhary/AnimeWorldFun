@@ -10,6 +10,7 @@ import Marquee from "@/components/motion/Marquee";
 import Parallax from "@/components/motion/Parallax";
 import LogbookDemo, { type DemoShow } from "@/components/account/LogbookDemo";
 import LogbookShelves, { LogbookShelvesSkeleton } from "@/components/account/LogbookShelves";
+import LogbookRail from "@/components/account/LogbookRail";
 import ScrollLitLine from "@/components/account/ScrollLitLine";
 import ProgressRing from "@/components/account/ProgressRing";
 import s from "@/components/account/logbook.module.css";
@@ -68,6 +69,13 @@ async function ShelvesFromTrending() {
   return <LogbookShelves items={items} />;
 }
 
+// the same shelves on one pinned, curved rail (wide screens with motion; CSS decides)
+async function RailFromTrending() {
+  const items = await getTrending();
+  if (items.length === 0) return null;
+  return <LogbookRail items={items} />;
+}
+
 async function TrendingTicker() {
   const items = await getTrending();
   if (items.length === 0) return null;
@@ -102,6 +110,7 @@ function Chapter({
   title,
   lead,
   children,
+  after,
   id,
 }: {
   n: string;
@@ -109,28 +118,34 @@ function Chapter({
   title: string;
   lead: string;
   children: ReactNode;
+  /** full-width content after the chapter column (e.g. the pinned rail) */
+  after?: ReactNode;
   id: string;
 }) {
   return (
-    <section id={id} aria-label={title} className="relative mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28 lg:pl-24">
-      <p
-        aria-hidden
-        className={`${s.sideLabel} absolute left-4 top-28 hidden font-display text-sm text-white/25 lg:block`}
-      >
-        CH.{n} — {label}
-      </p>
-      <Reveal>
-        <p className="font-display text-lg tracking-[0.25em] text-sash">Chapter {n}</p>
-      </Reveal>
-      <SplitText
-        text={title}
-        as="h2"
-        className="mt-1 font-display text-5xl leading-[0.95] tracking-wide text-text sm:text-7xl"
-      />
-      <Reveal delay={150}>
-        <p className="mt-4 max-w-2xl leading-relaxed text-muted">{lead}</p>
-      </Reveal>
-      <div className="mt-12">{children}</div>
+    <section id={id} aria-label={title} className="relative">
+      {/* with a pinned rail after it, the column hands straight over to the stage on wide screens */}
+      <div className={`relative mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28 lg:pl-24 ${after ? "lg:motion-safe:pb-0" : ""}`}>
+        <p
+          aria-hidden
+          className={`${s.sideLabel} absolute left-4 top-28 hidden font-display text-sm text-white/25 lg:block`}
+        >
+          CH.{n} — {label}
+        </p>
+        <Reveal>
+          <p className="font-display text-lg tracking-[0.25em] text-sash">Chapter {n}</p>
+        </Reveal>
+        <SplitText
+          text={title}
+          as="h2"
+          className="mt-1 font-display text-5xl leading-[0.95] tracking-wide text-text sm:text-7xl"
+        />
+        <Reveal delay={150}>
+          <p className="mt-4 max-w-2xl leading-relaxed text-muted">{lead}</p>
+        </Reveal>
+        <div className={after ? "mt-12 lg:motion-safe:mt-0" : "mt-12"}>{children}</div>
+      </div>
+      {after}
     </section>
   );
 }
@@ -248,6 +263,11 @@ export default function MyListPage() {
         label="THE SHELVES"
         title="Three shelves, one crew"
         lead="Your list will live on three shelves. Here's a sample, stocked with what's trending right now — tap a cover to open the show."
+        after={
+          <Suspense fallback={<div aria-hidden className={`${s.railOnly} h-[100svh]`} />}>
+            <RailFromTrending />
+          </Suspense>
+        }
       >
         <Suspense fallback={<LogbookShelvesSkeleton />}>
           <ShelvesFromTrending />

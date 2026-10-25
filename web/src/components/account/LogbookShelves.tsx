@@ -36,75 +36,97 @@ export function sampleOf(a: AnimeCard, kind: Kind, i: number) {
 }
 
 /** One cover on a shelf: links to the show, with its sample ring / stamp / lantern. */
-export function PosterCard({ a, kind, i, sizes }: { a: AnimeCard; kind: Kind; i: number; sizes: string }) {
+export function PosterCard({
+  a,
+  kind,
+  i,
+  sizes,
+  reveal = true,
+  shelfTitle,
+}: {
+  a: AnimeCard;
+  kind: Kind;
+  i: number;
+  sizes: string;
+  /** rise into view on scroll (off on the pinned rail, which moves the posters itself) */
+  reveal?: boolean;
+  /** named in the link label where no shelf heading groups the posters (the rail) */
+  shelfTitle?: string;
+}) {
   const { total, watched, label, caption } = sampleOf(a, kind, i);
   const title = displayTitle(a);
 
-  return (
-    <Reveal delay={(i % 4) * 90} y={34} scale={0.96}>
-      <Link
-        href={`/anime/${a.id}`}
-        aria-label={`${title}, sample: ${label}`}
-        className={`${s.poster} group relative block overflow-hidden rounded-2xl border-2 border-ink shadow-[5px_5px_0_var(--ink)] transition duration-300 hover:-translate-y-2 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-straw`}
-        style={{ background: a.coverImage.color ?? "#1d2c5e" }}
-      >
-        <div className="relative aspect-[2/3]">
-          <Image
-            src={a.coverImage.large}
-            alt=""
-            fill
-            sizes={sizes}
-            className="object-cover transition duration-500 group-hover:scale-105"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" />
+  const card = (
+    <Link
+      href={`/anime/${a.id}`}
+      aria-label={shelfTitle ? `${title}, ${shelfTitle} shelf, sample: ${label}` : `${title}, sample: ${label}`}
+      className={`${s.poster} group relative block overflow-hidden rounded-2xl border-2 border-ink shadow-[5px_5px_0_var(--ink)] transition duration-300 hover:-translate-y-2 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-straw`}
+      style={{ background: a.coverImage.color ?? "#1d2c5e" }}
+    >
+      <div className="relative aspect-[2/3]">
+        <Image
+          src={a.coverImage.large}
+          alt=""
+          fill
+          sizes={sizes}
+          className="object-cover transition duration-500 group-hover:scale-105"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" />
 
-          {kind === "watching" && (
-            <span className="absolute right-2 top-2 rounded-full bg-ink/80 p-1 backdrop-blur-sm">
-              <ProgressRing value={watched / total} size={46} stroke={4} color="#ff8fc2" delay={300 + (i % 4) * 120}>
-                <span className="text-[10px] font-extrabold text-white">
-                  {watched}/{total}
-                </span>
-              </ProgressRing>
-            </span>
-          )}
-          {kind === "completed" && (
+        {kind === "watching" && (
+          <span className="absolute right-2 top-2 rounded-full bg-ink/80 p-1 backdrop-blur-sm">
+            <ProgressRing value={watched / total} size={46} stroke={4} color="#ff8fc2" delay={300 + (i % 4) * 120}>
+              <span className="text-[10px] font-extrabold text-white">
+                {watched}/{total}
+              </span>
+            </ProgressRing>
+          </span>
+        )}
+        {kind === "completed" && (
+          <span
+            aria-hidden
+            className="absolute right-2 top-2 rotate-[-10deg] rounded-md border-2 border-straw bg-ink/80 px-2 py-0.5 font-display text-sm tracking-wider text-straw"
+            style={{ boxShadow: "var(--glow-gold)" }}
+          >
+            ★ Logged
+          </span>
+        )}
+        {kind === "plan" && (
+          <span aria-hidden className="absolute right-3 top-0 flex flex-col items-center">
+            <span className="h-4 w-px bg-straw/70" />
             <span
-              aria-hidden
-              className="absolute right-2 top-2 rotate-[-10deg] rounded-md border-2 border-straw bg-ink/80 px-2 py-0.5 font-display text-sm tracking-wider text-straw"
-              style={{ boxShadow: "var(--glow-gold)" }}
-            >
-              ★ Logged
-            </span>
-          )}
-          {kind === "plan" && (
-            <span aria-hidden className="absolute right-3 top-0 flex flex-col items-center">
-              <span className="h-4 w-px bg-straw/70" />
-              <span
-                className={`h-7 w-5 rounded-[40%] bg-gradient-to-b from-[#ffb347] to-sash ${s.lanternGlow}`}
-                style={{ boxShadow: "0 0 18px rgba(255,170,70,0.8), 0 0 40px rgba(230,57,70,0.5)", animationDelay: `${i * 0.4}s` }}
-              />
-            </span>
-          )}
+              className={`h-7 w-5 rounded-[40%] bg-gradient-to-b from-[#ffb347] to-sash ${s.lanternGlow}`}
+              style={{ boxShadow: "0 0 18px rgba(255,170,70,0.8), 0 0 40px rgba(230,57,70,0.5)", animationDelay: `${i * 0.4}s` }}
+            />
+          </span>
+        )}
 
-          <div className={`${s.posterCaption} absolute inset-x-0 bottom-0 p-3`}>
-            <h4 className="line-clamp-2 text-sm font-extrabold leading-tight text-white">{title}</h4>
-            <p className="mt-0.5 text-[11px] font-bold text-white/70">{caption}</p>
-          </div>
+        <div className={`${s.posterCaption} absolute inset-x-0 bottom-0 p-3`}>
+          <h4 className="line-clamp-2 text-sm font-extrabold leading-tight text-white">{title}</h4>
+          <p className="mt-0.5 text-[11px] font-bold text-white/70">{caption}</p>
         </div>
-      </Link>
+      </div>
+    </Link>
+  );
+  return reveal ? (
+    <Reveal delay={(i % 4) * 90} y={34} scale={0.96}>
+      {card}
     </Reveal>
+  ) : (
+    card
   );
 }
 
 /**
  * Watching / Completed / Plan-to-watch shelves filled with real trending covers.
- * This is the phone and "reduce motion" layout: a swipeable curved rail per
- * shelf on phones, a gently curved still grid otherwise. Wide screens with
- * motion get the pinned <PosterRail> instead (see logbook.module.css).
+ * This is the phone, tablet and "reduce motion" layout: a swipeable rail per
+ * shelf on phones, a gently curved grid that bends with the scroll otherwise.
+ * Wide screens with motion get the pinned <LogbookRail> instead (the swap is
+ * done in CSS: .staticOnly / .railOnly in logbook.module.css).
  */
 export default function LogbookShelves({ items }: { items: AnimeCard[] }) {
   return (
-    <div className="space-y-16 sm:space-y-24">
+    <div className={`${s.staticOnly} space-y-16 sm:space-y-24`}>
       {shelfRows(items).map(({ shelf, row }) => (
         <section key={shelf.kind} aria-labelledby={`shelf-${shelf.kind}`}>
           <Reveal className="mb-6 flex flex-wrap items-end justify-between gap-3">
@@ -146,7 +168,7 @@ export default function LogbookShelves({ items }: { items: AnimeCard[] }) {
 
 export function LogbookShelvesSkeleton() {
   return (
-    <div className="space-y-16" aria-hidden>
+    <div className={`${s.staticOnly} space-y-16`} aria-hidden>
       {[0, 1, 2].map((r) => (
         <div key={r}>
           <div className="mb-6 h-10 w-48 animate-pulse rounded-lg bg-white/10" />

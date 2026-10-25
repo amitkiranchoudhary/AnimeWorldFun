@@ -2,7 +2,7 @@ import Link from "next/link";
 import { cacheLife } from "next/cache";
 import type { CSSProperties, ReactNode } from "react";
 import { LogoMark } from "./Logo";
-import { BackToTop, Blossom } from "./Navbar";
+import { BackToTop } from "./Navbar";
 import Reveal from "./motion/Reveal";
 import SplitText from "./motion/SplitText";
 import Marquee from "./motion/Marquee";
@@ -54,6 +54,25 @@ const TITLES = [
 
 /* ── Small pieces ──────────────────────────────────────────────────────── */
 
+// Decorative sakura blossom (5 petals). Kept server-side here so the genre
+// ticker renders plain SVG instead of many client references.
+function Blossom({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 40 40" className={className} aria-hidden focusable="false">
+      {[0, 72, 144, 216, 288].map((r) => (
+        <path
+          key={r}
+          d="M20 20 C 14 12, 15 4, 20 2 C 25 4, 26 12, 20 20 Z"
+          fill="#ffc1dc"
+          fillOpacity="0.9"
+          transform={`rotate(${r} 20 20)`}
+        />
+      ))}
+      <circle cx="20" cy="20" r="2.6" fill="#f2c94c" />
+    </svg>
+  );
+}
+
 // A link whose gradient underline draws in from the left on hover/focus
 function FooterLink({ href, children }: { href: string; children: ReactNode }) {
   return (
@@ -89,6 +108,42 @@ function Lantern({ id, className = "", style }: { id: string; className?: string
         </radialGradient>
       </defs>
     </svg>
+  );
+}
+
+// One period of a rolling wave, repeated so the strip can slide by half its
+// width and loop seamlessly (viewBox is 2880 wide: two screens of waves).
+function wavePath(top: number, amp: number) {
+  let d = `M0 ${top} Q 180 ${top - amp} 360 ${top}`;
+  for (let x = 720; x <= 2880; x += 360) d += ` T ${x} ${top}`;
+  return `${d} V 120 H 0 Z`;
+}
+
+// The sea the wordmark sits on: two wave layers drifting at different speeds,
+// a glint of sunset on the water and a little pirate ship sailing past.
+function Sea() {
+  return (
+    <div aria-hidden className="ft-sea pointer-events-none relative">
+      <svg className="ft-wave ft-wave-back" viewBox="0 0 2880 120" preserveAspectRatio="none" focusable="false">
+        <path d={wavePath(46, 22)} fill="rgba(31, 95, 143, 0.38)" />
+      </svg>
+      <div className="ft-ship-lane">
+        <svg className="ft-ship" viewBox="0 0 64 56" focusable="false">
+          <line x1="32" y1="4" x2="32" y2="40" stroke="#3a2416" strokeWidth="2.4" />
+          <path d="M33 7 Q 52 15 50 31 L 33 31 Z" fill="#fff3d6" />
+          <circle cx="41" cy="20" r="4.2" fill="#2a1a10" />
+          <path d="M35.6 19 H 46.4" stroke="#f2c94c" strokeWidth="2.2" strokeLinecap="round" />
+          <path d="M31 10 Q 18 18 20 31 L 31 31 Z" fill="#ffe9b8" opacity="0.85" />
+          <path d="M32 2 L 40 4.5 L 32 7 Z" fill="#e63946" />
+          <path d="M6 38 H 58 L 50 50 Q 32 54 14 50 Z" fill="#5a341c" />
+          <path d="M8 40.5 H 56" stroke="#f2c94c" strokeWidth="1.4" opacity="0.8" />
+        </svg>
+      </div>
+      <svg className="ft-wave ft-wave-front" viewBox="0 0 2880 120" preserveAspectRatio="none" focusable="false">
+        <path d={wavePath(64, 14)} fill="#0b1726" />
+      </svg>
+      <span className="ft-glint" />
+    </div>
   );
 }
 
@@ -231,8 +286,10 @@ export default function Footer() {
         <SplitText as="div" by="char" stagger={40} text="ANIME WORLD FUN" className="ft-mark text-center font-display leading-none" />
       </div>
 
-      {/* ── End credits bar ── */}
-      <div className="relative border-t border-white/[0.07]">
+      <Sea />
+
+      {/* ── End credits bar: the deep water under the waves ── */}
+      <div className="ft-deep relative">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-4 py-5 text-center text-xs text-muted sm:flex-row sm:px-6 sm:text-left">
           <p>
             © <Year /> Anime World Fun · Made with 🍖 by a fan, for fans ·{" "}
@@ -397,14 +454,14 @@ const FOOTER_CSS = `
   letter-spacing: 0.02em;
   filter: drop-shadow(0 0 22px rgba(255, 120, 180, 0.28));
 }
-@keyframes ft-wave {
+@keyframes ft-stroke-wave {
   0%, 14%, 100% { -webkit-text-stroke-color: rgba(242, 201, 76, 0.5); }
   6% { -webkit-text-stroke-color: #ffc1dc; }
 }
 .ft-mark .split-piece {
   color: rgba(242, 201, 76, 0.03);
   -webkit-text-stroke: 1.5px rgba(242, 201, 76, 0.5);
-  animation: ft-wave 9s ease-in-out infinite;
+  animation: ft-stroke-wave 9s ease-in-out infinite;
   animation-delay: calc(1.8s + var(--i, 0) * 0.09s);
   transition-property: transform, opacity, color;
   transition-duration: 0.9s, 0.6s, 0.5s;
@@ -423,7 +480,8 @@ const FOOTER_CSS = `
   }
 }
 /* where the browser supports scroll-driven animation, the wordmark rises
-   out of the dark as the bottom of the page arrives */
+   out of the dark as the bottom of the page arrives. The range ends once the
+   wrap has fully entered, which is always reached at the end of the page. */
 @keyframes ft-rise {
   from { transform: translate3d(0, 28%, 0) scale(0.94); opacity: 0.35; }
   to { transform: none; opacity: 1; }
@@ -433,9 +491,90 @@ const FOOTER_CSS = `
     .ft-mark-wrap {
       animation: ft-rise linear both;
       animation-timeline: view();
-      animation-range: entry 0% cover 45%;
+      animation-range: entry 0% entry 100%;
+    }
+    /* the tide swells up under the wordmark as the credits arrive */
+    .ft-sea {
+      animation: ft-swell linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 100%;
     }
   }
+}
+@keyframes ft-swell {
+  from { transform: translate3d(0, 22%, 0); }
+  to { transform: none; }
+}
+
+/* the sea: the wordmark dips into a translucent back wave; the opaque front
+   wave flows straight into the deep-water credits bar below */
+.ft-sea {
+  height: clamp(72px, 10vw, 140px);
+  margin-top: calc(-1 * clamp(0.5rem, 3.2vw, 3.4rem));
+  /* skip painting the endless waves and ship while far off screen */
+  content-visibility: auto;
+  contain-intrinsic-size: auto clamp(72px, 10vw, 140px);
+}
+@keyframes ft-tide {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-50%, 0, 0); }
+}
+.ft-wave {
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  width: 200%;
+  height: 100%;
+  animation: ft-tide 26s linear infinite;
+}
+.ft-wave-back {
+  animation-duration: 38s;
+  animation-direction: reverse;
+  filter: drop-shadow(0 -6px 18px rgba(255, 143, 196, 0.18));
+}
+.ft-deep {
+  background: #0b1726;
+}
+.ft-glint {
+  position: absolute;
+  left: 25%;
+  right: 25%;
+  top: 48%;
+  height: 18%;
+  border-radius: 50%;
+  background: radial-gradient(50% 50% at 50% 50%, rgba(255, 193, 220, 0.4), rgba(242, 201, 76, 0.12) 55%, transparent 75%);
+  mix-blend-mode: screen;
+  animation: glow-pulse 5s ease-in-out infinite;
+}
+/* the ship crosses the whole width (lane slides by its own width), bobbing;
+   the lane sits low so only the mast tip grazes the feet of the letters and
+   the front wave hides the waterline */
+@keyframes ft-sail {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(calc(100% + 160px), 0, 0); }
+}
+@keyframes ft-bob {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(-3deg); }
+  50% { transform: translate3d(0, -4px, 0) rotate(3deg); }
+}
+.ft-ship-lane {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 32%;
+  height: clamp(36px, 4.6vw, 58px);
+  animation: ft-sail 60s linear -21s infinite;
+}
+.ft-ship {
+  position: absolute;
+  left: -80px;
+  bottom: 0;
+  height: 100%;
+  width: auto;
+  aspect-ratio: 64 / 56;
+  transform-origin: 50% 85%;
+  filter: drop-shadow(0 0 10px rgba(242, 201, 76, 0.25));
+  animation: ft-bob 3.4s ease-in-out infinite;
 }
 
 .ft-top-arrow {
@@ -448,7 +587,18 @@ const FOOTER_CSS = `
 
 @media (prefers-reduced-motion: reduce) {
   .ft-lantern,
-  .ft-mark .split-piece {
+  .ft-mark .split-piece,
+  .ft-wave,
+  .ft-ship,
+  .ft-glint {
+    animation: none;
+  }
+  /* the ship lies at anchor at the right edge of the sea */
+  .ft-ship-lane {
+    animation: none;
+    transform: translate3d(100%, 0, 0);
+  }
+  .ft-sea {
     animation: none;
   }
   .ft-mark .split-piece {

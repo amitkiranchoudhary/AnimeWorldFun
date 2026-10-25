@@ -2,6 +2,7 @@
 import Image from "next/image";
 import compass from "../../../public/images/compass.png";
 import NightHarbour from "@/components/account/NightHarbour";
+import CardLight from "@/components/account/CardLight";
 import s from "@/components/account/night.module.css";
 import LoginForm from "./LoginForm";
 
@@ -38,6 +39,9 @@ export default function LoginPage() {
             className="pointer-events-none absolute -top-24 left-1/2 h-48 w-72 -translate-x-1/2 rounded-full"
             style={{ background: "radial-gradient(closest-side, rgba(255,180,80,0.28), transparent)" }}
           />
+
+          {/* and a softer pool that follows the mouse */}
+          <CardLight />
 
           <Image
             src={compass}
