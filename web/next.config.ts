@@ -9,6 +9,8 @@ const nextConfig: NextConfig = {
     remotePatterns: [{ protocol: "https", hostname: "s4.anilist.co" }],
   },
   poweredByHeader: false,
+  // blog posts are read from Markdown files at request time; ship them with the server
+  outputFileTracingIncludes: { "/blog/*": ["./content/blog/**/*"] },
   async headers() {
     return [
       {

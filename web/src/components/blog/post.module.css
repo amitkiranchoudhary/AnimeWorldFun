@@ -1,0 +1,190 @@
+/* A blog post: readable long-form type on the dark sea, plus the read-along. */
+
+.body {
+  font-size: 1.125rem;
+  line-height: 1.85;
+  color: rgba(255, 255, 255, 0.86);
+}
+.body > * + * {
+  margin-top: 1.25rem;
+}
+.body h2 {
+  margin-top: 3rem;
+  font-family: var(--font-bangers), sans-serif;
+  font-size: clamp(2rem, 5vw, 2.8rem);
+  line-height: 1;
+  letter-spacing: 0.03em;
+  color: var(--straw);
+}
+.body h3 {
+  margin-top: 2.25rem;
+  font-weight: 900;
+  font-size: 1.35rem;
+  color: var(--text);
+}
+.body ul,
+.body ol {
+  padding-left: 1.4rem;
+}
+.body ul {
+  list-style: none;
+}
+.body ul > li {
+  position: relative;
+}
+.body ul > li::before {
+  content: "✿";
+  position: absolute;
+  left: -1.3rem;
+  color: #ff8fc2;
+  font-size: 0.8em;
+  top: 0.2em;
+}
+.body ol {
+  list-style: decimal;
+}
+.body li + li {
+  margin-top: 0.5rem;
+}
+.body blockquote {
+  border-left: 3px solid var(--sash);
+  padding: 0.25rem 0 0.25rem 1.25rem;
+  font-style: italic;
+  color: #ffe9c7;
+}
+.body hr {
+  margin: 3rem auto;
+  width: 40%;
+  border: 0;
+  border-top: 1px dashed rgba(242, 201, 76, 0.4);
+}
+.body a {
+  color: var(--straw);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.body a:focus-visible {
+  outline: 2px solid var(--straw);
+  outline-offset: 2px;
+}
+.body code {
+  border-radius: 0.4rem;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 0.1rem 0.4rem;
+  font-size: 0.92em;
+}
+.body strong {
+  color: var(--text);
+}
+/* ||spoilers|| stay blurred until hovered, focused or tapped */
+.body :global(.spoiler) {
+  border-radius: 0.3rem;
+  background: rgba(255, 255, 255, 0.06);
+  filter: blur(6px);
+  cursor: pointer;
+  transition: filter 0.3s var(--ease-out);
+}
+.body :global(.spoiler):hover,
+.body :global(.spoiler):focus-visible {
+  filter: none;
+  outline: none;
+}
+
+/* the read-along: every word is a span; the one being read glows */
+.body [data-w] {
+  border-radius: 0.3rem;
+  transition: background-color 0.18s, color 0.18s, box-shadow 0.18s;
+}
+.reader[data-reading] .body [data-w] {
+  cursor: pointer;
+}
+.body [data-w][data-on] {
+  background: rgba(255, 143, 194, 0.28);
+  color: #fff;
+  box-shadow: 0 0 0 3px rgba(255, 143, 194, 0.28), 0 0 22px rgba(255, 143, 194, 0.45);
+}
+
+.bar {
+  position: sticky;
+  top: 5.5rem;
+  z-index: 20;
+  margin-bottom: 2.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 0.9rem;
+  border-radius: 1.5rem;
+  padding: 0.75rem 1rem 1rem;
+  overflow: hidden;
+}
+.play {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 999px;
+  background: var(--straw);
+  color: var(--ink);
+  padding: 0.55rem 1.2rem;
+  font-weight: 900;
+  box-shadow: 3px 3px 0 var(--ink);
+  transition: transform 0.2s var(--ease-out);
+}
+.play:hover {
+  transform: translateY(-2px);
+}
+.small,
+.rate,
+.rateOn {
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(0, 0, 0, 0.3);
+  padding: 0.35rem 0.7rem;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+.rateOn {
+  border-color: var(--straw);
+  background: rgba(242, 201, 76, 0.18);
+  color: var(--straw);
+}
+.rates {
+  display: flex;
+  gap: 0.3rem;
+}
+.play:focus-visible,
+.small:focus-visible,
+.rate:focus-visible,
+.rateOn:focus-visible {
+  outline: 2px solid var(--straw);
+  outline-offset: 2px;
+}
+.play:disabled,
+.small:disabled {
+  opacity: 0.5;
+}
+.mode {
+  flex: 1 1 12rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+.progress {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.08);
+}
+.progress span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #ff8fc2, var(--straw));
+  transition: width 0.3s linear;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .body [data-w],
+  .progress span,
+  .play {
+    transition: none;
+  }
+}

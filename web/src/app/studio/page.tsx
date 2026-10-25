@@ -21,22 +21,36 @@ const PHASE_ACCENT: Record<string, string> = {
   Later: "#b9c3d6",
 };
 
-const TOOLS = [
-  { icon: "✍️", title: "Write a blog", body: "Paste or record a post and let the studio lay it out.", phase: "Phase 4" },
-  { icon: "🎙️", title: "Voice read-along", body: "Upload your recording; words highlight as you speak.", phase: "Phase 4" },
-  { icon: "🗺️", title: "Anime data", body: "Fix sub/dub and where-to-watch info for India.", phase: "Phase 2" },
-  { icon: "📊", title: "Site stats", body: "Views, popular posts and searches.", phase: "Later" },
+type Tool = { icon: string; title: string; body: string; phase: string; href: string | null };
+
+const TOOLS: Tool[] = [
+  {
+    icon: "✍️",
+    title: "Write a blog",
+    body: "Write or paste a post with a live preview, then download it and commit it to publish.",
+    phase: "Phase 4",
+    href: "/studio/write",
+  },
+  {
+    icon: "🎙️",
+    title: "Voice read-along",
+    body: "Load your recording and tap each sentence as you hear it; readers hear you while the words light up.",
+    phase: "Phase 4",
+    href: "/studio/write#voice",
+  },
+  { icon: "🗺️", title: "Anime data", body: "Fix sub/dub and where-to-watch info for India.", phase: "Phase 2", href: null },
+  { icon: "📊", title: "Site stats", body: "Views, popular posts and searches.", phase: "Later", href: null },
 ];
 
 // the route ahead, in the order the phases land
 const CHART = [
   { phase: "Phase 2", label: "Anime data", href: null },
   { phase: "Phase 3", label: "My List logbook", href: "/my-list" },
-  { phase: "Phase 4", label: "Blog & voice studio", href: null },
+  { phase: "Phase 4", label: "Blog & voice studio", href: "/studio/write" },
   { phase: "Later", label: "Site stats", href: null },
 ];
 
-function ToolCard({ t, i }: { t: (typeof TOOLS)[number]; i: number }) {
+function ToolCard({ t, i }: { t: Tool; i: number }) {
   const accent = PHASE_ACCENT[t.phase] ?? "#f2c94c";
   return (
     <Reveal as="li" delay={i * 110} y={34} scale={0.97}>
@@ -62,14 +76,23 @@ function ToolCard({ t, i }: { t: (typeof TOOLS)[number]; i: number }) {
                 background: `color-mix(in srgb, ${accent} 12%, transparent)`,
               }}
             >
-              {t.phase}
+              {t.href ? "Live" : t.phase}
             </span>
           </div>
           <h2 className="relative mt-5 font-display text-3xl tracking-wide text-straw">{t.title}</h2>
           <p className="relative mt-1.5 text-sm leading-relaxed text-muted">{t.body}</p>
-          <p className="relative mt-5 flex items-center gap-2 text-xs font-bold text-white/45">
-            <span aria-hidden>🔒</span> Switches on in {t.phase === "Later" ? "a later phase" : t.phase}
-          </p>
+          {t.href ? (
+            <Link
+              href={t.href}
+              className="relative mt-5 inline-block rounded-full bg-straw px-4 py-2 text-sm font-extrabold text-ink after:absolute after:inset-[-100vmax] after:content-[''] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-straw"
+            >
+              Open →
+            </Link>
+          ) : (
+            <p className="relative mt-5 flex items-center gap-2 text-xs font-bold text-white/45">
+              <span aria-hidden>🔒</span> Switches on in {t.phase === "Later" ? "a later phase" : t.phase}
+            </p>
+          )}
         </article>
       </TiltCard>
     </Reveal>
@@ -109,7 +132,7 @@ function VoyageChart() {
                       href={c.href}
                       className="mt-0.5 inline-block font-bold text-text underline decoration-white/30 underline-offset-4 transition hover:decoration-straw focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-straw"
                     >
-                      {c.label} · preview →
+                      {c.label} · open →
                     </Link>
                   ) : (
                     <span className="mt-0.5 block font-bold text-text">{c.label}</span>
@@ -144,7 +167,7 @@ async function Quarters() {
           </h1>
           <Reveal delay={700}>
             <p className="mt-4 max-w-md text-sm leading-relaxed text-muted">
-              The captain&apos;s quarters. Each tool below switches on as its phase lands.
+              The captain&apos;s quarters: write posts, sync your voice, and keep the anime data honest.
             </p>
           </Reveal>
         </div>
@@ -165,7 +188,7 @@ async function Quarters() {
 
       <Reveal>
         <p className="mt-10 text-sm text-muted">
-          These tools switch on as each phase lands.{" "}
+          Locked tools switch on as their phase lands.{" "}
           <Link
             href="/"
             className="font-bold text-straw underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-straw"

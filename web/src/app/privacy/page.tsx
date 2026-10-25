@@ -130,6 +130,10 @@ const SECTIONS: { id: string; title: string; body: ReactNode }[] = [
           </div>
         </div>
         <p>
+          On the site owner&apos;s own computer, the owner-only Studio also keeps an unfinished blog draft in local storage
+          (<code>awf-studio-draft</code>) so it isn&apos;t lost on a refresh. Visitors never get it.
+        </p>
+        <p>
           The site itself sets no other cookies. A YouTube trailer, if you load one, may set its own — see the next
           section.
         </p>
