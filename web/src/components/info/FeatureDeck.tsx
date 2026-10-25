@@ -74,7 +74,7 @@ export default function FeatureDeck() {
                 <p className="mt-3 flex-1 leading-relaxed text-muted">{f.body}</p>
                 <Link
                   href={f.href}
-                  className="mt-6 inline-flex w-fit items-center gap-2 rounded-full font-extrabold text-straw outline-none after:absolute after:inset-0 after:rounded-[1.4rem] after:content-[''] focus-visible:after:ring-2 focus-visible:after:ring-straw"
+                  className="mt-6 inline-flex w-fit items-center gap-2 rounded-full font-extrabold text-straw outline-none after:absolute after:inset-0 after:rounded-[1.4rem] after:content-[''] focus-visible:after:ring-2 focus-visible:after:ring-inset focus-visible:after:ring-straw"
                 >
                   {f.cta}
                   <span aria-hidden className="transition-transform duration-500 ease-[var(--ease-out)] group-hover:translate-x-1.5">

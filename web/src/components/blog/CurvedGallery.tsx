@@ -7,7 +7,7 @@ import { prefersReducedMotion } from "@/lib/motion/inView";
 import type { Topic } from "./topics";
 import s from "./blog.module.css";
 
-export type GalleryTopic = Topic & { cover?: string | null };
+type GalleryTopic = Topic & { cover?: string | null };
 
 const pad = (n: number) => String(n).padStart(2, "0");
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
@@ -28,7 +28,7 @@ export default function CurvedGallery({ topics }: { topics: GalleryTopic[] }) {
     const stage = sec.querySelector<HTMLElement>("[data-stage]");
     const track = sec.querySelector<HTMLElement>("[data-track]");
     const bar = sec.querySelector<HTMLElement>("[data-bar]");
-    const counter = sec.querySelector<HTMLElement>("[data-counter]");
+    const counter = sec.querySelector<HTMLElement>("[data-counter-n]");
     const slots = Array.from(sec.querySelectorAll<HTMLElement>("[data-slot]"));
     if (!stage || !track || !slots.length) return;
     sec.setAttribute("data-pinned", "");
@@ -85,7 +85,7 @@ export default function CurvedGallery({ topics }: { topics: GalleryTopic[] }) {
         slots[active]?.removeAttribute("data-active");
         slots[best].setAttribute("data-active", "");
         active = best;
-        if (counter) counter.textContent = `${pad(best + 1)} / ${pad(slots.length)}`;
+        if (counter) counter.textContent = pad(best + 1);
       }
       if (bar) bar.style.transform = `scaleX(${p.toFixed(4)})`;
       // keep easing the bend back to rest after the scroll stops
@@ -139,7 +139,10 @@ export default function CurvedGallery({ topics }: { topics: GalleryTopic[] }) {
             </h2>
           </div>
           <div aria-hidden className={s.galleryMeta}>
-            <span data-counter>01 / {pad(topics.length)}</span>
+            {/* the effect rewrites only the inner number, never React's own text nodes */}
+            <span>
+              <span data-counter-n>01</span> / {pad(topics.length)}
+            </span>
             <span className={s.galleryBar}>
               <span data-bar />
             </span>

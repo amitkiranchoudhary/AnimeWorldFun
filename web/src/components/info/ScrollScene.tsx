@@ -44,6 +44,14 @@ export default function ScrollScene({
     let frame = 0;
     let lastY = window.scrollY;
     let v = 0;
+    let active = false;
+    // last values written, so unchanged frames cost no style recalc
+    let lastP = "";
+    let lastV = "";
+    const write = (p: string, vs: string) => {
+      if (p !== lastP) el.style.setProperty("--p", (lastP = p));
+      if (vs !== lastV) el.style.setProperty("--v", (lastV = vs));
+    };
 
     const tick = () => {
       frame = 0;
@@ -56,22 +64,45 @@ export default function ScrollScene({
       lastY = y;
       v += (target - v) * 0.18;
       if (v < 0.002) v = 0;
-      el.style.setProperty("--p", p.toFixed(4));
-      el.style.setProperty("--v", v.toFixed(3));
+      write(p.toFixed(4), v.toFixed(3));
       // keep easing --v back to rest after the scrolling stops
-      if (v > 0) frame = requestAnimationFrame(tick);
+      if (v > 0 && active) frame = requestAnimationFrame(tick);
     };
     const onScroll = () => {
       if (!frame) frame = requestAnimationFrame(tick);
     };
 
-    tick();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll, { passive: true });
-    return () => {
-      cancelAnimationFrame(frame);
+    // only listen while the scene is near the screen
+    const start = () => {
+      if (active) return;
+      active = true;
+      lastY = window.scrollY;
+      window.addEventListener("scroll", onScroll, { passive: true });
+      window.addEventListener("resize", onScroll, { passive: true });
+      onScroll();
+    };
+    const stop = () => {
+      if (!active) return;
+      active = false;
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
+      cancelAnimationFrame(frame);
+      frame = 0;
+      v = 0;
+      // park it finished (above the screen) or unplayed (below)
+      write(el.getBoundingClientRect().top > 0 ? "0.0000" : "1.0000", "0.000");
+    };
+
+    tick();
+    let io: IntersectionObserver | undefined;
+    if (typeof IntersectionObserver === "undefined") start();
+    else {
+      io = new IntersectionObserver(([e]) => (e.isIntersecting ? start() : stop()), { rootMargin: "100% 0px" });
+      io.observe(el);
+    }
+    return () => {
+      io?.disconnect();
+      stop();
     };
   }, []);
 
@@ -87,6 +118,11 @@ export default function ScrollScene({
       <style href="awf-scroll-scene" precedence="default">{`
         .scroll-scene[data-still] { height: auto !important; }
         .scroll-scene[data-still] > .scroll-scene-stage { position: relative; height: auto; min-height: 100svh; }
+        /* collapse before hydration too, so reduced-motion visitors get no layout jump */
+        @media (prefers-reduced-motion: reduce) {
+          .scroll-scene { height: auto !important; --p: 1 !important; --v: 0 !important; }
+          .scroll-scene > .scroll-scene-stage { position: relative; height: auto; min-height: 100svh; }
+        }
       `}</style>
     </section>
   );

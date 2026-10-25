@@ -10,6 +10,7 @@ import PosterArc from "@/components/info/PosterArc";
 import AboutHero from "@/components/info/AboutHero";
 import FeatureDeck from "@/components/info/FeatureDeck";
 import AboutOutro from "@/components/info/AboutOutro";
+import MapReveal from "@/components/info/MapReveal";
 
 export const metadata: Metadata = {
   title: "About Us",
@@ -22,7 +23,23 @@ const QUESTIONS = ["Where is it streaming?", "Sub or dub?", "Which language?", "
 // AniList posters for the curved gallery (cached for hours in lib/anilist)
 async function Posters() {
   const items = (await getAllTimeGreats()).slice(0, 11);
-  return items.length > 0 ? <PosterArc items={items} /> : null;
+  return items.length > 0 ? <PosterArc items={items} /> : <PosterFrames />;
+}
+
+// While the posters load (or if AniList is unreachable): empty glowing frames
+function PosterFrames() {
+  return (
+    <div aria-hidden className="pointer-events-none absolute inset-x-0 top-[48%] flex justify-center gap-3 px-4 sm:gap-5">
+      {[0, 1, 2, 3, 4].map((i) => (
+        <span
+          key={i}
+          className={`aspect-[2/3] w-[clamp(64px,16vw,170px)] shrink-0 rounded-[14px] border border-[rgba(255,150,200,0.25)] bg-white/[0.03] shadow-[0_0_40px_-12px_rgba(255,120,180,0.5)] ${
+            i === 0 || i === 4 ? "hidden sm:block" : ""
+          }`}
+        />
+      ))}
+    </div>
+  );
 }
 
 export default function AboutPage() {
@@ -71,12 +88,19 @@ export default function AboutPage() {
       </div>
 
       {/* ── Chapter 02: the answer ──────────────────────────── */}
-      <ScrollScene length={220} label="Chapter two: the answer" stageClassName="bg-[#0b0b10]/70">
-        <ChapterFrame number="02" title="The answer" kanji="地図" kanjiMeaning="map" tint="242,201,76">
+      <ScrollScene length={260} label="Chapter two: the answer" stageClassName="bg-[#0b0b10]/70">
+        <ChapterFrame
+          number="02"
+          title="The answer"
+          kanji="地図"
+          kanjiMeaning="map"
+          tint="242,201,76"
+          overlay={<MapReveal from={0.4} to={0.8} />}
+        >
           <ScrubLine
             text="So I drew a *map*. One harbour. Every anime. *Honest* answers."
             from={0.04}
-            to={0.5}
+            to={0.36}
             accent="gold"
             className="mx-auto max-w-6xl text-center font-display text-[clamp(2.5rem,9vw,8rem)] uppercase leading-[0.92] tracking-wide text-text"
           />
@@ -102,7 +126,7 @@ export default function AboutPage() {
           tint="255,120,180"
           align="top"
           overlay={
-            <Suspense fallback={null}>
+            <Suspense fallback={<PosterFrames />}>
               <Posters />
             </Suspense>
           }
@@ -133,7 +157,7 @@ export default function AboutPage() {
           from={0.45}
           to={0.98}
           lines={[
-            "No paywall. No sign-up needed to browse.",
+            "No paywall. No accounts, no sign-ups.",
             "Built in spare time by one fan who kept getting lost —",
             "the map he wished he'd had. Now it's yours too.",
           ]}

@@ -71,7 +71,7 @@ export default function AboutHero() {
 
       {/* film-credit line + scroll cue */}
       <Reveal delay={1150} className="absolute inset-x-4 bottom-6 flex flex-col items-center gap-3">
-        <p className="font-mono text-[10px] uppercase tracking-[0.35em] text-white/40">A fan production · 4 chapters · runtime: one scroll</p>
+        <p className="font-mono text-[10px] uppercase tracking-[0.35em] text-white/60">A fan production · 4 chapters · runtime: one scroll</p>
         <span aria-hidden className="about-cue" />
       </Reveal>
 

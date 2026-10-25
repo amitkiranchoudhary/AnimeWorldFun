@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type MouseEvent } from "react";
 
 type Item = { id: string; title: string };
 
@@ -31,7 +31,8 @@ export default function PolicyToc({ items }: { items: Item[] }) {
     return () => io.disconnect();
   }, [items]);
 
-  const list = (
+  // onPick lets the phone menu fold itself away after a jump
+  const list = (onPick?: (e: MouseEvent<HTMLAnchorElement>) => void) => (
     <ol className="space-y-1">
       {items.map((it, i) => {
         const on = it.id === active;
@@ -40,11 +41,12 @@ export default function PolicyToc({ items }: { items: Item[] }) {
             <a
               href={`#${it.id}`}
               aria-current={on ? "location" : undefined}
+              onClick={onPick}
               className={`toc-link group flex items-baseline gap-3 rounded-lg px-3 py-1.5 text-sm outline-none transition-colors duration-300 focus-visible:ring-2 focus-visible:ring-straw ${
                 on ? "bg-white/[0.06] font-extrabold text-text" : "text-muted hover:text-text"
               }`}
             >
-              <span className={`font-mono text-[11px] ${on ? "text-[#ff9fc8]" : "text-white/30"}`}>{String(i + 1).padStart(2, "0")}</span>
+              <span className={`font-mono text-[11px] ${on ? "text-[#ff9fc8]" : "text-white/50"}`}>{String(i + 1).padStart(2, "0")}</span>
               <span>{it.title}</span>
             </a>
           </li>
@@ -56,8 +58,8 @@ export default function PolicyToc({ items }: { items: Item[] }) {
   return (
     <>
       <nav aria-label="On this page" className="hidden lg:block">
-        <p className="mb-3 px-3 text-[11px] font-extrabold uppercase tracking-[0.3em] text-white/40">On this page</p>
-        {list}
+        <p className="mb-3 px-3 text-[11px] font-extrabold uppercase tracking-[0.3em] text-white/60">On this page</p>
+        {list()}
       </nav>
       <details className="glass group rounded-2xl lg:hidden">
         <summary className="flex cursor-pointer list-none items-center justify-between rounded-2xl px-4 py-3 text-sm font-extrabold text-text outline-none focus-visible:ring-2 focus-visible:ring-straw [&::-webkit-details-marker]:hidden">
@@ -67,7 +69,10 @@ export default function PolicyToc({ items }: { items: Item[] }) {
           </span>
         </summary>
         <nav aria-label="On this page" className="px-1 pb-3">
-          {list}
+          {list((e) => {
+            const menu = e.currentTarget.closest("details");
+            if (menu) menu.open = false;
+          })}
         </nav>
       </details>
     </>

@@ -39,9 +39,10 @@ export default function BlogPage() {
 
       <ScrollLitLine
         kicker="Chapter 01 — The voice"
+        label={["Chapter 01", "The voice"]}
         text="Every post in this log will speak. Press play, and each word lights up as it's read, like subtitles for your favourite episode."
         accents={["speak", "lights", "up"]}
-        note="Read along, or close your eyes and just listen: narration is built into every post we write."
+        note="Read along, or close your eyes and just listen: narration will be built into every post we write."
       />
 
       <Suspense fallback={<TopicGalleryFallback />}>

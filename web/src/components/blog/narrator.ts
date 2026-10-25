@@ -16,7 +16,7 @@ export const canSpeak = () =>
   typeof window !== "undefined" && "speechSynthesis" in window && typeof SpeechSynthesisUtterance !== "undefined";
 
 /** How long a word stays lit on the timer at 1× (about 170 words a minute, with pauses at punctuation). */
-export function wordMs(word: string) {
+function wordMs(word: string) {
   let ms = 190 + word.replace(/[^\w']/g, "").length * 34;
   if (/[.!?]["”’)]?$/.test(word)) ms += 380;
   else if (/[,;:—]$/.test(word)) ms += 180;
@@ -54,6 +54,7 @@ export function createNarrator(words: string[], cb: Callbacks) {
   let current = -1;
   let rate = 1;
   let noBoundaries = false; // learned once: this voice never sends word events
+  let speechFailed = false; // learned once: speech never started or errored, so stay silent
   let live: SpeechSynthesisUtterance | null = null; // also keeps Chrome from garbage-collecting it
 
   const light = (i: number) => {
@@ -84,6 +85,7 @@ export function createNarrator(words: string[], cb: Callbacks) {
 
   /** Fall back to the silent timer from the current word to the end. */
   function silent(id: number) {
+    speechFailed = true; // later plays skip the 2.5 s start guard and go straight to the timer
     live = null;
     synth?.cancel();
     cb.onMode("timed");
@@ -163,7 +165,7 @@ export function createNarrator(words: string[], cb: Callbacks) {
     const id = session;
     rate = opts.rate;
     current = from;
-    if (opts.voice && synth) {
+    if (opts.voice && synth && !speechFailed) {
       cb.onMode(noBoundaries ? "voice-timed" : "voice");
       light(from);
       // Chrome can drop an utterance queued in the same tick as cancel()

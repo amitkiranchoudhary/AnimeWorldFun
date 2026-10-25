@@ -448,6 +448,20 @@
   justify-content: center;
   padding-top: 4.5rem;
 }
+/* short screens (landscape phones): start at the top and drop the hint so
+   the pinned stage never clips its title */
+@media (max-height: 520px) {
+  .gallery[data-pinned] .galleryStage {
+    padding-top: 3.5rem;
+    justify-content: flex-start;
+  }
+  .gallery[data-pinned] .galleryHint {
+    display: none;
+  }
+  .gallery .chapterTitle {
+    font-size: 2.2rem;
+  }
+}
 .galleryHead {
   width: 100%;
   max-width: 74rem;
@@ -649,8 +663,56 @@
 
 /* ── Chapter 03: read-along preview ──────────────────── */
 .reader {
-  padding: 7rem 1rem 6rem;
+  padding: 7rem 1rem 3rem;
   scroll-margin-top: 4rem;
+  isolation: isolate;
+}
+/* cinema mode (data-cinema while playing): the house lights go down around
+   the panel, a vignette plus a soft pink bloom behind the "screen" */
+.reader::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 60% 45% at 50% 62%, rgba(255, 130, 190, 0.16), transparent 70%),
+    radial-gradient(ellipse 85% 75% at 50% 58%, rgba(8, 6, 10, 0.35) 30%, rgba(4, 3, 6, 0.88) 100%);
+  opacity: 0;
+  transform: scale(1.06);
+  transition: opacity 0.9s var(--ease-out), transform 1.2s var(--ease-out);
+}
+.reader[data-cinema]::before {
+  opacity: 1;
+  transform: none;
+}
+.readerHead,
+.reader .sideLabel {
+  transition: opacity 0.9s var(--ease-out);
+}
+.reader[data-cinema] .readerHead,
+.reader[data-cinema] .sideLabel {
+  opacity: 0.4;
+}
+@media (prefers-reduced-motion: reduce) {
+  .reader::before,
+  .readerHead,
+  .reader .sideLabel {
+    transition: none;
+    transform: none;
+  }
+}
+/* the line being read, as a movie subtitle under the panel (space reserved
+   so the page doesn't jump when it appears) */
+.readSubs {
+  max-width: 56rem;
+  margin: 1.4rem auto 0;
+  min-height: 5.6em;
+  text-align: center;
+}
+.subNow {
+  color: #ffe08a;
+  text-shadow: 0 2px 2px #000, 0 0 14px rgba(255, 140, 200, 0.85), 0 0 28px rgba(242, 201, 76, 0.45);
 }
 .readerHead {
   max-width: 56rem;
@@ -921,9 +983,11 @@
 .finale {
   padding: 7rem 1rem 8rem;
   text-align: center;
+  isolation: isolate; /* keeps the glow behind the copy */
 }
 .finaleGlow {
   position: absolute;
+  z-index: -1;
   left: 50%;
   top: 40%;
   width: min(80vw, 720px);

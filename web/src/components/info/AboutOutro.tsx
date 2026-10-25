@@ -56,7 +56,7 @@ export default function AboutOutro() {
       <dl className="mx-auto mt-24 grid max-w-md gap-5 border-t border-white/10 pt-10 font-mono text-xs uppercase tracking-[0.25em]">
         {CREDITS.map(([role, who], i) => (
           <Reveal key={role} delay={i * 90} y={14} blur={3}>
-            <dt className="text-white/35">{role}</dt>
+            <dt className="text-white/60">{role}</dt>
             <dd className="mt-1 text-text/85">{who}</dd>
           </Reveal>
         ))}

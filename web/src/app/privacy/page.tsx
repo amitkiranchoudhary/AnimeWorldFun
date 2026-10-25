@@ -19,14 +19,14 @@ const TLDR = [
   { icon: "🙅", title: "No accounts", body: "Visitors never sign up or log in. There's nothing to register for." },
   { icon: "🚫", title: "No tracking or ads", body: "No analytics, no pixels, no ad cookies — not now. We'll update this first if that changes." },
   { icon: "🏮", title: "One preference", body: "If you switch the straw-hat cursor off, your browser remembers it. That's all." },
-  { icon: "🗺️", title: "Data from AniList", body: "Our server fetches anime info from AniList. Your details are never sent to it." },
+  { icon: "🗺️", title: "Data from AniList", body: "Our server fetches anime info from AniList and never passes on your details. Only the small platform icons load straight from AniList's image server." },
 ];
 
 /** A name/value row in a storage card. */
 function Row({ k, children }: { k: string; children: ReactNode }) {
   return (
     <div className="grid gap-0.5 border-t border-white/5 py-2.5 sm:grid-cols-[9rem_1fr] sm:gap-4">
-      <dt className="text-[11px] font-extrabold uppercase tracking-[0.2em] text-white/40">{k}</dt>
+      <dt className="text-[11px] font-extrabold uppercase tracking-[0.2em] text-white/60">{k}</dt>
       <dd className="text-sm text-text/90">{children}</dd>
     </div>
   );
@@ -76,7 +76,7 @@ const SECTIONS: { id: string; title: string; body: ReactNode }[] = [
             don&apos;t save them or connect them to you.
           </li>
           <li>
-            <strong>Tracking is coming later.</strong> When the My List feature arrives, this policy will be updated
+            <strong>Watch-list tracking (My List) is coming later.</strong> When the My List feature arrives, this policy will be updated
             before it launches to explain exactly what it stores and where.
           </li>
         </ul>
@@ -148,6 +148,12 @@ const SECTIONS: { id: string; title: string; body: ReactNode }[] = [
             <strong>The cherry blossom photo</strong> — &ldquo;Sakura branch&rdquo; by Raita Futo, from{" "}
             <Out href="https://commons.wikimedia.org/wiki/File:Sakura_branch_(52013006346).jpg">Wikimedia Commons</Out> (CC
             BY 2.0) — is stored on and served from our own server, so no request goes to Wikimedia.
+          </li>
+          <li>
+            <strong>Read-aloud.</strong> The <Link href="/blog">blog</Link>&apos;s listen button uses your browser&apos;s own
+            speech voice, preferring one that runs on your device. Some browsers use an online voice service instead (such
+            as Google&apos;s voices in Chrome), which then receives the text being read. Only the sample text on the page is
+            read — never anything you type.
           </li>
           <li>
             <strong>Links out.</strong> Streaming platforms, AniList and GitHub have their own privacy policies, which apply

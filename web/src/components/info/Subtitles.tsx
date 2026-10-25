@@ -55,6 +55,10 @@ export default function Subtitles({
         .subtitle-line:last-child { --show: clamp(0, calc(var(--t) * 5), 1); }
         .scroll-scene[data-still] .subtitles { position: static; display: flex; flex-direction: column; gap: .5rem; margin-top: 2rem; }
         .scroll-scene[data-still] .subtitle-line { opacity: 1; transform: none; }
+        @media (prefers-reduced-motion: reduce) {
+          .scroll-scene .subtitles { position: static; display: flex; flex-direction: column; gap: .5rem; margin-top: 2rem; }
+          .scroll-scene .subtitle-line { opacity: 1; transform: none; }
+        }
       `}</style>
     </ol>
   );

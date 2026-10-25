@@ -15,6 +15,19 @@ type Status = "idle" | "playing" | "paused" | "done";
 
 // speech support never changes after load, so there is nothing to subscribe to
 const subscribeNever = () => () => {};
+const onClient = () => true;
+const onServer = () => false;
+
+const isSentenceEnd = (w: string) => /[.!?]["”’)]?$/.test(w);
+// the sentence each word belongs to, as [start, end] word indexes (for the subtitle)
+const SENTENCES: [number, number][] = [];
+for (let i = 0, start = 0; i < N; i++) {
+  if (isSentenceEnd(WORDS[i]) || i === N - 1) {
+    SENTENCES.push([start, i]);
+    start = i + 1;
+  }
+}
+const sentenceOf = (i: number) => SENTENCES.find(([a, b]) => i >= a && i <= b) ?? null;
 
 function PlayIcon({ playing }: { playing: boolean }) {
   return (
@@ -35,7 +48,10 @@ function PlayIcon({ playing }: { playing: boolean }) {
  * or click any word (or use the arrow keys) to jump there.
  */
 export default function ReadAlong() {
-  const speechOk = useSyncExternalStore(subscribeNever, canSpeak, () => false);
+  const speechOk = useSyncExternalStore(subscribeNever, canSpeak, onServer);
+  // false on the server and first paint, so the note doesn't flash "no narrator"
+  const known = useSyncExternalStore(subscribeNever, onClient, onServer);
+  const panelRef = useRef<HTMLDivElement>(null);
   const [status, setStatus] = useState<Status>("idle");
   const [index, setIndex] = useState(-1);
   const [rate, setRate] = useState(1);
@@ -61,10 +77,27 @@ export default function ReadAlong() {
     narrator.current = n;
     // Chrome loads its voice list lazily; ask early so it's ready on Play
     if (canSpeak()) window.speechSynthesis.getVoices();
-    return () => {
+    // Stop speaking when the route is hidden (Next keeps it in <Activity>),
+    // unmounted, or the page is left; at.current is kept so Resume picks up here.
+    const halt = () => {
       n.stop();
+      setStatus((st) => (st === "playing" ? "paused" : st));
+    };
+    window.addEventListener("pagehide", halt);
+    return () => {
+      window.removeEventListener("pagehide", halt);
+      halt();
     };
   }, []);
+
+  // cinema mode: while playing, the whole chapter dims around the panel
+  const playingNow = status === "playing";
+  useEffect(() => {
+    const sec = panelRef.current?.closest("section");
+    if (!sec) return;
+    sec.toggleAttribute("data-cinema", playingNow);
+    return () => sec.removeAttribute("data-cinema");
+  }, [playingNow]);
 
   const voice = voiceOn && speechOk;
 
@@ -127,13 +160,23 @@ export default function ReadAlong() {
   const progress = status === "done" ? 1 : index < 0 ? 0 : (index + 1) / N;
   const playLabel = playing ? "Pause" : status === "paused" ? "Resume" : status === "done" ? "Play again" : "Play";
 
-  const note = !speechOk ? (
+  // the voice really is speaking (not fallen back to the silent timer)
+  const aloud = voice && mode !== "timed";
+
+  const note = !known ? (
+    <>Press Play to hear it read aloud, one glowing word at a time.</>
+  ) : !speechOk ? (
     <>
       <strong>Silent mode.</strong> This browser has no built-in narrator, so the words light up on a timer instead.
     </>
   ) : !voiceOn ? (
     <>
       <strong>Silent mode.</strong> The voice is off, so the words light up on a timer.
+    </>
+  ) : mode === "timed" ? (
+    <>
+      <strong>Silent mode.</strong> Your browser&apos;s voice didn&apos;t start, so the words light up on a timer
+      instead.
     </>
   ) : mode === "voice-timed" ? (
     <>
@@ -149,15 +192,21 @@ export default function ReadAlong() {
 
   const live =
     status === "playing"
-      ? `Reading${voice ? " aloud" : ""} at ${rate} times speed.`
+      ? `Reading${aloud ? " aloud" : ""} at ${rate} times speed.`
       : status === "paused"
         ? `Paused at word ${index + 1} of ${N}: ${WORDS[index] ?? ""}`
         : status === "done"
           ? "Finished. Press Play again to hear it once more."
           : "";
 
+  const sentence = playing && index >= 0 ? sentenceOf(index) : null;
+
   return (
-    <div className={`glass ${s.panel} ${playing ? s.playing : ""} ${status === "paused" ? s.paused : ""}`}>
+    <>
+    <div
+      ref={panelRef}
+      className={`glass ${s.panel} ${playing ? s.playing : ""} ${status === "paused" ? s.paused : ""}`}
+    >
       <div className={s.panelTop}>
         <span className={s.badge}>
           <span aria-hidden className={s.dot} /> Preview · Phase 4
@@ -198,7 +247,7 @@ export default function ReadAlong() {
         <button type="button" onClick={toggle} className={`${s.btn} shimmer`}>
           <PlayIcon playing={playing} />
           {playLabel}
-          {playing && voice && (
+          {playing && aloud && (
             <span aria-hidden className={s.eq}>
               <span />
               <span />
@@ -262,5 +311,23 @@ export default function ReadAlong() {
         {live}
       </p>
     </div>
+
+    {/* Cinema mode's movie subtitle: the line being read, under the "screen".
+        Decorative, since the same words are in the panel above. */}
+    <div aria-hidden className={`${s.subs} ${s.readSubs}`}>
+      {sentence && (
+        <span key={sentence[0]} className={s.sub}>
+          {WORDS.slice(sentence[0], sentence[1] + 1).map((w, j) => {
+            const i = sentence[0] + j;
+            return (
+              <Fragment key={i}>
+                <span className={i === index ? s.subNow : undefined}>{w}</span>{" "}
+              </Fragment>
+            );
+          })}
+        </span>
+      )}
+    </div>
+    </>
   );
 }

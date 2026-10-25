@@ -103,7 +103,7 @@ export default function ContactPage() {
                     href={h.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="mt-6 inline-flex w-fit items-center gap-2 font-extrabold text-straw outline-none after:absolute after:inset-0 after:rounded-[1.4rem] after:content-[''] focus-visible:after:ring-2 focus-visible:after:ring-straw"
+                    className="mt-6 inline-flex w-fit items-center gap-2 font-extrabold text-straw outline-none after:absolute after:inset-0 after:rounded-[1.4rem] after:content-[''] focus-visible:after:ring-2 focus-visible:after:ring-inset focus-visible:after:ring-straw"
                   >
                     {h.cta}
                     <span aria-hidden className="transition-transform duration-500 ease-[var(--ease-out)] group-hover:translate-x-1.5">
@@ -111,7 +111,7 @@ export default function ContactPage() {
                     </span>
                     <span className="sr-only">(opens GitHub in a new tab)</span>
                   </a>
-                  <p className="mt-2 break-all font-mono text-[11px] text-white/35">{h.href.replace("https://", "")}</p>
+                  <p className="mt-2 break-all font-mono text-[11px] text-white/60">{h.href.replace("https://", "")}</p>
                 </article>
               </TiltCard>
             </Reveal>
@@ -146,8 +146,8 @@ export default function ContactPage() {
             </ul>
             <Reveal delay={400}>
               <p className="mt-8 text-sm leading-relaxed text-muted">
-                Curious what happens to your data? Short answer: nothing — this page doesn&apos;t send anything anywhere.
-                The long answer is in the{" "}
+                Curious what happens to your data? Short answer: nothing on this page is sent to our server. Casting just opens GitHub with your note
+                filled in. The long answer is in the{" "}
                 <Link href="/privacy" className="font-bold text-straw underline-offset-4 hover:underline">
                   privacy policy
                 </Link>

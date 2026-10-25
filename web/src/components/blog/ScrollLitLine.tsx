@@ -12,11 +12,14 @@ import s from "./blog.module.css";
  */
 export default function ScrollLitLine({
   kicker,
+  label,
   text,
   accents = [],
   note,
 }: {
   kicker: string;
+  /** the vertical side label, e.g. ["Chapter 01", "The voice"] */
+  label?: [string, string];
   text: string;
   /** words (lower case, no punctuation) drawn in gold */
   accents?: string[];
@@ -67,9 +70,11 @@ export default function ScrollLitLine({
 
   return (
     <section ref={ref} className={`${s.chapter} ${s.lit}`} aria-label={kicker}>
-      <p aria-hidden className={`${s.sideLabel} ${s.sideLeft}`}>
-        Chapter 01 <b>·</b> The voice
-      </p>
+      {label && (
+        <p aria-hidden className={`${s.sideLabel} ${s.sideLeft}`}>
+          {label[0]} <b>·</b> {label[1]}
+        </p>
+      )}
       <div className={s.litStage}>
         <p className={s.kicker}>
           <span aria-hidden className={s.dot} /> {kicker}

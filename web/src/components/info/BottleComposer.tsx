@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useState, type MouseEvent } from "react";
+import { useEffect, useId, useRef, useState, type MouseEvent } from "react";
 import { ISSUES_URL } from "./links";
 import { Bottle } from "./Sea";
 
@@ -18,8 +18,9 @@ const MAX = 1500;
 /**
  * "Message in a bottle": write a note on parchment, cork it, and cast it.
  * There is no backend — casting opens GitHub's "new issue" form in a new tab
- * with the note already filled in, and nothing is sent until you press
- * "Submit" there. The draft lives only in this page's memory.
+ * with the note filled in (it travels in that page's address), and nothing is
+ * posted until you press "Submit new issue" there. Our server never sees it;
+ * the draft lives only in this page's memory.
  */
 export default function BottleComposer() {
   const uid = useId();
@@ -28,6 +29,17 @@ export default function BottleComposer() {
   const [message, setMessage] = useState("");
   const [cast, setCast] = useState(false);
   const [hint, setHint] = useState("");
+  const doneRef = useRef<HTMLDivElement>(null);
+  const messageRef = useRef<HTMLTextAreaElement>(null);
+  const wasCast = useRef(false);
+
+  // the form goes inert while the bottle sails, so move keyboard focus with it:
+  // onto the "cast" panel, and back to the message when writing another
+  useEffect(() => {
+    if (cast) doneRef.current?.focus({ preventScroll: true });
+    else if (wasCast.current) messageRef.current?.focus({ preventScroll: true });
+    wasCast.current = cast;
+  }, [cast]);
 
   const prefix = KINDS.find((k) => k.id === kind)!.prefix;
   const title = `${prefix} ${subject.trim() || "A message in a bottle"}`;
@@ -80,7 +92,7 @@ export default function BottleComposer() {
         </fieldset>
 
         <label htmlFor={`${uid}-subject`} className="mt-6 block text-xs font-extrabold uppercase tracking-[0.2em] text-ink/70">
-          Subject <span className="font-bold normal-case tracking-normal text-ink/50">(optional)</span>
+          Subject <span className="font-bold normal-case tracking-normal text-ink/70">(optional)</span>
         </label>
         <input
           id={`${uid}-subject`}
@@ -94,19 +106,21 @@ export default function BottleComposer() {
           Your message
         </label>
         <textarea
+          ref={messageRef}
           id={`${uid}-message`}
+          aria-describedby={`${uid}-count`}
           value={message}
           onChange={(e) => setMessage(e.target.value.slice(0, MAX))}
           rows={6}
           placeholder="Dear Captain…"
           className="letter-lines mt-1.5 w-full resize-y rounded-xl border-2 border-ink/70 bg-white/30 px-4 py-3 font-semibold leading-8 text-ink placeholder:text-ink/40 focus:border-ink focus:outline-none focus:ring-2 focus:ring-sash"
         />
-        <p className="mt-1 text-right text-xs font-bold text-ink/50" aria-live="polite">
+        <p id={`${uid}-count`} className="mt-1 text-right text-xs font-bold text-ink/70">
           {message.length} / {MAX}
         </p>
 
         <p id={`${uid}-note`} className="mt-3 text-sm leading-relaxed text-ink/75">
-          Casting opens GitHub in a new tab with your note filled in — nothing is sent until you press{" "}
+          Casting opens GitHub in a new tab with your note filled in. Nothing is posted until you press{" "}
           <strong>Submit new issue</strong> there (you&apos;ll need a free GitHub account). Issues are public, so please
           leave out personal details.
         </p>
@@ -122,19 +136,27 @@ export default function BottleComposer() {
             Cork it &amp; cast it <span aria-hidden>🌊</span>
             <span className="sr-only">(opens GitHub in a new tab)</span>
           </a>
-          <p className="text-sm font-bold text-sash" role="status">
-            {hint}
-          </p>
+          <p className="text-sm font-bold text-sash">{hint}</p>
         </div>
       </form>
+
+      {/* one always-present live region (outside the inert form) for announcements */}
+      <p className="sr-only" role="status">
+        {cast ? "Bottle cast! It's waiting for you on GitHub in a new tab." : hint}
+      </p>
 
       {/* after casting: the bottle sails away, with a note on what happens next */}
       <div className="cast-scene pointer-events-none absolute inset-0 flex items-center justify-center" aria-hidden={!cast}>
         <Bottle className="cast-bottle w-48 sm:w-64" />
       </div>
       <div className="cast-done absolute inset-0 grid place-items-center p-6 text-center" hidden={!cast}>
-        <div className="glass max-w-sm rounded-3xl p-6" role="status">
-          <p className="font-display text-3xl tracking-wide text-straw text-glow-gold">Bottle cast!</p>
+        <div
+          ref={doneRef}
+          tabIndex={-1}
+          aria-labelledby={`${uid}-done`}
+          className="glass max-w-sm rounded-3xl p-6 outline-none focus-visible:ring-2 focus-visible:ring-straw"
+        >
+          <p id={`${uid}-done`} className="font-display text-3xl tracking-wide text-straw text-glow-gold">Bottle cast!</p>
           <p className="mt-2 text-sm leading-relaxed text-muted">
             It&apos;s waiting for you on GitHub. Press <strong className="text-text">Submit new issue</strong> there to send it
             on its way. The captain answers right on the issue.

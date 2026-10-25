@@ -70,10 +70,17 @@ export default function PosterArc({ items }: { items: AnimeCard[] }) {
           border-radius: 14px;
           border: 1px solid rgba(255,255,255,0.14);
           background: var(--c);
-          box-shadow:
-            0 30px 60px -20px rgba(0,0,0,0.9),
-            0 0 max(0px, calc(70px - var(--ax) * 18px)) -12px var(--c);
-          filter: brightness(calc(1.08 - min(var(--ax), 3) * 0.16));
+          box-shadow: 0 30px 60px -20px rgba(0,0,0,0.9);
+        }
+        /* glow and dimming are static layers that only fade (opacity), so scrolling never repaints the shadows */
+        .poster::before {
+          content: ""; position: absolute; inset: -14%; z-index: -1; border-radius: 30%;
+          background: radial-gradient(closest-side, var(--c), transparent);
+          opacity: calc(clamp(0, calc(1 - var(--ax) * 0.35), 1) * 0.5);
+        }
+        .poster-card::after {
+          content: ""; position: absolute; inset: 0; background: #000; pointer-events: none;
+          opacity: calc(min(var(--ax), 3) * 0.15);
         }
         .poster-sheen {
           position: absolute; inset: 0;
@@ -93,6 +100,14 @@ export default function PosterArc({ items }: { items: AnimeCard[] }) {
         .scroll-scene[data-still] .poster-arc { position: static; display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; }
         .scroll-scene[data-still] .poster { position: relative; left: auto; top: auto; margin: 0; transform: none; opacity: 1; width: 120px; }
         .scroll-scene[data-still] .poster-captions { display: none; }
+        .scroll-scene[data-still] .poster-card::after { opacity: 0; }
+        @media (prefers-reduced-motion: reduce) {
+          .scroll-scene .poster-arc-wrap { position: relative; perspective: none; padding: 2rem 1rem 3rem; }
+          .scroll-scene .poster-arc { position: static; display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; }
+          .scroll-scene .poster { position: relative; left: auto; top: auto; margin: 0; transform: none; opacity: 1; width: 120px; }
+          .scroll-scene .poster-captions { display: none; }
+          .scroll-scene .poster-card::after { opacity: 0; }
+        }
       `}</style>
     </div>
   );
