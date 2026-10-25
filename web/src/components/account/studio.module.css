@@ -1,0 +1,84 @@
+/* Captain's Quarters (owner studio) — page-only looks.
+   Loops are transform/opacity only; the global reduced-motion rule stops them. */
+
+.sideLabel {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  letter-spacing: 0.4em;
+}
+
+.aurora {
+  /* soft pink/gold light behind the welcome line */
+  background:
+    radial-gradient(40% 60% at 25% 40%, rgba(255, 120, 180, 0.2), transparent 70%),
+    radial-gradient(35% 55% at 75% 30%, rgba(242, 201, 76, 0.14), transparent 70%);
+  filter: blur(8px);
+  animation: glow-pulse 8s ease-in-out infinite;
+}
+
+/* ── Tool cards ────────────────────────────────────────── */
+.tool {
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.06), transparent 40%),
+    rgba(20, 14, 28, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow:
+    0 24px 60px -24px rgba(0, 0, 0, 0.8),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  transition:
+    border-color 0.5s var(--ease-out),
+    box-shadow 0.5s var(--ease-out);
+}
+/* the glowing rim lights up on hover, and on keyboard focus inside */
+.tool:hover,
+.tool:focus-within {
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+  box-shadow:
+    0 24px 60px -24px rgba(0, 0, 0, 0.8),
+    0 0 32px color-mix(in srgb, var(--accent) 30%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+.toolLight {
+  /* a pool of the card's accent colour in its corner */
+  background: radial-gradient(circle, color-mix(in srgb, var(--accent) 40%, transparent), transparent 65%);
+  opacity: 0.55;
+  transition:
+    opacity 0.6s var(--ease-out),
+    transform 0.8s var(--ease-out);
+}
+.tool:hover .toolLight {
+  opacity: 0.95;
+  transform: scale(1.2);
+}
+.medallion {
+  background: radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.03) 70%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 0 26px color-mix(in srgb, var(--accent) 35%, transparent);
+  animation: float 6s ease-in-out var(--fd, 0s) infinite;
+}
+
+/* ── Voyage chart (phase timeline) ─────────────────────── */
+.track {
+  background: linear-gradient(90deg, var(--sash), var(--straw) 50%, rgba(255, 255, 255, 0.15));
+  transform-origin: left center;
+  transform: scaleX(0);
+  transition: transform 1.6s var(--ease-out) 0.3s;
+}
+:global([data-shown]) .track {
+  transform: scaleX(1);
+}
+.stop {
+  box-shadow: 0 0 0 4px rgba(18, 18, 18, 0.9), 0 0 18px var(--accent);
+}
+@media (max-width: 639px) {
+  .track {
+    background: linear-gradient(180deg, var(--sash), var(--straw) 50%, rgba(255, 255, 255, 0.15));
+    transform-origin: center top;
+    transform: scaleY(0);
+  }
+  :global([data-shown]) .track {
+    transform: scaleY(1);
+  }
+}

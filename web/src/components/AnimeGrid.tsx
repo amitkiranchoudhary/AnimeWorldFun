@@ -1,52 +1,92 @@
 import Image from "next/image";
 import Link from "next/link";
+import type { CSSProperties } from "react";
+import Reveal from "@/components/motion/Reveal";
+import TiltCard from "@/components/motion/TiltCard";
 import { type AnimeCard, displayTitle, FORMATS } from "@/lib/anilist";
+import g from "./explore/grid.module.css";
 
+const GRID = "grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6";
+
+/** Poster-shaped placeholders with a light sweeping across them, rippling left to right. */
 export function AnimeGridSkeleton() {
   return (
-    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+    <div className={GRID} aria-hidden>
       {Array.from({ length: 12 }, (_, i) => (
-        <div key={i} className="aspect-[2/3] animate-pulse rounded-2xl bg-white/10" />
+        <div key={i} className={g.skel} style={{ "--d": `${(i % 6) * 110}ms` } as CSSProperties}>
+          <span className={g.skelLine} style={{ bottom: "2.1rem", width: "70%" }} />
+          <span className={g.skelLine} style={{ bottom: "1.1rem", width: "45%" }} />
+        </div>
       ))}
     </div>
   );
 }
 
-export default function AnimeGrid({ items }: { items: AnimeCard[] }) {
+function Card({ a, priority }: { a: AnimeCard; priority: boolean }) {
+  const title = displayTitle(a);
+  const studio = a.studios?.nodes?.[0]?.name;
+  const genres = a.genres?.slice(0, 3) ?? [];
+  const meta = [a.format && (FORMATS[a.format] ?? a.format), a.seasonYear, a.episodes && `${a.episodes} eps`]
+    .filter(Boolean)
+    .join(" · ");
+
   return (
-    <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-      {items.map((a, i) => (
-        <li key={a.id}>
-          <Link
-            href={`/anime/${a.id}`}
-            className="group block overflow-hidden rounded-2xl border-2 border-ink shadow-[4px_4px_0_var(--ink)] transition duration-200 hover:-translate-y-1.5 hover:rotate-[-1deg] focus-visible:outline-2 focus-visible:outline-straw"
-            style={{ background: a.coverImage.color ?? "#1d2c5e" }}
-          >
-            <div className="relative aspect-[2/3]">
-              <Image
-                src={a.coverImage.large}
-                alt={`${displayTitle(a)} cover`}
-                fill
-                sizes="(min-width: 1280px) 16vw, (min-width: 1024px) 20vw, (min-width: 640px) 30vw, 50vw"
-                className="object-cover"
-                priority={i < 6}
-              />
-              {a.averageScore != null && (
-                <span className="absolute right-2 top-2 rounded-full bg-ink/85 px-2 py-0.5 text-xs font-extrabold text-straw">
-                  ★ {(a.averageScore / 10).toFixed(1)}
-                </span>
-              )}
-              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-3 pt-10">
-                <h3 className="line-clamp-2 text-sm font-extrabold leading-tight text-white">{displayTitle(a)}</h3>
-                <p className="mt-1 line-clamp-1 text-[11px] text-white/70">
-                  {[a.format && (FORMATS[a.format] ?? a.format), a.seasonYear, a.episodes && `${a.episodes} eps`]
-                    .filter(Boolean)
-                    .join(" · ")}
-                </p>
+    <TiltCard className={g.tilt} max={8} scale={1.04}>
+      <Link
+        href={`/anime/${a.id}`}
+        className={`${g.card} shimmer`}
+        style={a.coverImage.color ? ({ "--c": a.coverImage.color } as CSSProperties) : undefined}
+      >
+        <div className={g.media}>
+          <Image
+            src={a.coverImage.large}
+            alt={`${title} cover`}
+            fill
+            sizes="(min-width: 1280px) 16vw, (min-width: 1024px) 20vw, (min-width: 640px) 30vw, 50vw"
+            className={`${g.cover} object-cover`}
+            priority={priority}
+          />
+        </div>
+        {a.nextAiringEpisode && <span className={g.airing}>Airing</span>}
+        {a.averageScore != null && <span className={g.score}>★ {(a.averageScore / 10).toFixed(1)}</span>}
+        <div className={g.info}>
+          <h3 className="line-clamp-2 text-sm font-extrabold leading-tight text-white">{title}</h3>
+          {meta && <p className="mt-1 line-clamp-1 text-[11px] text-white/75">{meta}</p>}
+          {(genres.length > 0 || studio) && (
+            <div className={g.more}>
+              <div className={g.moreInner}>
+                {genres.length > 0 && (
+                  <ul className="flex flex-wrap gap-1 pt-2" aria-label="Genres">
+                    {genres.map((x) => (
+                      <li key={x} className={g.tag}>{x}</li>
+                    ))}
+                  </ul>
+                )}
+                {studio && (
+                  <p className={`${g.studio} mt-1.5 line-clamp-1 text-[11px] font-bold text-straw`}>
+                    <span className="text-white/55">Studio</span> {studio}
+                  </p>
+                )}
               </div>
             </div>
-          </Link>
-        </li>
+          )}
+        </div>
+      </Link>
+    </TiltCard>
+  );
+}
+
+/**
+ * A responsive grid of anime poster cards that rise into view in a staggered
+ * wave. Used by Explore and by the anime detail page (related, recommended).
+ */
+export default function AnimeGrid({ items }: { items: AnimeCard[] }) {
+  return (
+    <ul className={GRID}>
+      {items.map((a, i) => (
+        <Reveal as="li" key={a.id} delay={(i % 6) * 70} y={36} blur={6} scale={0.96}>
+          <Card a={a} priority={i < 6} />
+        </Reveal>
       ))}
     </ul>
   );

@@ -1,0 +1,224 @@
+/* Captain's Login — a harbour at night. Page-only looks.
+   Everything moves with transform/opacity only; the global reduced-motion
+   rule in globals.css stops the loops, and the explicit block at the end
+   keeps the scene calm and fully visible. */
+
+/* ── Sky ───────────────────────────────────────────────── */
+.sky {
+  background:
+    radial-gradient(120% 70% at 50% 0%, rgba(40, 38, 92, 0.75), transparent 70%),
+    radial-gradient(60% 40% at 50% 100%, rgba(242, 201, 76, 0.08), transparent 70%),
+    linear-gradient(180deg, rgba(10, 12, 32, 0.92) 0%, rgba(18, 18, 18, 0.55) 70%, rgba(18, 18, 18, 0.9) 100%);
+}
+.star {
+  position: absolute;
+  border-radius: 9999px;
+  background: #fff;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.8);
+  animation: twinkle var(--tw, 4s) ease-in-out var(--td, 0s) infinite;
+}
+@keyframes twinkle {
+  0%, 100% { opacity: 0.25; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+.moon {
+  background: radial-gradient(circle at 38% 38%, #fffbe8 0%, #f7e7b0 55%, #d9c193 100%);
+  box-shadow:
+    0 0 40px rgba(255, 240, 190, 0.55),
+    0 0 120px rgba(255, 220, 150, 0.25);
+}
+.moon::after {
+  /* a soft crater */
+  content: "";
+  position: absolute;
+  right: 24%;
+  top: 30%;
+  width: 22%;
+  height: 22%;
+  border-radius: 9999px;
+  background: rgba(200, 170, 110, 0.35);
+}
+
+/* ── Sky lanterns drifting up ─────────────────────────── */
+.skyLantern {
+  position: absolute;
+  bottom: -60px;
+  width: var(--lw, 16px);
+  height: calc(var(--lw, 16px) * 1.35);
+  border-radius: 40% 40% 30% 30%;
+  background: linear-gradient(180deg, #ffd27a, #ff8a3d 70%, #e63946);
+  box-shadow:
+    0 0 14px rgba(255, 170, 70, 0.9),
+    0 0 40px rgba(255, 120, 60, 0.45);
+  opacity: 0;
+  animation: lantern-rise var(--ld, 18s) linear var(--ldl, 0s) infinite;
+}
+@keyframes lantern-rise {
+  0% { opacity: 0; transform: translate3d(0, 0, 0); }
+  10% { opacity: 0.9; }
+  50% { transform: translate3d(var(--lx, 20px), -55vh, 0); }
+  85% { opacity: 0.7; }
+  100% { opacity: 0; transform: translate3d(calc(var(--lx, 20px) * -0.5), -110vh, 0); }
+}
+
+/* ── Sea ───────────────────────────────────────────────── */
+.waves {
+  width: 200%;
+  animation: wave-drift var(--wd, 22s) linear infinite;
+}
+@keyframes wave-drift {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-50%, 0, 0); }
+}
+.moonPath {
+  /* moonlight shimmering on the water */
+  background: linear-gradient(180deg, rgba(255, 240, 190, 0.35), transparent);
+  -webkit-mask-image: repeating-linear-gradient(180deg, #000 0 3px, transparent 3px 9px);
+  mask-image: repeating-linear-gradient(180deg, #000 0 3px, transparent 3px 9px);
+  animation: glow-pulse 4s ease-in-out infinite;
+}
+
+/* ── The card ──────────────────────────────────────────── */
+.cardGlow {
+  /* warm lantern light pooling behind the card */
+  background: radial-gradient(closest-side, rgba(255, 176, 70, 0.32), rgba(230, 57, 70, 0.12) 55%, transparent);
+  animation: flicker 5s ease-in-out infinite;
+}
+.lantern {
+  /* the paper lantern hanging over the card */
+  background:
+    repeating-linear-gradient(180deg, transparent 0 7px, rgba(120, 30, 20, 0.35) 7px 8px),
+    radial-gradient(circle at 50% 45%, #ffe39a, #ff9b45 55%, #e63946 100%);
+  box-shadow:
+    0 0 24px rgba(255, 170, 70, 0.9),
+    0 0 70px rgba(255, 140, 60, 0.55),
+    0 0 140px rgba(230, 57, 70, 0.3);
+  animation: flicker 3.4s ease-in-out infinite;
+}
+.lanternSwing {
+  transform-origin: 50% 0;
+  animation: swing 6s ease-in-out infinite;
+}
+@keyframes swing {
+  0%, 100% { transform: rotate(-4deg); }
+  50% { transform: rotate(4deg); }
+}
+@keyframes flicker {
+  0%, 100% { opacity: 1; }
+  40% { opacity: 0.86; }
+  45% { opacity: 0.97; }
+  70% { opacity: 0.9; }
+}
+.cardIn {
+  animation: card-in 1.1s var(--ease-out) 0.15s both;
+}
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 28px, 0) scale(0.97);
+    filter: blur(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+
+/* ── Fields ────────────────────────────────────────────── */
+.field {
+  position: relative;
+  border-radius: 0.9rem;
+  transition: box-shadow 0.45s var(--ease-out);
+}
+.field:focus-within {
+  box-shadow:
+    0 0 0 1px rgba(242, 201, 76, 0.7),
+    0 0 22px rgba(242, 201, 76, 0.35),
+    0 0 60px rgba(255, 140, 60, 0.18);
+}
+.field:focus-within .fieldIcon {
+  color: var(--straw);
+  transform: scale(1.12);
+}
+.fieldIcon {
+  transition:
+    color 0.35s var(--ease-out),
+    transform 0.45s var(--ease-out);
+}
+.input {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  transition:
+    border-color 0.35s var(--ease-out),
+    background-color 0.35s var(--ease-out);
+}
+.input:hover {
+  border-color: rgba(255, 255, 255, 0.26);
+}
+.input:focus {
+  outline: none;
+  border-color: rgba(242, 201, 76, 0.85);
+  background: rgba(255, 255, 255, 0.08);
+}
+/* keep browser autofill dark instead of bright yellow */
+.input:-webkit-autofill {
+  -webkit-text-fill-color: var(--text);
+  -webkit-box-shadow: 0 0 0 100px #22202c inset;
+  caret-color: var(--text);
+}
+
+/* ── Submit / boarding ─────────────────────────────────── */
+.board {
+  background: linear-gradient(180deg, #ef4a57, var(--sash));
+  box-shadow:
+    3px 3px 0 var(--ink),
+    0 0 26px rgba(230, 57, 70, 0.35);
+  transition:
+    transform 0.35s var(--ease-out),
+    box-shadow 0.35s var(--ease-out);
+}
+.board:hover:not(:disabled) {
+  transform: translate3d(0, -2px, 0);
+  box-shadow:
+    4px 5px 0 var(--ink),
+    0 0 36px rgba(230, 57, 70, 0.55);
+}
+.board:active:not(:disabled) {
+  transform: translate3d(2px, 2px, 0);
+  box-shadow: 1px 1px 0 var(--ink);
+}
+.board[data-pending] {
+  cursor: progress;
+}
+/* a little ship sailing across the button while the gangplank is checked */
+.sail {
+  animation: sail 1.8s var(--ease-out) infinite;
+}
+@keyframes sail {
+  0% { transform: translate3d(-120%, 0, 0) rotate(-4deg); opacity: 0; }
+  15% { opacity: 1; }
+  50% { transform: translate3d(0, -2px, 0) rotate(3deg); }
+  85% { opacity: 1; }
+  100% { transform: translate3d(120%, 0, 0) rotate(-4deg); opacity: 0; }
+}
+.rope {
+  background: repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.85) 0 8px, transparent 8px 14px);
+  animation: rope 0.7s linear infinite;
+}
+@keyframes rope {
+  from { transform: translate3d(-14px, 0, 0); }
+  to { transform: translate3d(0, 0, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skyLantern {
+    display: none;
+  }
+  .star {
+    opacity: 0.7;
+  }
+  .lanternSwing {
+    transform: none;
+  }
+}

@@ -1,0 +1,189 @@
+/* Anime poster cards (components/AnimeGrid.tsx): tilt + glare from <TiltCard>,
+   a slow cover zoom, a glow in the poster's own colour and an info drawer
+   (genres, studio) that opens on hover/focus. Touch screens get the drawer
+   open and, where supported, a gentle scroll-linked drift of the cover. */
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.45; transform: scale(0.7); }
+}
+@keyframes sweep {
+  from { transform: translate3d(-100%, 0, 0); }
+  to { transform: translate3d(100%, 0, 0); }
+}
+
+.tilt {
+  border-radius: 1rem;
+}
+
+.card {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border-radius: 1rem;
+  background: var(--c, #1d2c5e);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 16px 32px -20px rgba(0, 0, 0, 0.9);
+  transition:
+    box-shadow 0.6s var(--ease-out),
+    border-color 0.4s var(--ease-out);
+}
+.card:hover,
+.card:focus-visible {
+  border-color: rgba(255, 255, 255, 0.28);
+  box-shadow:
+    0 26px 50px -22px var(--c, rgba(242, 201, 76, 0.7)),
+    0 0 34px -8px var(--c, rgba(242, 201, 76, 0.55));
+}
+.card:focus-visible {
+  outline: 2px solid var(--straw);
+  outline-offset: 3px;
+}
+
+.media {
+  position: relative;
+  aspect-ratio: 2 / 3;
+}
+.cover {
+  transition:
+    transform 1.2s var(--ease-out),
+    filter 0.6s var(--ease-out);
+}
+.card:hover .cover,
+.card:focus-visible .cover {
+  transform: scale(1.09);
+  filter: saturate(1.12) brightness(1.05);
+}
+
+/* badges */
+.score {
+  position: absolute;
+  right: 0.5rem;
+  top: 0.5rem;
+  border-radius: 999px;
+  padding: 0.15rem 0.5rem;
+  background: rgba(15, 11, 20, 0.78);
+  border: 1px solid rgba(242, 201, 76, 0.35);
+  color: var(--straw);
+  font-size: 0.72rem;
+  font-weight: 800;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transition: box-shadow 0.4s var(--ease-out);
+}
+.card:hover .score {
+  box-shadow: var(--glow-gold);
+}
+.airing {
+  position: absolute;
+  left: 0.5rem;
+  top: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  border-radius: 999px;
+  padding: 0.15rem 0.5rem;
+  background: rgba(230, 57, 70, 0.88);
+  color: #fff;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.airing::before {
+  content: "";
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 999px;
+  background: #fff;
+  animation: pulse-dot 1.6s ease-in-out infinite;
+}
+
+/* title block + drawer, over a gradient that grows with it */
+.info {
+  position: absolute;
+  inset: auto 0 0 0;
+  padding: 2.6rem 0.75rem 0.75rem;
+  background: linear-gradient(to top, rgba(6, 4, 10, 0.95), rgba(6, 4, 10, 0.72) 55%, transparent);
+}
+.more {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition:
+    grid-template-rows 0.6s var(--ease-out),
+    opacity 0.45s var(--ease-out);
+}
+.moreInner {
+  min-height: 0;
+  overflow: hidden;
+}
+.tag {
+  display: inline-block;
+  border-radius: 999px;
+  padding: 0.1rem 0.45rem;
+  background: rgba(255, 255, 255, 0.13);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-size: 0.62rem;
+  font-weight: 800;
+}
+.card:focus-visible .more {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+@media (hover: hover) {
+  .card:hover .more {
+    grid-template-rows: 1fr;
+    opacity: 1;
+  }
+}
+
+/* touch: no hover, so genres stay visible (the studio line is left out to
+   keep small cards uncluttered) and covers drift gently as they scroll by */
+@media (hover: none) {
+  .more {
+    grid-template-rows: 1fr;
+    opacity: 1;
+  }
+  .studio {
+    display: none;
+  }
+}
+@keyframes drift {
+  from { transform: scale(1.12) translate3d(0, -4%, 0); }
+  to { transform: scale(1.12) translate3d(0, 4%, 0); }
+}
+@supports (animation-timeline: view()) {
+  @media (hover: none) and (prefers-reduced-motion: no-preference) {
+    .cover {
+      animation: drift linear both;
+      animation-timeline: view();
+    }
+  }
+}
+
+/* ── Skeleton ─────────────────────────────────────── */
+.skel {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 2 / 3;
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.025));
+}
+.skel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 20%, rgba(255, 255, 255, 0.1) 50%, transparent 80%);
+  animation: sweep 1.6s var(--ease-in-out) infinite;
+  animation-delay: var(--d, 0ms);
+}
+.skelLine {
+  position: absolute;
+  left: 0.75rem;
+  height: 0.55rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+}

@@ -1,0 +1,674 @@
+/* Explore page looks: cinematic hero, curved poster ring, ribbon bands, glass
+   filters with springy chips, the floating search dock, pagination and the
+   empty/error scenes. Motion is transform/opacity only; globals.css already
+   shortens every animation and transition for "reduce motion". */
+
+/* local copies of the global glow-pulse / float keyframes (module-scoped names) */
+@keyframes pulse {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 1; }
+}
+@keyframes bob {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -6px, 0); }
+}
+
+/* ── Hero ─────────────────────────────────────────── */
+.hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: clamp(560px, 82svh, 900px);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.glow {
+  position: absolute;
+  z-index: -1;
+  border-radius: 999px;
+  filter: blur(80px);
+  pointer-events: none;
+  animation: pulse 7s ease-in-out infinite;
+}
+
+/* darkens the bottom of the hero so the title always reads over the posters */
+.vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 35%, transparent 30%, rgba(10, 8, 14, 0.55) 100%),
+    linear-gradient(to bottom, transparent 35%, rgba(14, 11, 18, 0.8) 78%, #121212 100%);
+}
+
+/* giant title: gold fill, ink outline + offset shadow, soft pink bloom */
+.heroTitle {
+  font-family: var(--font-bangers);
+  font-size: clamp(3.7rem, 16vw, 12rem);
+  line-height: 0.84;
+  letter-spacing: 0.03em;
+  color: var(--straw);
+  -webkit-text-stroke: 2px var(--ink);
+  paint-order: stroke fill;
+  text-shadow:
+    5px 5px 0 var(--ink),
+    0 0 50px rgba(255, 130, 190, 0.4);
+}
+.heroTitle :global(.split-mask) {
+  /* room for the offset shadow so the mask doesn't clip it */
+  padding-right: 0.1em;
+  margin-right: -0.1em;
+}
+.heroTitleOutline {
+  color: transparent;
+  -webkit-text-stroke: 2px var(--straw);
+  text-shadow: 0 0 38px rgba(242, 201, 76, 0.4);
+}
+
+.kicker {
+  color: #ff9cc8;
+  text-shadow: var(--glow-pink);
+  letter-spacing: 0.34em;
+}
+
+/* film-subtitle captions: pale yellow on a soft black band */
+.subtitle {
+  max-width: 40rem;
+  line-height: 2.05;
+  font-weight: 700;
+  font-size: clamp(0.95rem, 2.4vw, 1.12rem);
+}
+.subtitle > span {
+  background: rgba(6, 4, 10, 0.68);
+  color: #fff6d2;
+  padding: 0.22em 0.6em;
+  border-radius: 0.3em;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.sideLabel {
+  writing-mode: vertical-rl;
+  font-family: var(--font-bangers);
+  letter-spacing: 0.55em;
+  font-size: 0.95rem;
+  color: rgba(244, 241, 234, 0.3);
+}
+
+.cta {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  border-radius: 999px;
+  padding: 0.85rem 1.6rem;
+  background: var(--sash);
+  color: #fff;
+  font-family: var(--font-bangers);
+  font-size: 1.3rem;
+  letter-spacing: 0.08em;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.14) inset,
+    0 14px 40px -12px rgba(230, 57, 70, 0.85);
+  transition: box-shadow 0.4s var(--ease-out);
+}
+.cta:hover {
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.22) inset,
+    0 0 32px rgba(230, 57, 70, 0.6),
+    0 18px 50px -10px rgba(230, 57, 70, 0.95);
+}
+.ctaArrow {
+  display: inline-block;
+  animation: bob 2.4s ease-in-out infinite;
+}
+
+/* quick-voyage presets (ready-made filter links) */
+.preset {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  border-radius: 999px;
+  padding: 0.55rem 1rem;
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--text);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(20, 14, 28, 0.6);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition:
+    transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+    border-color 0.3s,
+    box-shadow 0.4s var(--ease-out);
+}
+.preset:hover {
+  transform: translateY(-3px);
+  border-color: rgba(255, 150, 200, 0.6);
+  box-shadow: var(--glow-pink);
+}
+.preset:focus-visible,
+.cta:focus-visible {
+  outline: 2px solid var(--straw);
+  outline-offset: 3px;
+}
+
+/* "scroll" cue: a line with a light running down it */
+@keyframes cue-run {
+  from { transform: translate3d(0, -100%, 0); }
+  to { transform: translate3d(0, 250%, 0); }
+}
+.cue {
+  position: relative;
+  width: 1px;
+  height: 64px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.14);
+}
+.cue::after {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 40%;
+  background: linear-gradient(to bottom, transparent, #ff9cc8);
+  animation: cue-run 2.2s var(--ease-in-out) infinite;
+}
+
+/* ── Curved poster ring (PosterRing.tsx) ─────────── */
+.ringWrap {
+  position: absolute;
+  inset: 0 0 14% 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.66;
+  -webkit-mask-image:
+    linear-gradient(to bottom, #000 35%, transparent 95%),
+    linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(to bottom, #000 35%, transparent 95%),
+    linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+  mask-composite: intersect;
+}
+.stage {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 1000px;
+  perspective-origin: 50% 40%;
+  will-change: transform;
+}
+.ring {
+  --w: 98px;
+  --r: calc(var(--n) * (var(--w) + 14px) / 6.2832);
+  position: relative;
+  width: var(--w);
+  height: calc(var(--w) * 1.5);
+  transform-style: preserve-3d;
+  transform: rotateX(-5deg) rotateY(0deg);
+  will-change: transform;
+}
+@media (min-width: 640px) {
+  .ring {
+    --w: 128px;
+  }
+}
+@media (min-width: 1024px) {
+  .ring {
+    --w: 150px;
+  }
+}
+/* each poster sits on the inside of a cylinder, facing its centre, so the far
+   wall reads as a concave curved gallery; the near wall is hidden */
+.poster {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 0.85rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: var(--c, #1d2c5e);
+  box-shadow: 0 0 46px -10px var(--c, rgba(255, 130, 190, 0.6));
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transform: rotateY(calc(var(--i) * 360deg / var(--n))) translateZ(calc(var(--r) * -1));
+}
+
+/* ── Ribbon bands under the hero ──────────────────── */
+.bands {
+  position: relative;
+  overflow: hidden;
+  padding: 2.4rem 0;
+}
+.band {
+  width: 112%;
+  margin-left: -6%;
+}
+.bandGold {
+  position: relative;
+  z-index: 1;
+  transform: rotate(-2deg);
+  background: var(--straw);
+  color: var(--ink);
+  box-shadow: var(--glow-gold);
+}
+.bandRed {
+  transform: rotate(1.6deg);
+  margin-top: -0.9rem;
+  background: linear-gradient(90deg, #8f1d29, var(--sash), #8f1d29);
+  color: #ffe9ef;
+}
+
+/* ── Chapter headings ─────────────────────────────── */
+.chapterNum {
+  font-family: var(--font-bangers);
+  font-size: clamp(4.5rem, 15vw, 8.5rem);
+  line-height: 0.8;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.14);
+  user-select: none;
+}
+
+/* ── Filters ──────────────────────────────────────── */
+.panel {
+  position: relative;
+  border-radius: 1.75rem;
+}
+.panel::before {
+  /* a thin glowing rim along the top edge */
+  content: "";
+  position: absolute;
+  inset: 0 12% auto;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 156, 200, 0.85), rgba(242, 201, 76, 0.85), transparent);
+  pointer-events: none;
+}
+
+.label {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--text-muted);
+}
+
+.field {
+  width: 100%;
+  border-radius: 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--text);
+  padding: 0.7rem 0.9rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color-scheme: dark;
+  transition:
+    border-color 0.3s var(--ease-out),
+    box-shadow 0.4s var(--ease-out),
+    background-color 0.3s var(--ease-out);
+}
+.field::placeholder {
+  color: rgba(244, 241, 234, 0.45);
+}
+.field:hover {
+  border-color: rgba(242, 201, 76, 0.42);
+}
+.field:focus {
+  outline: none;
+  border-color: var(--straw);
+  background-color: rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 0 0 3px rgba(242, 201, 76, 0.22),
+    0 0 28px rgba(242, 201, 76, 0.18);
+}
+select.field {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 2.2rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5 6 6.5l5-5' fill='none' stroke='%23f2c94c' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.85rem center;
+  background-size: 11px;
+}
+select.field option {
+  background: #17141d;
+  color: var(--text);
+}
+/* a field with a value set glows faintly gold */
+.fieldOn {
+  border-color: rgba(242, 201, 76, 0.55);
+  background-color: rgba(242, 201, 76, 0.08);
+}
+.search {
+  padding-left: 2.9rem;
+  font-size: 1rem;
+  padding-top: 0.85rem;
+  padding-bottom: 0.85rem;
+}
+
+.apply {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.9rem;
+  background: var(--sash);
+  color: #fff;
+  padding: 0.8rem 1.6rem;
+  font-family: var(--font-bangers);
+  font-size: 1.25rem;
+  letter-spacing: 0.08em;
+  box-shadow: 0 10px 30px -10px rgba(230, 57, 70, 0.85);
+  transition:
+    transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.4s var(--ease-out);
+}
+.apply:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 0 26px rgba(230, 57, 70, 0.55),
+    0 14px 36px -10px rgba(230, 57, 70, 0.9);
+}
+.apply:active {
+  transform: scale(0.96);
+}
+.apply:focus-visible {
+  outline: 2px solid var(--straw);
+  outline-offset: 3px;
+}
+
+/* genre chips: springy pop, a tick that slides in, gold glow when picked */
+.chip {
+  display: inline-block;
+  cursor: pointer;
+}
+.chipFace {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.045);
+  padding: 0.45rem 0.9rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--text);
+  transition:
+    transform 0.55s cubic-bezier(0.34, 1.7, 0.64, 1),
+    background-color 0.3s var(--ease-out),
+    border-color 0.3s var(--ease-out),
+    color 0.3s var(--ease-out),
+    box-shadow 0.45s var(--ease-out);
+}
+@media (hover: hover) {
+  .chip:hover .chipFace {
+    transform: translateY(-2px);
+    border-color: rgba(242, 201, 76, 0.6);
+  }
+}
+.chip:active .chipFace {
+  transform: scale(0.9);
+}
+.tick {
+  display: inline-block;
+  width: 0;
+  overflow: hidden;
+  opacity: 0;
+  transform: scale(0.2) rotate(-40deg);
+  transition:
+    width 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
+    margin 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
+    opacity 0.3s,
+    transform 0.5s cubic-bezier(0.34, 1.7, 0.64, 1);
+}
+.chipInput:checked + .chipFace {
+  background: var(--straw);
+  border-color: var(--straw);
+  color: var(--ink);
+  box-shadow: var(--glow-gold);
+  transform: scale(1.05);
+}
+.chipInput:checked + .chipFace .tick {
+  width: 0.9em;
+  margin-right: 0.3em;
+  opacity: 1;
+  transform: none;
+}
+.chipInput:focus-visible + .chipFace {
+  outline: 2px solid var(--straw);
+  outline-offset: 3px;
+}
+
+/* active-filter pills (links that remove one filter) */
+.activePill {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border-radius: 999px;
+  padding: 0.35rem 0.4rem 0.35rem 0.85rem;
+  background: rgba(242, 201, 76, 0.12);
+  border: 1px solid rgba(242, 201, 76, 0.5);
+  color: var(--straw);
+  font-size: 0.78rem;
+  font-weight: 800;
+  transition:
+    transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+    background-color 0.3s,
+    color 0.3s,
+    border-color 0.3s,
+    box-shadow 0.4s var(--ease-out);
+}
+.activePill > span {
+  display: grid;
+  place-items: center;
+  width: 1.3rem;
+  height: 1.3rem;
+  border-radius: 999px;
+  background: rgba(242, 201, 76, 0.2);
+  font-size: 0.65rem;
+  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.activePill:hover {
+  transform: translateY(-2px);
+  background: var(--sash);
+  border-color: var(--sash);
+  color: #fff;
+  box-shadow: 0 0 22px rgba(230, 57, 70, 0.5);
+}
+.activePill:hover > span {
+  transform: rotate(90deg);
+  background: rgba(255, 255, 255, 0.2);
+}
+.activePill:focus-visible,
+.textLink:focus-visible {
+  outline: 2px solid var(--straw);
+  outline-offset: 3px;
+  border-radius: 999px;
+}
+
+/* ── Floating search dock (FilterDock.tsx) ────────── */
+.dock {
+  position: fixed;
+  left: 50%;
+  bottom: max(14px, env(safe-area-inset-bottom));
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  width: min(38rem, calc(100% - 1.5rem));
+  padding: 0.35rem;
+  border-radius: 999px;
+  transform: translate3d(-50%, 160%, 0) scale(0.92);
+  opacity: 0;
+  transition:
+    transform 0.8s var(--ease-out),
+    opacity 0.45s var(--ease-out);
+}
+.dock[data-show] {
+  transform: translate3d(-50%, 0, 0);
+  opacity: 1;
+}
+.dock::before {
+  content: "";
+  position: absolute;
+  inset: 0 18% auto;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 156, 200, 0.8), transparent);
+  pointer-events: none;
+}
+.dockInput {
+  min-width: 0;
+  flex: 1;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text);
+  padding: 0.55rem 0.9rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  transition:
+    border-color 0.3s var(--ease-out),
+    box-shadow 0.4s var(--ease-out);
+}
+.dockInput::placeholder {
+  color: rgba(244, 241, 234, 0.45);
+}
+.dockInput:focus {
+  outline: none;
+  border-color: var(--straw);
+  box-shadow: 0 0 0 3px rgba(242, 201, 76, 0.2);
+}
+.dockBtn {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border-radius: 999px;
+  padding: 0.55rem 0.95rem;
+  font-size: 0.8rem;
+  font-weight: 800;
+  transition:
+    transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.4s var(--ease-out),
+    background-color 0.3s;
+}
+.dockBtn:hover {
+  transform: translateY(-1px);
+}
+.dockBtn:focus-visible {
+  outline: 2px solid var(--straw);
+  outline-offset: 2px;
+}
+
+/* ── Pagination ───────────────────────────────────── */
+.pageBtn {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 999px;
+  padding: 0.8rem 1.4rem;
+  font-weight: 800;
+  transition:
+    box-shadow 0.4s var(--ease-out),
+    background-color 0.3s,
+    color 0.3s;
+}
+.pageBtn:focus-visible {
+  outline: 2px solid var(--straw);
+  outline-offset: 3px;
+}
+.pageNext {
+  background: var(--straw);
+  color: var(--ink);
+  box-shadow: 0 10px 30px -10px rgba(242, 201, 76, 0.8);
+}
+.pageNext:hover {
+  box-shadow: var(--glow-gold);
+}
+.pagePrev {
+  border: 1px solid rgba(242, 201, 76, 0.6);
+  color: var(--straw);
+  background: rgba(20, 14, 28, 0.55);
+}
+.pagePrev:hover {
+  background: rgba(242, 201, 76, 0.12);
+  box-shadow: 0 0 22px rgba(242, 201, 76, 0.25);
+}
+.pageArrow {
+  display: inline-block;
+  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.pageNext:hover .pageArrow {
+  transform: translateX(4px);
+}
+.pagePrev:hover .pageArrow {
+  transform: translateX(-4px);
+}
+
+/* ── Empty & error scenes ─────────────────────────── */
+.scene {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1.75rem;
+}
+.floaty {
+  animation: bob 5s ease-in-out infinite;
+}
+@keyframes wave-slide {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-50%, 0, 0); }
+}
+.wave {
+  width: 200%;
+  animation: wave-slide 9s linear infinite;
+}
+.waveSlow {
+  animation-duration: 15s;
+  animation-direction: reverse;
+}
+@keyframes lantern-sway {
+  0%, 100% { transform: rotate(-5deg); }
+  50% { transform: rotate(5deg); }
+}
+.sway {
+  transform-origin: 50% 0;
+  animation: lantern-sway 4.5s ease-in-out infinite;
+}
+.stormy {
+  animation-duration: 2.6s;
+}
+
+/* ── Loading placeholders ─────────────────────────── */
+@keyframes sweep {
+  from { transform: translate3d(-100%, 0, 0); }
+  to { transform: translate3d(100%, 0, 0); }
+}
+.skel {
+  position: relative;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.06);
+}
+.skel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 20%, rgba(255, 255, 255, 0.09) 50%, transparent 80%);
+  animation: sweep 1.6s var(--ease-in-out) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dock {
+    transform: translate3d(-50%, 0, 0);
+    transition: opacity 0.2s;
+  }
+}

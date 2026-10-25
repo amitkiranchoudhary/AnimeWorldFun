@@ -1,0 +1,205 @@
+/* My List (“voyage logbook”) preview — page-only looks.
+   Everything animates transform/opacity/stroke only; the global
+   reduced-motion rule in globals.css snaps these to their end state. */
+
+/* ── Progress ring ─────────────────────────────────────── */
+.ring {
+  display: block;
+  transform: rotate(-90deg);
+}
+.ringTrack {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.12);
+}
+.ringArc {
+  fill: none;
+  stroke-linecap: round;
+  stroke-dasharray: var(--c);
+  stroke-dashoffset: var(--c);
+  transition: stroke-dashoffset 1.6s var(--ease-out) var(--ring-delay, 0ms);
+  filter: drop-shadow(0 0 6px currentColor);
+}
+/* rings start empty and fill once their <Reveal> parent is on screen */
+:global([data-shown]) .ringArc,
+.ringLive .ringArc {
+  stroke-dashoffset: calc(var(--c) * (1 - var(--p)));
+}
+.ringLive .ringArc {
+  transition-duration: 0.45s;
+  transition-delay: 0ms;
+}
+
+/* ── Hero ──────────────────────────────────────────────── */
+.heroGlow {
+  position: absolute;
+  inset: -20% -10% auto;
+  height: 120%;
+  background:
+    radial-gradient(40% 45% at 50% 40%, rgba(255, 120, 180, 0.22), transparent 70%),
+    radial-gradient(30% 35% at 30% 60%, rgba(242, 201, 76, 0.12), transparent 70%);
+  filter: blur(10px);
+  animation: glow-pulse 7s ease-in-out infinite;
+  pointer-events: none;
+}
+.sideLabel {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  letter-spacing: 0.4em;
+}
+.subtitle {
+  /* movie-subtitle caption: soft dark band behind light text */
+  background: rgba(0, 0, 0, 0.55);
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+/* ── Scroll-lit line (pinned chapter) ─────────────────── */
+.litWord {
+  opacity: 0.14;
+  filter: blur(1.5px);
+  transition:
+    opacity 0.5s var(--ease-out),
+    filter 0.5s var(--ease-out),
+    text-shadow 0.5s var(--ease-out);
+}
+.litWord[data-lit] {
+  opacity: 1;
+  filter: none;
+  text-shadow: var(--glow-pink);
+}
+.litWordGold[data-lit] {
+  color: var(--straw);
+  text-shadow: var(--glow-gold);
+}
+/* "reduce motion": no pinned scroll-through, just the lit line */
+.litOuter[data-still] {
+  height: auto;
+}
+.litOuter[data-still] .litSticky {
+  position: relative;
+  height: auto;
+  padding-block: 6rem;
+}
+@media (prefers-reduced-motion: reduce) {
+  .litOuter {
+    height: auto;
+  }
+  .litSticky {
+    position: relative;
+    height: auto;
+    padding-block: 6rem;
+  }
+}
+
+/* ── Demo panel ────────────────────────────────────────── */
+.stamp {
+  opacity: 0;
+  transform: scale(1.8) rotate(-18deg);
+  transition:
+    opacity 0.25s ease-out,
+    transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.stampOn {
+  opacity: 1;
+  transform: scale(1) rotate(-12deg);
+}
+.tick {
+  transform: scale(0.55);
+  opacity: 0.35;
+  transition:
+    transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+    opacity 0.3s var(--ease-out),
+    background-color 0.3s var(--ease-out),
+    box-shadow 0.3s var(--ease-out);
+}
+.tickOn {
+  transform: scale(1);
+  opacity: 1;
+  background-color: var(--straw);
+  box-shadow: 0 0 10px rgba(242, 201, 76, 0.7);
+}
+.coverSwap {
+  animation: cover-in 0.9s var(--ease-out) both;
+}
+@keyframes cover-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0) scale(0.96) rotate(-2deg);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+.captionSwap {
+  animation: caption-in 0.6s var(--ease-out) both;
+}
+@keyframes caption-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 6px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.chip {
+  transition:
+    background-color 0.4s var(--ease-out),
+    color 0.4s var(--ease-out),
+    box-shadow 0.4s var(--ease-out),
+    border-color 0.4s var(--ease-out);
+}
+
+/* ── Curved shelves ────────────────────────────────────── */
+.shelf {
+  perspective: 1100px;
+  --bend: 0;
+}
+.shelfItem {
+  /* each poster sits on a gentle cylinder; --k is -1 … 1 across the row and
+     --bend (set on scroll) deepens or relaxes the curve */
+  transform: rotateY(calc(var(--k) * (-10deg - var(--bend) * 12deg)))
+    translate3d(0, calc(var(--k) * var(--k) * (6px + var(--bend) * 10px)), 0);
+  transform-style: preserve-3d;
+  transition: transform 0.5s var(--ease-out);
+  will-change: transform;
+}
+@media (max-width: 639px) {
+  /* two-up grid on phones: keep posters flat */
+  .shelfItem {
+    transform: none;
+  }
+}
+.plank {
+  /* the wooden shelf the posters stand on */
+  background: linear-gradient(180deg, #5b3a1e, #2e1d0e);
+  box-shadow:
+    0 10px 30px -6px rgba(0, 0, 0, 0.8),
+    inset 0 1px 0 rgba(255, 220, 160, 0.25);
+}
+.lanternGlow {
+  animation: glow-pulse 3.2s ease-in-out infinite;
+}
+
+/* touch screens have no hover: show poster captions all the time */
+.posterCaption {
+  opacity: 1;
+}
+@media (hover: hover) {
+  .posterCaption {
+    opacity: 0;
+    transform: translate3d(0, 6px, 0);
+    transition:
+      opacity 0.4s var(--ease-out),
+      transform 0.4s var(--ease-out);
+  }
+  .poster:hover .posterCaption,
+  .poster:focus-visible .posterCaption {
+    opacity: 1;
+    transform: none;
+  }
+}
