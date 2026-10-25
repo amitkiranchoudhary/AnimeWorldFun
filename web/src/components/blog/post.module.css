@@ -4,6 +4,8 @@
   font-size: 1.125rem;
   line-height: 1.85;
   color: rgba(255, 255, 255, 0.86);
+  /* long links and words wrap instead of running off a phone screen */
+  overflow-wrap: anywhere;
 }
 .body > * + * {
   margin-top: 1.25rem;
