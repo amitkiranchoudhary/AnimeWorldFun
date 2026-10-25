@@ -105,6 +105,8 @@ function CursorToggle({ className = "" }: { className?: string }) {
       onClick={toggle}
       className={`nb-chip hidden items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs font-bold text-muted transition-colors duration-300 hover:border-straw/60 hover:text-straw focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-straw [@media(pointer:fine)]:inline-flex ${className}`}
       title={off ? "Turn the straw-hat cursor on" : "Turn the straw-hat cursor off"}
+      aria-label="Straw-hat cursor"
+      aria-pressed={!off}
     >
       {off ? "🖱️ Normal cursor" : "👒 Hat cursor"}
     </button>

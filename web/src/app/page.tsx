@@ -92,6 +92,8 @@ export default function Home() {
         </div>
 
         <div className="relative z-10 mx-auto -mt-16 max-w-3xl px-4 text-center sm:-mt-24">
+          {/* the banner art carries the name visually; this is the page's heading for search engines and screen readers */}
+          <h1 className="sr-only">Anime World Fun: find where to watch any anime, and in which language</h1>
           <p className="text-lg font-semibold leading-relaxed text-text/95 [text-shadow:0_2px_8px_#000] sm:text-xl">
             Find <strong className="text-straw">where to watch</strong> any anime,{" "}
             <strong className="text-straw">in which language</strong>, track every episode — and read tales from the

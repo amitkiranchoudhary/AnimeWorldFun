@@ -156,7 +156,9 @@ async function AnimeContent({ params }: { params: Props["params"] }) {
     .filter((e) => e.node.type === "ANIME")
     .map((e) => ({ ...e.node, relation: titleCase(e.relationType) }));
   const recs = anime.recommendations.nodes.map((n) => n.mediaRecommendation).filter((m) => m !== null).slice(0, 12);
-  const trailer = anime.trailer?.site === "youtube" ? anime.trailer.id : null;
+  // AniList ids sometimes carry stray whitespace (a trailing tab breaks the embed)
+  const trailerId = anime.trailer?.site === "youtube" ? anime.trailer.id.trim() : "";
+  const trailer = /^[\w-]{6,20}$/.test(trailerId) ? trailerId : null;
   const studio = anime.allStudios.edges.find((e) => e.isMain)?.node.name ?? null;
   const line = logline(paragraphs);
   const format = anime.format ? (FORMATS[anime.format] ?? anime.format) : null;
