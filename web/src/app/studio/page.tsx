@@ -38,13 +38,19 @@ const TOOLS: Tool[] = [
     phase: "Phase 4",
     href: "/studio/write#voice",
   },
-  { icon: "🗺️", title: "Anime data", body: "Fix sub/dub and where-to-watch info for India.", phase: "Phase 2", href: null },
+  {
+    icon: "🗺️",
+    title: "Anime data",
+    body: "Fill in the sub and dub languages you've checked on each platform for India.",
+    phase: "Phase 2",
+    href: "/studio/anime-data",
+  },
   { icon: "📊", title: "Site stats", body: "Views, popular posts and searches.", phase: "Later", href: null },
 ];
 
 // the route ahead, in the order the phases land
 const CHART = [
-  { phase: "Phase 2", label: "Anime data", href: null },
+  { phase: "Phase 2", label: "Anime data", href: "/studio/anime-data" },
   { phase: "Phase 3", label: "My List logbook", href: "/my-list" },
   { phase: "Phase 4", label: "Blog & voice studio", href: "/studio/write" },
   { phase: "Later", label: "Site stats", href: null },

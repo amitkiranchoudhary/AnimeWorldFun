@@ -1,17 +1,17 @@
+import data from "./availability.json";
+
 // Sub/dub details per platform, checked by hand.
 //
 // AniList tells us WHICH platforms carry an anime, but not which subtitle or
-// dub languages each one offers (or in which country). Add verified entries
-// here and they show up in the "Where to watch" hover cards. Anything not
-// listed shows "not confirmed yet" instead of a guess.
+// dub languages each one offers (or in which country). Verified entries live in
+// availability.json and show up in the "Where to watch" hover cards; anything
+// not listed shows "not confirmed yet" instead of a guess.
 //
-// Key: AniList anime id (the number in /anime/<id>).
-// Platform key: the platform name exactly as AniList spells it (e.g. "Crunchyroll", "Netflix").
-//
-// Example (replace with real, checked data):
-//   21: {
-//     Crunchyroll: { region: "India", sub: ["English", "Hindi"], dub: ["English", "Hindi"], checked: "2026-10" },
-//   },
+// The easy way to edit it: Studio → Anime data, then download the new
+// availability.json and replace this folder's copy. By hand, the shape is:
+//   { "21": { "Crunchyroll": { "region": "India", "sub": ["English", "Hindi"], "dub": ["English"], "checked": "2026-10" } } }
+// Key: AniList anime id (the number in /anime/<id>). Platform: its name exactly as
+// AniList spells it. Leave out sub or dub when unknown; [] means "not available".
 
 export type PlatformLanguages = {
   region?: string;
@@ -21,4 +21,6 @@ export type PlatformLanguages = {
   checked?: string;
 };
 
-export const AVAILABILITY: Record<number, Record<string, PlatformLanguages>> = {};
+export type Availability = Record<string, Record<string, PlatformLanguages>>;
+
+export const AVAILABILITY: Availability = data as Availability;
