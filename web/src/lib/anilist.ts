@@ -253,3 +253,78 @@ async function cachedAnime(id: number): Promise<AnimeDetail | null> {
   if (!media || media.isAdult) return null;
   return media;
 }
+
+/* ── My List import (never cached: it's one visitor's own list) ── */
+
+export type ImportedShow = {
+  id: number;
+  idMal: number | null;
+  title: string;
+  cover: string;
+  color: string | null;
+  episodes: number | null;
+  format: string | null;
+};
+
+type ImportMedia = {
+  id: number;
+  idMal: number | null;
+  title: { romaji: string; english: string | null };
+  coverImage: { large: string; color: string | null };
+  episodes: number | null;
+  format: string | null;
+  isAdult: boolean | null;
+};
+
+const IMPORT_FIELDS = "id idMal title { romaji english } coverImage { large color } episodes format isAdult";
+
+const toShow = (m: ImportMedia): ImportedShow => ({
+  id: m.id,
+  idMal: m.idMal,
+  title: displayTitle(m),
+  cover: m.coverImage.large,
+  color: m.coverImage.color,
+  episodes: m.episodes,
+  format: m.format,
+});
+
+export type AniListEntry = ImportedShow & {
+  status: "CURRENT" | "PLANNING" | "COMPLETED" | "DROPPED" | "PAUSED" | "REPEATING";
+  progress: number;
+  score: number;
+  notes: string | null;
+};
+
+/** A public AniList user's anime list, or null when the user doesn't exist or is private. */
+export async function getUserAnimeList(userName: string): Promise<AniListEntry[] | null> {
+  const data = await query<{
+    MediaListCollection: {
+      lists: { entries: { status: AniListEntry["status"]; progress: number; score: number; notes: string | null; media: ImportMedia }[] }[];
+    } | null;
+  }>(
+    `query ($name: String) {
+      MediaListCollection(userName: $name, type: ANIME) {
+        lists { entries { status progress score(format: POINT_10) notes media { ${IMPORT_FIELDS} } } }
+      }
+    }`,
+    { name: userName },
+  );
+  if (!data?.MediaListCollection) return null;
+  return data.MediaListCollection.lists
+    .flatMap((l) => l.entries)
+    .filter((e) => !e.media.isAdult)
+    .map((e) => ({ ...toShow(e.media), status: e.status, progress: e.progress, score: e.score, notes: e.notes }));
+}
+
+/** Look up shows by their MyAnimeList ids (for a MAL export), 50 per request. */
+export async function findByMalIds(ids: number[]): Promise<ImportedShow[]> {
+  const out: ImportedShow[] = [];
+  for (let i = 0; i < ids.length; i += 50) {
+    const data = await query<{ Page: { media: ImportMedia[] } }>(
+      `query ($ids: [Int]) { Page(perPage: 50) { media(idMal_in: $ids, type: ANIME) { ${IMPORT_FIELDS} } } }`,
+      { ids: ids.slice(i, i + 50) },
+    );
+    for (const m of data?.Page.media ?? []) if (!m.isAdult) out.push(toShow(m));
+  }
+  return out;
+}

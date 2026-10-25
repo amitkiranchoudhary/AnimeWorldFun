@@ -13,12 +13,12 @@ export const metadata: Metadata = {
 };
 
 // Bump this whenever the policy text changes.
-const LAST_UPDATED = "25 October 2026";
+const LAST_UPDATED = "26 October 2026";
 
 const TLDR = [
   { icon: "🙅", title: "No accounts", body: "Visitors never sign up or log in. There's nothing to register for." },
   { icon: "🚫", title: "No tracking or ads", body: "No analytics, no pixels, no ad cookies — not now. We'll update this first if that changes." },
-  { icon: "🏮", title: "One preference", body: "If you switch the straw-hat cursor off, your browser remembers it. That's all." },
+  { icon: "🏮", title: "Stays on your device", body: "Your My List and the cursor setting are saved in your own browser. We never see them." },
   { icon: "🗺️", title: "Data from AniList", body: "Our server fetches anime info from AniList and never passes on your details. Only the small platform icons load straight from AniList's image server." },
 ];
 
@@ -76,8 +76,16 @@ const SECTIONS: { id: string; title: string; body: ReactNode }[] = [
             don&apos;t save them or connect them to you.
           </li>
           <li>
-            <strong>Watch-list tracking (My List) is coming later.</strong> When the My List feature arrives, this policy will be updated
-            before it launches to explain exactly what it stores and where.
+            <strong>My List stays in your browser.</strong> The shows you add to <Link href="/my-list">My List</Link>, with
+            your episode counts, ratings and notes, are saved only in your own browser&apos;s storage (see below). They are
+            never sent to our server, and we can&apos;t see them. A backup file you download stays on your device too.
+          </li>
+          <li>
+            <strong>Importing a list.</strong> If you import from AniList, the username you type is sent through our server
+            to AniList&apos;s public API to read that public list. If you import a MyAnimeList export, your browser reads the
+            file and sends only the anime ID numbers and your statuses, episode counts, scores and notes through our server so
+            the shows can be matched on AniList. The results come straight back to your browser; our server doesn&apos;t keep
+            any of it.
           </li>
         </ul>
       </>
@@ -88,7 +96,7 @@ const SECTIONS: { id: string; title: string; body: ReactNode }[] = [
     title: "Cookies & browser storage",
     body: (
       <>
-        <p>The whole list is two items. Nothing here is used for advertising or tracking.</p>
+        <p>The whole list is three items. Nothing here is used for advertising or tracking.</p>
         <div className="not-prose mt-5 grid gap-4">
           <div className="glass rounded-2xl px-5 pb-2 pt-4">
             <p className="mb-2 font-mono text-sm font-bold text-straw">awf_owner</p>
@@ -110,6 +118,16 @@ const SECTIONS: { id: string; title: string; body: ReactNode }[] = [
             <Row k="Lasts">Until you clear this site&apos;s data in your browser.</Row>
             </dl>
           </div>
+          <div className="glass rounded-2xl px-5 pb-2 pt-4">
+            <p className="mb-2 font-mono text-sm font-bold text-straw">awf-my-list</p>
+            <dl>
+            <Row k="Type">Local storage in your browser</Row>
+            <Row k="When">Saved when you add a show to My List, log an episode, rate it, write a note or import a list.</Row>
+            <Row k="What's inside">Each show&apos;s AniList ID, title, cover link, episode count, your shelf, progress, rating and note.</Row>
+            <Row k="Sent to us?">Never. It stays on your device.</Row>
+            <Row k="Lasts">Until you remove the shows or clear this site&apos;s data in your browser.</Row>
+            </dl>
+          </div>
         </div>
         <p>
           The site itself sets no other cookies. A YouTube trailer, if you load one, may set its own — see the next
@@ -127,7 +145,8 @@ const SECTIONS: { id: string; title: string; body: ReactNode }[] = [
           <li>
             <strong>AniList</strong> (<Out href="https://anilist.co">anilist.co</Out>) supplies titles, descriptions,
             scores and streaming links. Our server fetches this from AniList&apos;s public API and caches it for hours. Your
-            browser doesn&apos;t contact the AniList API, and we send AniList nothing about you.
+            browser doesn&apos;t contact the AniList API, and we send AniList nothing about you — except, if you choose to
+            import a list, what that import needs (described above).
           </li>
           <li>
             <strong>Anime images</strong> come from AniList&apos;s image server, <code>s4.anilist.co</code>. Posters and

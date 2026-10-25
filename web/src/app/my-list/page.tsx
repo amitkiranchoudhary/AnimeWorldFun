@@ -13,12 +13,13 @@ import LogbookShelves, { LogbookShelvesSkeleton } from "@/components/account/Log
 import LogbookRail from "@/components/account/LogbookRail";
 import ScrollLitLine from "@/components/account/ScrollLitLine";
 import ProgressRing from "@/components/account/ProgressRing";
+import MyListApp from "@/components/account/MyListApp";
 import s from "@/components/account/logbook.module.css";
 
 export const metadata: Metadata = {
   title: "My List",
   description:
-    "Coming soon: a voyage logbook for your anime. Track what you're watching, completed or planning, and import from AniList or MyAnimeList.",
+    "Your anime logbook: track what you're watching, completed or planning, log episodes, rate shows and import from AniList or MyAnimeList. Saved in your browser, no account needed.",
 };
 
 /* ── Data pieces (each inside its own <Suspense>) ───────────── */
@@ -153,18 +154,18 @@ function Chapter({
 const FEATURES = [
   {
     ring: 1,
-    title: "Three shelves",
-    body: "Watching, Completed and Plan to watch — move a show between them in one tap.",
+    title: "Five shelves",
+    body: "Watching, Plan to watch, Completed, On hold and Dropped — move a show between them in one tap.",
   },
   {
     ring: 0.58,
     title: "Episode rings",
-    body: "Log each episode and watch the ring fill. Pick up exactly where you left off.",
+    body: "Log each episode with +1 and watch the ring fill. The last episode stamps it Completed.",
   },
   {
     ring: 0.82,
     title: "Bring your log",
-    body: "Import your existing list from AniList or MyAnimeList so nothing is lost at sea.",
+    body: "Import your list from AniList or MyAnimeList, and download a backup to move it to another device.",
   },
 ];
 
@@ -185,7 +186,7 @@ export default function MyListPage() {
           <Reveal y={14}>
             <span className="inline-flex items-center gap-2 rounded-full border border-sash/50 bg-sash/15 px-4 py-1.5 text-xs font-extrabold uppercase tracking-[0.25em] text-[#ffc9cd]">
               <span className="h-2 w-2 rounded-full bg-sash" style={{ animation: "glow-pulse 1.6s ease-in-out infinite", boxShadow: "0 0 10px var(--sash)" }} />
-              Coming soon · Phase 3
+              Saved in your browser · no account
             </span>
           </Reveal>
           <h1 className="mt-6">
@@ -211,16 +212,16 @@ export default function MyListPage() {
               </span>
             </p>
             <p className="mx-auto mt-5 max-w-lg text-sm leading-relaxed text-muted">
-              My List isn&apos;t open yet — this is a preview of how tracking will work. The covers below are real
-              trending shows; the progress is just a sample.
+              Five shelves, episode rings, your own ratings and notes. Add shows from any anime page, or import
+              your list from AniList or MyAnimeList. It stays in this browser — no sign-up.
             </p>
           </Reveal>
           <Reveal delay={1100} className="mt-10 flex flex-wrap items-center justify-center gap-4">
             <a
-              href="#how-it-works"
+              href="#my-log"
               className="rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-bold text-text transition hover:border-straw/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-straw"
             >
-              See how it works ↓
+              Open your logbook ↓
             </a>
             <Link
               href="/explore"
@@ -232,14 +233,27 @@ export default function MyListPage() {
         </div>
       </header>
 
-      {/* ── Chapter 01: the demo ─────────────────────── */}
-      <div id="how-it-works" className="scroll-mt-20">
+      {/* ── Chapter 01: the visitor's real logbook ───── */}
+      <div id="my-log" className="scroll-mt-20">
         <Chapter
           n="01"
+          id="ch-log"
+          label="YOUR LOG"
+          title="Your logbook"
+          lead="Everything you've added, shelf by shelf. Log an episode with +1, rate it, jot a note — it saves as you go."
+        >
+          <MyListApp />
+        </Chapter>
+      </div>
+
+      {/* ── Chapter 02: the demo ─────────────────────── */}
+      <div id="how-it-works" className="scroll-mt-20">
+        <Chapter
+          n="02"
           id="ch-demo"
           label="HOW IT WORKS"
           title="Log it, episode by episode"
-          lead="Add a show to Plan to watch, log episodes as you go and see the ring fill, then stamp it Completed. Try the button — it's a live demo."
+          lead="Add a show to Plan to watch, log episodes as you go and see the ring fill, then stamp it Completed. Try the button — this one's just a demo."
         >
           <Reveal scale={0.97}>
             <Suspense fallback={<div className="glass h-[420px] animate-pulse rounded-[2rem]" />}>
@@ -251,18 +265,18 @@ export default function MyListPage() {
 
       {/* ── Chapter 02: a line that owns the screen ──── */}
       <ScrollLitLine
-        eyebrow="Chapter 02 · The log"
+        eyebrow="Chapter 03 · The log"
         text="Every episode you watch becomes a line in your logbook."
         gold={["episode", "logbook"]}
       />
 
       {/* ── Chapter 03: the shelves ──────────────────── */}
       <Chapter
-        n="03"
+        n="04"
         id="ch-shelves"
-        label="THE SHELVES"
-        title="Three shelves, one crew"
-        lead="Your list will live on three shelves. Here's a sample, stocked with what's trending right now — tap a cover to open the show."
+        label="NEED IDEAS?"
+        title="What the crew is watching"
+        lead="A sample logbook stocked with what's trending right now — tap a cover to open the show and add it to yours."
         after={
           <Suspense fallback={<div aria-hidden className={`${s.railOnly} h-[100svh]`} />}>
             <RailFromTrending />
@@ -280,11 +294,11 @@ export default function MyListPage() {
 
       {/* ── Chapter 04: what's coming ────────────────── */}
       <Chapter
-        n="04"
+        n="05"
         id="ch-features"
-        label="ON THE HORIZON"
-        title="What's being built"
-        lead="My List lands in Phase 3. Here's what's on the chart."
+        label="ON BOARD"
+        title="What your logbook can do"
+        lead="No account, no tracking — just your list, kept on your own device."
       >
         <ul className="grid gap-5 sm:grid-cols-3">
           {FEATURES.map((f, i) => (
@@ -292,14 +306,14 @@ export default function MyListPage() {
               <ProgressRing value={f.ring} size={56} stroke={5} color={i === 1 ? "#ff8fc2" : "var(--straw)"} delay={200 + i * 150} />
               <h3 className="mt-4 font-display text-3xl tracking-wide text-straw">{f.title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-muted">{f.body}</p>
-              <span className="mt-4 inline-block rounded-full bg-white/10 px-2.5 py-0.5 text-xs font-bold text-muted">Phase 3</span>
+              <span className="mt-4 inline-block rounded-full bg-straw/15 px-2.5 py-0.5 text-xs font-bold text-straw">Live now</span>
             </Reveal>
           ))}
         </ul>
       </Chapter>
 
       {/* ── Finale: call to action ───────────────────── */}
-      <section aria-label="Set sail while we build" className="relative px-4 pb-28 pt-10 text-center sm:px-6">
+      <section aria-label="Find your next voyage" className="relative px-4 pb-28 pt-10 text-center sm:px-6">
         <div
           aria-hidden
           className="pointer-events-none absolute left-1/2 top-1/2 h-[28rem] w-[28rem] max-w-full -translate-x-1/2 -translate-y-1/2 rounded-full"
@@ -307,13 +321,13 @@ export default function MyListPage() {
         />
         <div className="relative">
           <SplitText
-            text="Set sail while we build"
+            text="Find your next voyage"
             as="h2"
             className="mx-auto max-w-3xl font-display text-5xl leading-[0.95] tracking-wide text-text text-glow-gold sm:text-7xl"
           />
           <Reveal delay={250}>
             <p className="mx-auto mt-5 max-w-md text-muted">
-              Find your next show now — when the logbook opens, it&apos;ll be waiting for you.
+              Open any anime and press “Add to My List” — it&apos;ll be waiting for you here.
             </p>
           </Reveal>
           <Reveal delay={400} className="mt-10 flex flex-wrap items-center justify-center gap-5">

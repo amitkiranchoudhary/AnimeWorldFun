@@ -24,10 +24,10 @@ const FEATURES = [
   {
     no: "03",
     title: "Track your voyage",
-    body: "Mark shows as Watching, Completed or Plan to Watch and keep count of episodes. Being built in the shipyard right now.",
-    status: "soon" as const,
+    body: "Mark shows as Watching, Completed or Plan to Watch, log every episode, rate and add notes, or import your list from AniList or MyAnimeList. No account needed.",
+    status: "live" as const,
     href: "/my-list",
-    cta: "Peek at My List",
+    cta: "Open My List",
   },
   {
     no: "04",

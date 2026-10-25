@@ -7,6 +7,7 @@ import AnimeGrid from "@/components/AnimeGrid";
 import WhereToWatch from "@/components/WhereToWatch";
 import Chapter from "@/components/anime/Chapter";
 import HeroBanner from "@/components/anime/HeroBanner";
+import AddToList from "@/components/anime/AddToList";
 import Logline from "@/components/anime/Logline";
 import PosterCarousel, { type Poster } from "@/components/anime/PosterCarousel";
 import ScoreRing from "@/components/anime/ScoreRing";
@@ -258,6 +259,19 @@ async function AnimeContent({ params }: { params: Props["params"] }) {
                 </p>
               </Reveal>
             )}
+
+            <Reveal delay={800} y={12} blur={0} className="mt-6">
+              <AddToList
+                show={{
+                  id: anime.id,
+                  title,
+                  cover: anime.coverImage.large,
+                  color: anime.coverImage.color,
+                  episodes: anime.episodes,
+                  format: anime.format,
+                }}
+              />
+            </Reveal>
 
             <Reveal delay={1000} y={12} blur={4} className="mt-5 flex flex-wrap justify-center gap-2 md:justify-start">
               {anime.genres.map((g) => (
