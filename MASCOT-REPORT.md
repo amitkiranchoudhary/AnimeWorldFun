@@ -80,3 +80,15 @@ No copyrighted character art remains on any page.
 **⚠️ Not actually pushed:** the repo is 7 commits ahead of `origin/main`. Nothing from the mascot swap is on GitHub yet.
 
 No ❌ items, so nothing needed fixing.
+
+---
+
+# Part 2: voice change
+
+The blog read-along voice is now calm and female where the browser has one. `web/src/components/blog/narrator.ts` picks, in order: Natural/Neural female (Aria, Jenny), Google UK English Female, Google US English, Microsoft Zira or Samantha, any female English voice, then the default. It waits for the voice list to load, uses rate 0.9 (at 1× speed) and pitch 1.0. A "Reader" dropdown in the controls lets visitors choose a voice, and the choice is remembered in the browser. No paid services or keys.
+
+On this PC it picks **Microsoft Zira**. Edge and Android Chrome usually have better voices and will pick those. Type check and lint pass; not tried on a real Android phone.
+
+# Final status
+
+Mascot check: 12 of 13 items ✅, sakura animation ⚠️ (look at it once). Voice fix done. **Nothing is pushed to GitHub yet.**

@@ -87,3 +87,6 @@ Done: 12 of 13 items confirmed ✅, #5 (sakura) ⚠️ needs a quick visual look
 
 ## Part 2: calm female voice
 Done. `web/src/components/blog/narrator.ts` ranks voices (Natural/Neural, Google UK Female, Google US, Zira/Samantha, any female English, default), waits for voices to load, rate 0.9, pitch 1. "Reader" dropdown in the read-along controls, choice saved in localStorage.
+
+## Part 3
+Report updated. Final commit made.
