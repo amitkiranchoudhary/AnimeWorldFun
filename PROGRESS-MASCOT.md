@@ -81,3 +81,6 @@ These are official covers and banners loaded from AniList (`s4.anilist.co`), alw
   - **Removed** the unused hat cursor keyframes from `globals.css`.
   - No references to the old files remain; the build passes.
 - Phase 6: tested desktop (1280px) and phone (375px) widths and all links; wrote `MASCOT-REPORT.md`.
+
+## Part 1 re-verification
+Done: 12 of 13 items confirmed ✅, #5 (sakura) ⚠️ needs a quick visual look. Repo is 7 commits ahead of origin: not pushed. Details in `MASCOT-REPORT.md`.

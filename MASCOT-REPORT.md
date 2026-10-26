@@ -54,3 +54,29 @@ Every phase is committed separately; the full log is in `PROGRESS-MASCOT.md`. No
 - **Old images in git history:** the removed collages are still in old commits. That only matters if you want them gone from history too, which needs a history rewrite and a force push. I wouldn't bother.
 
 No copyrighted character art remains on any page.
+
+---
+
+# Part 1 re-verification (code and files check)
+
+| # | Item | Result |
+|---|---|---|
+| 1 | Captain logo in navbar | ✅ `Logo.tsx` uses `captain/logo-*` |
+| 2 | Favicon | ✅ `src/app/icon.png` (Captain) |
+| 3 | Desktop hero: Captain left, text right | ✅ `object-[28%_center]`, text block `md:justify-end` |
+| 4 | Mobile hero: Captain on top, text below | ✅ `hero-mobile` source, text `-mt-28` below |
+| 5 | Sakura animation | ⚠️ `SkyScene` (canvas petals) is mounted on Home; not run in a browser this pass, please glance at it |
+| 6 | No copyrighted background chibis | ✅ `bg-dark.*` deleted, CSS night sky only |
+| 7 | Dragon Ball decorations gone | ✅ no matches in src or public |
+| 8 | Captain cursor replaced hat cursor | ✅ `CaptainCursor.tsx` (katana); no `cursor-hat` references |
+| 9 | Chibis placed | ✅ waving (Home), reading (Blog), cheering (My List, anime page "Completed!"), sleeping (404, empty My List, Explore no results) |
+| 10 | "Hi!" text removed | ✅ removed from the image, no "Hi!" in code |
+| 11 | Footer credit | ✅ "Data and images from AniList" |
+| 12 | Broken images or links | ✅ every `/images/...` path in `src` exists |
+| 13 | Posters next to titles | ✅ `remotePatterns` for `s4.anilist.co` intact, components unchanged |
+
+**Leftover names:** only the text "Naruto" and "One Piece" in the footer ticker and search placeholder (titles, not art). Fine to keep.
+
+**⚠️ Not actually pushed:** the repo is 7 commits ahead of `origin/main`. Nothing from the mascot swap is on GitHub yet.
+
+No ❌ items, so nothing needed fixing.
