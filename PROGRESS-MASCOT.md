@@ -84,3 +84,6 @@ These are official covers and banners loaded from AniList (`s4.anilist.co`), alw
 
 ## Part 1 re-verification
 Done: 12 of 13 items confirmed ✅, #5 (sakura) ⚠️ needs a quick visual look. Repo is 7 commits ahead of origin: not pushed. Details in `MASCOT-REPORT.md`.
+
+## Part 2: calm female voice
+Done. `web/src/components/blog/narrator.ts` ranks voices (Natural/Neural, Google UK Female, Google US, Zira/Samantha, any female English, default), waits for voices to load, rate 0.9, pitch 1. "Reader" dropdown in the read-along controls, choice saved in localStorage.

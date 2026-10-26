@@ -23,17 +23,68 @@ function wordMs(word: string) {
   return ms;
 }
 
-function pickVoice(): SpeechSynthesisVoice | null {
-  const voices = window.speechSynthesis.getVoices();
-  const en = voices.filter((v) => /^en([-_]|$)/i.test(v.lang));
-  // voices on the device report word boundaries far more reliably than online ones
+const VOICE_KEY = "awf-voice";
+const MALE = /\b(guy|davis|ryan|brian|christopher|eric|roger|steffan|andrew|david|mark|george|james|male)\b/i;
+const FEMALE = /\b(aria|jenny|sonia|libby|michelle|ana|emma|zira|samantha|susan|hazel|female|karen|moira|tessa|victoria|serena)\b/i;
+const isMale = (v: SpeechSynthesisVoice) => MALE.test(v.name) && !/female/i.test(v.name);
+
+export const englishVoices = () =>
+  canSpeak() ? window.speechSynthesis.getVoices().filter((v) => /^en([-_]|$)/i.test(v.lang)) : [];
+
+/** The calm female voice we prefer: Natural/Neural, Google UK Female, Google US, Zira/Samantha, any female English, then the default. */
+export function bestVoice(): SpeechSynthesisVoice | null {
+  const en = englishVoices();
+  const calm = (v: SpeechSynthesisVoice) => /natural|neural/i.test(v.name) && !isMale(v);
   return (
-    en.find((v) => v.localService && /^en[-_](US|GB)/i.test(v.lang)) ??
-    en.find((v) => v.localService) ??
+    en.find((v) => calm(v) && FEMALE.test(v.name)) ??
+    en.find(calm) ??
+    en.find((v) => /google uk english female/i.test(v.name)) ??
+    en.find((v) => /google us english/i.test(v.name)) ??
+    en.find((v) => /zira|samantha/i.test(v.name)) ??
+    en.find((v) => FEMALE.test(v.name) && !isMale(v)) ??
+    en.find((v) => v.default) ??
     en[0] ??
     null
   );
 }
+
+export const savedVoiceName = () => {
+  try {
+    return localStorage.getItem(VOICE_KEY) ?? "";
+  } catch {
+    return "";
+  }
+};
+
+export const saveVoiceName = (name: string) => {
+  try {
+    if (name) localStorage.setItem(VOICE_KEY, name);
+    else localStorage.removeItem(VOICE_KEY);
+  } catch {}
+};
+
+/** The visitor's saved choice if that voice still exists here, otherwise the best default. */
+export function pickVoice(): SpeechSynthesisVoice | null {
+  const saved = savedVoiceName();
+  return (saved && englishVoices().find((v) => v.name === saved)) || bestVoice();
+}
+
+/** Resolves once the voice list is ready (Chrome fills it in late; Android can be slower still). */
+export function voicesReady(): Promise<SpeechSynthesisVoice[]> {
+  return new Promise((resolve) => {
+    if (!canSpeak()) return resolve([]);
+    const synth = window.speechSynthesis;
+    const done = () => {
+      synth.removeEventListener("voiceschanged", done);
+      resolve(synth.getVoices());
+    };
+    if (synth.getVoices().length) return resolve(synth.getVoices());
+    synth.addEventListener("voiceschanged", done);
+    window.setTimeout(done, 1500); // some browsers never fire the event
+  });
+}
+
+const CALM_RATE = 0.9; // our 1× is a touch slower than the browser's default
 
 export function createNarrator(words: string[], cb: Callbacks) {
   const offsets: number[] = [];
@@ -100,7 +151,8 @@ export function createNarrator(words: string[], cb: Callbacks) {
     const voice = pickVoice();
     if (voice) u.voice = voice;
     u.lang = voice?.lang ?? "en-US";
-    u.rate = rate;
+    u.rate = rate * CALM_RATE;
+    u.pitch = 1;
     live = u;
     const mine = () => id === session && live === u;
 

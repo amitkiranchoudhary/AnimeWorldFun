@@ -1,7 +1,7 @@
 "use client";
 
 import { Fragment, useEffect, useId, useRef, useState, useSyncExternalStore, type KeyboardEvent, type MouseEvent } from "react";
-import { canSpeak, createNarrator, type Narrator, type NarratorMode } from "./narrator";
+import { bestVoice, canSpeak, createNarrator, englishVoices, savedVoiceName, saveVoiceName, voicesReady, type Narrator, type NarratorMode } from "./narrator";
 import s from "./blog.module.css";
 
 // An original sample entry for the preview.
@@ -57,6 +57,8 @@ export default function ReadAlong() {
   const [rate, setRate] = useState(1);
   const [voiceOn, setVoiceOn] = useState(true);
   const [mode, setMode] = useState<NarratorMode | null>(null);
+  const [voiceList, setVoiceList] = useState<string[]>([]);
+  const [voiceName, setVoiceName] = useState("");
   const narrator = useRef<Narrator | null>(null);
   const at = useRef(-1); // the current word, for the event handlers
   const hintId = useId();
@@ -76,7 +78,13 @@ export default function ReadAlong() {
     });
     narrator.current = n;
     // Chrome loads its voice list lazily; ask early so it's ready on Play
-    if (canSpeak()) window.speechSynthesis.getVoices();
+    let alive = true;
+    voicesReady().then(() => {
+      if (!alive) return;
+      setVoiceList(englishVoices().map((v) => v.name));
+      const saved = savedVoiceName();
+      setVoiceName(englishVoices().some((v) => v.name === saved) ? saved : "");
+    });
     // Stop speaking when the route is hidden (Next keeps it in <Activity>),
     // unmounted, or the page is left; at.current is kept so Resume picks up here.
     const halt = () => {
@@ -85,6 +93,7 @@ export default function ReadAlong() {
     };
     window.addEventListener("pagehide", halt);
     return () => {
+      alive = false;
       window.removeEventListener("pagehide", halt);
       halt();
     };
@@ -122,6 +131,12 @@ export default function ReadAlong() {
     at.current = to;
     setIndex(to);
     setStatus("paused");
+  };
+
+  const chooseVoice = (name: string) => {
+    saveVoiceName(name);
+    setVoiceName(name);
+    if (status === "playing") start(Math.max(0, at.current));
   };
 
   const changeRate = (r: number) => {
@@ -300,6 +315,24 @@ export default function ReadAlong() {
           <span aria-hidden className={s.switchKnob} />
           Voice
         </button>
+
+        {speechOk && voiceList.length > 0 && (
+          <label className="flex items-center gap-2">
+            <span className={s.ctrlLabel}>Reader</span>
+            <select
+              value={voiceName}
+              onChange={(e) => chooseVoice(e.target.value)}
+              className="max-w-[12rem] rounded-lg border border-white/20 bg-transparent px-2 py-1 text-sm"
+            >
+              <option value="">Auto: {bestVoice()?.name ?? "calm female"}</option>
+              {voiceList.map((n) => (
+                <option key={n} value={n}>
+                  {n}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
       </div>
 
       <p className={s.modeNote}>{note}</p>
