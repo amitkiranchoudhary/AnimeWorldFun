@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   openGraph: {
     siteName: "Anime World Fun",
     type: "website",
-    images: [{ url: "/images/og.jpg", width: 1200, height: 630, alt: "Anime World Fun — heroes from your favourite anime" }],
+    images: [{ url: "/images/og.jpg", width: 1200, height: 630, alt: "The Captain, Anime World Fun's mascot, on the bow of his ship at night" }],
   },
   twitter: { card: "summary_large_image" },
   title: {

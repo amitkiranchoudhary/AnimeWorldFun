@@ -1,7 +1,8 @@
-import Image from "next/image";
+import Image, { getImageProps } from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
-import heroBanner from "../../public/images/hero-landing.png";
+import heroDesktop from "../../public/images/captain/hero-desktop.jpg";
+import heroMobile from "../../public/images/captain/hero-mobile.jpg";
 import compass from "../../public/images/compass.png";
 import AnimeRow, { AnimeRowSkeleton } from "@/components/AnimeRow";
 import SkyScene from "@/components/SkyScene";
@@ -65,36 +66,49 @@ function SectionHeading({ kicker, title, href, cta }: { kicker: string; title: s
   );
 }
 
-export default function Home() {
+// The Captain on the bow of his ship. Desktop: the wide painting fills the hero,
+// the Captain stands on the left and the words sit over the open sky and sea on
+// the right. Phones: a portrait crop of the Captain on top, the words below.
+function Hero() {
+  const common = {
+    alt: "The Captain, Anime World Fun's mascot, standing on the bow of his ship under a starry night sky",
+    sizes: "100vw",
+    loading: "eager" as const,
+    fetchPriority: "high" as const,
+  };
+  const {
+    props: { srcSet: desktop },
+  } = getImageProps({ ...common, src: heroDesktop });
+  const {
+    props: { srcSet: mobile, ...img },
+  } = getImageProps({ ...common, src: heroMobile });
+
   return (
-    <>
-      <SkyScene />
+    <section className="relative md:h-[clamp(560px,52vw,800px)]">
+      <div
+        className="relative h-[66svh] max-h-[620px] min-h-[380px] w-full overflow-hidden md:absolute md:inset-0 md:h-full md:max-h-none"
+        style={{
+          maskImage: "linear-gradient(to bottom, #000 72%, transparent 100%)",
+          WebkitMaskImage: "linear-gradient(to bottom, #000 72%, transparent 100%)",
+        }}
+      >
+        <picture>
+          <source media="(min-width: 768px)" srcSet={desktop} />
+          <source srcSet={mobile} />
+          <img {...img} alt={common.alt} className="absolute inset-0 h-full w-full object-cover object-top md:object-[28%_center]" />
+        </picture>
+        {/* keeps the words readable over the sky without hiding the Captain */}
+        <div aria-hidden className="absolute inset-0 hidden bg-gradient-to-r from-transparent via-[#0a0f24]/10 to-[#070a18]/70 md:block" />
+        <div aria-hidden className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/50 to-transparent" />
+      </div>
 
-      {/* ── Hero: the original banner, full width ── */}
-      <section className="relative">
-        <div
-          className="relative h-[clamp(300px,46vw,620px)] w-full overflow-hidden"
-          style={{
-            maskImage: "linear-gradient(to bottom, #000 60%, transparent 100%)",
-            WebkitMaskImage: "linear-gradient(to bottom, #000 60%, transparent 100%)",
-          }}
-        >
-          <Image
-            src={heroBanner}
-            alt="Anime World Fun — heroes from Naruto, Dragon Ball, One Piece, Jujutsu Kaisen and more"
-            fill
-            priority
-            sizes="100vw"
-            quality={90}
-            className="object-cover object-center"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/50" />
-        </div>
-
-        <div className="relative z-10 mx-auto -mt-16 max-w-3xl px-4 text-center sm:-mt-24">
-          {/* the banner art carries the name visually; this is the page's heading for search engines and screen readers */}
-          <h1 className="sr-only">Anime World Fun: find where to watch any anime, and in which language</h1>
-          <p className="text-lg font-semibold leading-relaxed text-text/95 [text-shadow:0_2px_8px_#000] sm:text-xl">
+      <div className="relative z-10 mx-auto -mt-28 max-w-7xl px-4 sm:px-6 md:mt-0 md:flex md:h-full md:items-center md:justify-end">
+        <div className="text-center md:w-[min(46%,560px)] md:pt-16 md:text-left">
+          <p className="font-display text-lg tracking-[0.3em] text-[#ff9fc8] [text-shadow:0_2px_10px_#000]">Welcome aboard</p>
+          <h1 className="title-stroke mt-1 text-[clamp(3rem,11vw,5.6rem)] leading-[0.9] md:text-[clamp(3.4rem,5.6vw,5.8rem)]">
+            Anime World Fun
+          </h1>
+          <p className="mt-4 text-lg font-semibold leading-relaxed text-text/95 [text-shadow:0_2px_8px_#000] sm:text-xl">
             Find <strong className="text-straw">where to watch</strong> any anime,{" "}
             <strong className="text-straw">in which language</strong>, track every episode — and read tales from the
             crew.
@@ -102,7 +116,7 @@ export default function Home() {
 
           <form
             action="/explore"
-            className="mx-auto mt-6 flex max-w-2xl overflow-hidden rounded-2xl border-2 border-ink bg-parchment shadow-[5px_5px_0_var(--ink)]"
+            className="mx-auto mt-6 flex max-w-2xl overflow-hidden rounded-2xl border-2 border-ink bg-parchment shadow-[5px_5px_0_var(--ink)] md:mx-0"
           >
             <label htmlFor="hero-search" className="sr-only">Search anime</label>
             <input
@@ -116,7 +130,7 @@ export default function Home() {
             </button>
           </form>
 
-          <div className="mt-6 flex flex-wrap justify-center gap-3">
+          <div className="mt-6 flex flex-wrap justify-center gap-3 md:justify-start">
             <Link href="/explore" className="rounded-full bg-straw px-6 py-3 font-extrabold text-ink shadow-[4px_4px_0_var(--ink)] transition hover:-translate-y-0.5">
               Explore the database
             </Link>
@@ -125,7 +139,17 @@ export default function Home() {
             </Link>
           </div>
         </div>
-      </section>
+      </div>
+    </section>
+  );
+}
+
+export default function Home() {
+  return (
+    <>
+      <SkyScene />
+
+      <Hero />
 
     <div className="mx-auto max-w-7xl px-4 pt-8 sm:px-6">
 

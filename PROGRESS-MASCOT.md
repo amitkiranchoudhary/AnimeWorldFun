@@ -8,18 +8,20 @@ Replacing every piece of copyrighted anime character art with **the Captain**, y
 |---|---|---|
 | 1. Audit | ✅ Done | `3b5327b` "Before mascot swap" + this file |
 | 2. Prepare images | ✅ Done | see log |
-| 3. Logo and hero | ⏳ Next | |
-| 4. Backgrounds, cursor, decorations | ⬜ | |
+| 3. Logo and hero | ✅ Done | see log |
+| 4. Backgrounds, cursor, decorations | ⏳ Next | |
 | 5. Poster credits and cleanup | ⬜ | |
 | 6. Test and report | ⬜ | |
 
-**Exact next step:** Phase 3.
-1. In `web/src/components/Logo.tsx`, swap `public/images/logo.png` for `/images/captain/logo-256.webp` (circular).
-2. Rebuild the homepage hero in `web/src/app/page.tsx`:
-   - Desktop: `hero-desktop` as a full-bleed background, with the Captain on the left and the text, search bar and buttons in a column on the right.
-   - Mobile: `hero-mobile` on top, text stacked below.
-   - Keep the sakura layer (SkyScene) and update the image alt text.
-3. Point the link-preview alt text in `web/src/app/layout.tsx` at the Captain. (`og.jpg` itself was already regenerated from the Captain hero.)
+**Exact next step:** Phase 4.
+1. In `web/src/components/SiteBackground.tsx`, stop using `/images/bg-dark.webp` (the chibi collage). Use an original backdrop (night sea, stars and glow in CSS) instead.
+2. Swap the straw hat on the boat sail in `web/src/components/info/Sea.tsx` for the Captain's dark hat.
+3. Place the chibis:
+   - waving on Home
+   - reading on `/blog`
+   - cheering for Logbook completion (My List `EntryCard` / `AddToList` when a show is completed)
+   - sleeping for empty states (My List `EmptyLog`, Explore `EmptyScene`) and the 404 (`web/src/app/not-found.tsx`)
+4. Rename `web/src/components/StrawHatCursor.tsx` to a Captain cursor (an SVG katana), rename the navbar toggle to "Captain cursor", and update the privacy text.
 
 ---
 
@@ -66,3 +68,8 @@ These are official covers and banners loaded from AniList (`s4.anilist.co`), alw
 - **For you to know:**
   - The katana can't be cut out of the chibi sheet cleanly (in every pose it touches the Captain), so the Phase 4 cursor will be a hand-drawn SVG of his katana in the same colours.
   - `master-character-sheet.jpg` also has the generator sparkle; it isn't used on the site.
+- Phase 3:
+  - **Logo:** `web/src/components/Logo.tsx` is now the Captain badge (`captain/logo-256.png`, served as WebP/AVIF by next/image) in a gold ring, with an "Anime / World Fun" wordmark beside it. Used in the navbar (still links home) and the footer.
+  - **Hero:** in `web/src/app/page.tsx`, the hero collage is replaced by an art-directed `<picture>` (`getImageProps`). Desktop: `hero-desktop` full width, the Captain on the left, and a visible h1 "Anime World Fun" with the text, search and buttons on the right over the sky. Phones: `hero-mobile` on top, text stacked below. Checked at 1280px and 375px, with no sideways scroll. The sakura layer (SkyScene) is unchanged.
+  - The link-preview alt text in `layout.tsx` now describes the Captain.
+  - The old `public/images/hero-landing.png` and `logo.png` are unused now; they're deleted in Phase 5.

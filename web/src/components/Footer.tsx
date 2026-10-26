@@ -234,7 +234,7 @@ export default function Footer() {
       {/* ── Credits and link columns ── */}
       <div className="relative mx-auto grid max-w-7xl grid-cols-2 gap-x-6 gap-y-10 px-4 pb-6 pt-6 sm:px-6 md:grid-cols-[1.7fr_1fr_1fr_1fr]">
         <Reveal className="col-span-2 md:col-span-1">
-          <LogoMark className="h-24 w-auto drop-shadow-[0_0_24px_rgba(242,201,76,0.25)]" />
+          <LogoMark className="h-20" text="text-3xl" />
           <p className="mt-4 max-w-sm text-sm leading-relaxed text-muted">
             A fan-made harbour for anime lovers: find where to watch, in which language, track what you&apos;ve seen,
             and read stories from the crew.

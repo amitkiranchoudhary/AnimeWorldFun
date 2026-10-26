@@ -394,7 +394,7 @@ export default function Navbar() {
             aria-label="Anime World Fun home"
             onClick={() => open && close(false)}
           >
-            <LogoMark className="nb-logo h-14 w-auto" />
+            <LogoMark className="nb-logo h-11 sm:h-12" text="text-lg sm:text-xl" />
           </Link>
         </Magnetic>
 
