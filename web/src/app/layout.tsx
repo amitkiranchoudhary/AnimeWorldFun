@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Bangers, Nunito } from "next/font/google";
 import "./globals.css";
 import SiteBackground from "@/components/SiteBackground";
-import StrawHatCursor from "@/components/StrawHatCursor";
+import CaptainCursor from "@/components/CaptainCursor";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AmbientSky from "@/components/ambient/AmbientSky";
@@ -47,7 +47,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <SiteBackground />
         <AmbientSky />
         <SmoothScroll />
-        <StrawHatCursor />
+        <CaptainCursor />
         <Navbar />
         <main className="flex-1">{children}</main>
         <Footer />

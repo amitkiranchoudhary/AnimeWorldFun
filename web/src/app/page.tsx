@@ -6,6 +6,7 @@ import heroMobile from "../../public/images/captain/hero-mobile.jpg";
 import compass from "../../public/images/compass.png";
 import AnimeRow, { AnimeRowSkeleton } from "@/components/AnimeRow";
 import SkyScene from "@/components/SkyScene";
+import CaptainChibi from "@/components/CaptainChibi";
 import WhereToWatchDemo from "@/components/WhereToWatchDemo";
 import { getAllTimeGreats, getTrending } from "@/lib/anilist";
 
@@ -219,6 +220,7 @@ export default function Home() {
       {/* ── Join ── */}
       <section className="py-10">
         <div className="card flex flex-col items-center gap-5 px-6 py-12 text-center">
+          <CaptainChibi pose="waving" float className="-mb-2 w-28 sm:w-36" label="The Captain waving hello" />
           <h2 className="title-stroke text-4xl sm:text-6xl">Free for every fan, forever</h2>
           <p className="max-w-lg text-muted">
             No subscriptions, no treasure required. Watchlists, dub alerts and comments are on their way.

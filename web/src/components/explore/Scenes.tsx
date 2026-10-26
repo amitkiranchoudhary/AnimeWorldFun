@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import Reveal from "@/components/motion/Reveal";
+import CaptainChibi from "@/components/CaptainChibi";
 import s from "./explore.module.css";
 
 /* Little animated scenes for "nothing here" and "something went wrong". */
@@ -59,6 +60,7 @@ function Scene({ title, children, stormy }: { title: string; children: ReactNode
 export function EmptyScene({ clearHref }: { clearHref?: string }) {
   return (
     <Scene title="No anime found">
+      <CaptainChibi pose="sleeping" className="mx-auto mt-4 w-36 sm:w-44" />
       <p className="mx-auto mt-3 max-w-md text-muted">Only open water out here. Try removing a filter or two.</p>
       {clearHref && (
         <Link

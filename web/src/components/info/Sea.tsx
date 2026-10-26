@@ -121,7 +121,7 @@ export function Moon({ className = "" }: { className?: string }) {
   );
 }
 
-/** A little sailboat with a straw hat on its sail and a glowing lantern at the bow, bobbing on the swell. */
+/** A little sailboat with the Captain's hat on its sail and a glowing lantern at the bow, bobbing on the swell. */
 export function LanternBoat({ className = "" }: { className?: string }) {
   const glow = `awf-lantern-${useId()}`;
   return (
@@ -142,10 +142,10 @@ export function LanternBoat({ className = "" }: { className?: string }) {
         {/* sails */}
         <path d="M75 26 Q100 50 104 80 L75 80 Z" fill="#f6e7c8" stroke="#1b1410" strokeWidth="2" strokeLinejoin="round" />
         <path d="M69 32 Q50 56 44 80 L69 80 Z" fill="#e9d6ad" stroke="#1b1410" strokeWidth="2" strokeLinejoin="round" />
-        {/* straw hat on the big sail */}
-        <ellipse cx="88" cy="62" rx="10" ry="3" fill="#f2c94c" stroke="#1b1410" strokeWidth="1.5" />
-        <path d="M81.5 61.5 Q82 52 88 52 Q94 52 94.5 61.5 Z" fill="#f2c94c" stroke="#1b1410" strokeWidth="1.5" />
-        <rect x="81.8" y="57.6" width="12.4" height="2.6" fill="#e63946" />
+        {/* the Captain's dark wide-brimmed hat on the big sail */}
+        <path d="M76.5 62.5 Q88 58.5 99.5 62.5 Q88 66 76.5 62.5 Z" fill="#3b3634" stroke="#1b1410" strokeWidth="1.5" strokeLinejoin="round" />
+        <path d="M82 61.5 Q82.5 52.5 88 52 Q93.5 52.5 94 61.5 Z" fill="#45403d" stroke="#1b1410" strokeWidth="1.5" />
+        <path d="M82.2 59 Q88 60.4 93.8 59 L93.9 61.2 Q88 62.6 82.1 61.2 Z" fill="#7a5233" />
         {/* hull */}
         <path d="M24 82 L120 82 Q114 98 100 102 L42 102 Q30 96 24 82 Z" fill="#5a3520" stroke="#1b1410" strokeWidth="2.5" strokeLinejoin="round" />
         <path d="M30 89 L116 89" stroke="#3b2416" strokeWidth="2" />

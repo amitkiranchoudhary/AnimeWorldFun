@@ -9,19 +9,15 @@ Replacing every piece of copyrighted anime character art with **the Captain**, y
 | 1. Audit | ✅ Done | `3b5327b` "Before mascot swap" + this file |
 | 2. Prepare images | ✅ Done | see log |
 | 3. Logo and hero | ✅ Done | see log |
-| 4. Backgrounds, cursor, decorations | ⏳ Next | |
-| 5. Poster credits and cleanup | ⬜ | |
+| 4. Backgrounds, cursor, decorations | ✅ Done | see log |
+| 5. Poster credits and cleanup | ⏳ Next | |
 | 6. Test and report | ⬜ | |
 
-**Exact next step:** Phase 4.
-1. In `web/src/components/SiteBackground.tsx`, stop using `/images/bg-dark.webp` (the chibi collage). Use an original backdrop (night sea, stars and glow in CSS) instead.
-2. Swap the straw hat on the boat sail in `web/src/components/info/Sea.tsx` for the Captain's dark hat.
-3. Place the chibis:
-   - waving on Home
-   - reading on `/blog`
-   - cheering for Logbook completion (My List `EntryCard` / `AddToList` when a show is completed)
-   - sleeping for empty states (My List `EmptyLog`, Explore `EmptyScene`) and the 404 (`web/src/app/not-found.tsx`)
-4. Rename `web/src/components/StrawHatCursor.tsx` to a Captain cursor (an SVG katana), rename the navbar toggle to "Captain cursor", and update the privacy text.
+**Exact next step:** Phase 5.
+1. Add "Data and images from AniList" to the footer credits (`web/src/components/Footer.tsx`, beside the existing AniList credit).
+2. Delete the old copyrighted files: `web/public/images/hero-landing.png`, `logo.png`, `bg-dark.png`, `bg-dark.webp`, `cursor-hat.png` and `cursor-hand.png`.
+3. Remove the unused hat keyframes (`hat-flip`, `hat-hop`, `hat-streak`) from `web/src/app/globals.css`.
+4. Grep for any remaining references, then build.
 
 ---
 
@@ -73,3 +69,13 @@ These are official covers and banners loaded from AniList (`s4.anilist.co`), alw
   - **Hero:** in `web/src/app/page.tsx`, the hero collage is replaced by an art-directed `<picture>` (`getImageProps`). Desktop: `hero-desktop` full width, the Captain on the left, and a visible h1 "Anime World Fun" with the text, search and buttons on the right over the sky. Phones: `hero-mobile` on top, text stacked below. Checked at 1280px and 375px, with no sideways scroll. The sakura layer (SkyScene) is unchanged.
   - The link-preview alt text in `layout.tsx` now describes the Captain.
   - The old `public/images/hero-landing.png` and `logo.png` are unused now; they're deleted in Phase 5.
+- Phase 4:
+  - **Background** (`SiteBackground.tsx`): the chibi collage (Naruto, Goku, Luffy, Gojo, Dragon Balls…) is replaced by an original night sky drawn in CSS (two drifting star layers, moon glow, sea-blue wash). No image file needed.
+  - **Sail** (`info/Sea.tsx`, used on the 404 and Contact pages): the straw hat with the red band is now the Captain's dark hat with a brown band.
+  - **Chibis** (new `components/CaptainChibi.tsx`):
+    - waving: the Home "Free for every fan" card
+    - reading: above the blog's read-along
+    - cheering: My List cards for completed shows, and "Completed!" on anime pages
+    - sleeping: the 404, the empty My List and Explore's "No anime found"
+  - **Cursor:** `StrawHatCursor.tsx` → `CaptainCursor.tsx`, the Captain's katana as an SVG (white blade, gold guard, maroon grip). The blade tip is the pointer. It tilts and glints over links and swings on click. The navbar toggle now reads "⚔️ Captain cursor", and the privacy text is updated (same storage key).
+  - Removed a stale "Goku on the Flying Nimbus" comment in `SkyScene.tsx`.

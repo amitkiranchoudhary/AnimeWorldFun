@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import CaptainChibi from "@/components/CaptainChibi";
 import { addShow, logEpisode, removeShow, SHELVES, updateEntry, useListReady, useMyList, type Shelf, type ShowInfo } from "@/lib/myList";
 
 const btn =
@@ -46,7 +47,13 @@ export default function AddToList({ show }: { show: ShowInfo }) {
   const total = entry.episodes;
   return (
     <div className="glass inline-flex max-w-full flex-wrap items-center justify-center gap-x-4 gap-y-3 rounded-3xl px-4 py-3 md:justify-start">
-      <span className="text-xs font-extrabold uppercase tracking-[0.2em] text-straw">✓ On My List</span>
+      {entry.status === "completed" ? (
+        <span className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-[0.2em] text-straw">
+          <CaptainChibi pose="cheering" className="-my-3 w-12" /> Completed!
+        </span>
+      ) : (
+        <span className="text-xs font-extrabold uppercase tracking-[0.2em] text-straw">✓ On My List</span>
+      )}
       <label className="flex items-center gap-2 text-sm font-bold">
         <span className="sr-only">Shelf</span>
         <select

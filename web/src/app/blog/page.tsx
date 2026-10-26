@@ -11,6 +11,7 @@ import Magnetic from "@/components/motion/Magnetic";
 import Marquee from "@/components/motion/Marquee";
 import Reveal from "@/components/motion/Reveal";
 import SplitText from "@/components/motion/SplitText";
+import CaptainChibi from "@/components/CaptainChibi";
 import { formatDate, getPosts } from "@/lib/blog";
 
 export const metadata: Metadata = {
@@ -134,6 +135,9 @@ export default function BlogPage() {
             <p className={s.kicker}>
               <span aria-hidden className={s.dot} /> Feature preview
             </p>
+          </Reveal>
+          <Reveal delay={80} className="mt-2 flex justify-center">
+            <CaptainChibi pose="reading" float className="w-28 sm:w-36" label="The Captain reading a book" />
           </Reveal>
           <SplitText as="h2" text="Hear it, word by word" className={s.chapterTitle} />
           <Reveal delay={120}>

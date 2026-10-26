@@ -3,6 +3,7 @@ import Link from "next/link";
 import Reveal from "@/components/motion/Reveal";
 import SplitText from "@/components/motion/SplitText";
 import Magnetic from "@/components/motion/Magnetic";
+import CaptainChibi from "@/components/CaptainChibi";
 import { DriftPetals, LanternBoat, Moon, Stars, Waves } from "@/components/info/Sea";
 
 export const metadata: Metadata = {
@@ -36,7 +37,10 @@ export default function NotFound() {
         delay={120}
         className="mt-2 font-display text-[clamp(3.4rem,14vw,8.5rem)] uppercase leading-[0.9] tracking-wide text-text text-glow-pink"
       />
-      <Reveal delay={500} className="mx-auto mt-5 max-w-md">
+      <Reveal delay={350} className="mt-4">
+        <CaptainChibi pose="sleeping" className="w-40 sm:w-52" label="The Captain asleep on his hat" />
+      </Reveal>
+      <Reveal delay={500} className="mx-auto mt-3 max-w-md">
         <p className="leading-relaxed text-muted">
           This page sailed off the edge of the map. The link may be old, or the page never existed. Let&apos;s light the
           lantern and head somewhere real.

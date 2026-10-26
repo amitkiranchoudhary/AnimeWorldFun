@@ -112,7 +112,7 @@ const SECTIONS: { id: string; title: string; body: ReactNode }[] = [
             <p className="mb-2 font-mono text-sm font-bold text-straw">awf-cursor-off</p>
             <dl>
             <Row k="Type">Local storage in your browser</Row>
-            <Row k="When">Saved when you switch the straw-hat cursor off or back on from the navigation bar.</Row>
+            <Row k="When">Saved when you switch the Captain cursor off or back on from the navigation bar.</Row>
             <Row k="What's inside">&ldquo;1&rdquo; (cursor off) or &ldquo;0&rdquo; (cursor on).</Row>
             <Row k="Sent to us?">Never. It stays on your device.</Row>
             <Row k="Lasts">Until you clear this site&apos;s data in your browser.</Row>

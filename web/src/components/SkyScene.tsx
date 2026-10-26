@@ -3,8 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 
 // Click-through sky layer for the Home page:
-//  • a 3D canvas (Goku on the Flying Nimbus, sakura, lanterns) between the chibi
-//    background and the page content, so posters and tiles cover it
+//  • a 3D canvas (sakura, lanterns) between the night-sky background and the
+//    page content, so posters and tiles cover it
 //  • a light 2D canvas of sakura petals in front, drifting over and between the tiles
 // Three.js loads after the page is up; "reduce motion" users and browsers
 // without WebGL skip it.

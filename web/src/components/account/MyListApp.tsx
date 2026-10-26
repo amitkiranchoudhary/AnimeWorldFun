@@ -18,6 +18,7 @@ import {
 } from "@/lib/myList";
 import { importFromAniList, matchMalEntries, type ImportResult } from "@/app/my-list/actions";
 import ProgressRing from "./ProgressRing";
+import CaptainChibi from "@/components/CaptainChibi";
 
 const focus = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-straw";
 // big imported lists render a page of cards at a time
@@ -173,6 +174,7 @@ export default function MyListApp() {
 function EmptyLog() {
   return (
     <div className="glass rounded-[2rem] px-6 py-12 text-center">
+      <CaptainChibi pose="sleeping" className="mx-auto mb-2 w-36 sm:w-44" />
       <p className="font-display text-4xl tracking-wide text-straw">Your logbook is empty</p>
       <p className="mx-auto mt-3 max-w-md leading-relaxed text-muted">
         Open any anime and press <strong className="text-text">＋ Add to My List</strong>, or bring your list over from
@@ -207,7 +209,12 @@ function EntryCard({ e }: { e: ListEntry }) {
       </Link>
 
       <div className="min-w-0 flex-1">
-        <h3 className="line-clamp-2 font-extrabold leading-snug">
+        {done && (
+          <span className="pointer-events-none absolute -right-1 -top-2 flex flex-col items-center" aria-hidden>
+            <CaptainChibi pose="cheering" className="w-14 motion-safe:animate-[float_3s_ease-in-out_infinite]" />
+          </span>
+        )}
+        <h3 className="line-clamp-2 pr-10 font-extrabold leading-snug">
           <Link href={`/anime/${e.id}`} className={`hover:text-straw ${focus}`}>
             {e.title}
           </Link>

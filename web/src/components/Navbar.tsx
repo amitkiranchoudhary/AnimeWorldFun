@@ -16,7 +16,7 @@ import {
 } from "react";
 import Magnetic from "./motion/Magnetic";
 import { LogoMark } from "./Logo";
-import { STORAGE_KEY, TOGGLE_EVENT } from "./StrawHatCursor";
+import { STORAGE_KEY, TOGGLE_EVENT } from "./CaptainCursor";
 
 const LINKS = [
   { href: "/", label: "Home", jp: "ホーム", caption: "Back to the harbour" },
@@ -73,7 +73,7 @@ export function BackToTop({ className = "", children }: { className?: string; ch
   );
 }
 
-/* ── Straw-hat cursor toggle (desktop mice only) ───────────────────────── */
+/* ── Captain cursor toggle (desktop mice only) ───────────────────────── */
 
 function subscribeCursorPref(onChange: () => void) {
   window.addEventListener(TOGGLE_EVENT, onChange);
@@ -104,11 +104,11 @@ function CursorToggle({ className = "" }: { className?: string }) {
       type="button"
       onClick={toggle}
       className={`nb-chip hidden items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs font-bold text-muted transition-colors duration-300 hover:border-straw/60 hover:text-straw focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-straw [@media(pointer:fine)]:inline-flex ${className}`}
-      title={off ? "Turn the straw-hat cursor on" : "Turn the straw-hat cursor off"}
-      aria-label="Straw-hat cursor"
+      title={off ? "Turn the Captain's katana cursor on" : "Turn the Captain's katana cursor off"}
+      aria-label="Captain cursor"
       aria-pressed={!off}
     >
-      {off ? "🖱️ Normal cursor" : "👒 Hat cursor"}
+      {off ? "🖱️ Normal cursor" : "⚔️ Captain cursor"}
     </button>
   );
 }
