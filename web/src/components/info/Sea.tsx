@@ -1,7 +1,7 @@
 import { useId, type CSSProperties } from "react";
 
 /*
- * Night-sea scenery shared by the 404, Contact and "coming soon" pages:
+ * Night-sea scenery shared by the 404 and Contact pages:
  * layered rolling waves, a field of twinkling stars, a glowing moon, a little
  * lantern boat and a message bottle. Pure SVG + CSS (transform/opacity only),
  * server-rendered, all aria-hidden. The global reduced-motion rule in
