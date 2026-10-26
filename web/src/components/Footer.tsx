@@ -240,12 +240,13 @@ export default function Footer() {
             and read stories from the crew.
           </p>
           <p className="mt-4 text-xs text-muted/80">
-            Anime data provided by{" "}
+            Data and images from{" "}
             <a href="https://anilist.co" target="_blank" rel="noopener noreferrer" className="ft-inline">
               AniList
             </a>
-            . All anime titles and artwork belong to their respective owners.
+            . All anime titles, posters and artwork belong to their respective owners.
           </p>
+          <p className="mt-2 text-xs text-muted/80">The Captain, our mascot, is an original Anime World Fun character.</p>
           <p className="mt-2 text-xs text-muted/80">
             Cherry blossom photo:{" "}
             <a

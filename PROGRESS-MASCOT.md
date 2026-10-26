@@ -10,14 +10,14 @@ Replacing every piece of copyrighted anime character art with **the Captain**, y
 | 2. Prepare images | ✅ Done | see log |
 | 3. Logo and hero | ✅ Done | see log |
 | 4. Backgrounds, cursor, decorations | ✅ Done | see log |
-| 5. Poster credits and cleanup | ⏳ Next | |
-| 6. Test and report | ⬜ | |
+| 5. Poster credits and cleanup | ✅ Done | see log |
+| 6. Test and report | ⏳ Next | |
 
-**Exact next step:** Phase 5.
-1. Add "Data and images from AniList" to the footer credits (`web/src/components/Footer.tsx`, beside the existing AniList credit).
-2. Delete the old copyrighted files: `web/public/images/hero-landing.png`, `logo.png`, `bg-dark.png`, `bg-dark.webp`, `cursor-hat.png` and `cursor-hand.png`.
-3. Remove the unused hat keyframes (`hat-flip`, `hat-hop`, `hat-streak`) from `web/src/app/globals.css`.
-4. Grep for any remaining references, then build.
+**Exact next step:** Phase 6.
+1. Check every page at desktop (1280px) and mobile (375px) widths: no overflow, chibis showing.
+2. Run the link crawler.
+3. Write `MASCOT-REPORT.md`.
+4. Final commit: "Mascot swap complete".
 
 ---
 
@@ -79,3 +79,8 @@ These are official covers and banners loaded from AniList (`s4.anilist.co`), alw
     - sleeping: the 404, the empty My List and Explore's "No anime found"
   - **Cursor:** `StrawHatCursor.tsx` → `CaptainCursor.tsx`, the Captain's katana as an SVG (white blade, gold guard, maroon grip). The blade tip is the pointer. It tilts and glints over links and swings on click. The navbar toggle now reads "⚔️ Captain cursor", and the privacy text is updated (same storage key).
   - Removed a stale "Goku on the Flying Nimbus" comment in `SkyScene.tsx`.
+- Phase 5:
+  - **Footer:** now says "Data and images from AniList. All anime titles, posters and artwork belong to their respective owners." plus "The Captain, our mascot, is an original Anime World Fun character."
+  - **Deleted** `public/images/hero-landing.png`, `logo.png`, `bg-dark.png`, `bg-dark.webp`, `cursor-hat.png` and `cursor-hand.png`. They're still in git history.
+  - **Removed** the unused hat cursor keyframes from `globals.css`.
+  - No references to the old files remain; the build passes.

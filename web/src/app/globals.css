@@ -108,22 +108,6 @@ html.awf-cursor * {
   50% { transform: rotate(8deg); }
 }
 
-/* ── Cursor animations ──────────────────────────────── */
-@keyframes hat-flip {
-  to { transform: rotateY(360deg); }
-}
-
-@keyframes hat-streak {
-  from { opacity: 0.15; }
-  to { opacity: 0.9; }
-}
-
-@keyframes hat-hop {
-  0% { transform: translateY(0); }
-  40% { transform: translateY(-22px); }
-  100% { transform: translateY(0); }
-}
-
 /* ════════════════════════════════════════════════════════
    Motion system (components in src/components/motion)
    Natural easing, transform/opacity only, all off for "reduce motion".
