@@ -9,7 +9,7 @@ import { ISSUES_URL, PROFILE_URL } from "@/components/info/links";
 export const metadata: Metadata = {
   title: "Privacy Policy",
   description:
-    "How Anime World Fun handles your data: no visitor accounts, no analytics, no ads, one browser preference, and anime data fetched server-side from AniList.",
+    "How Anime World Fun handles your data: no visitor accounts, no analytics, no ads; your My List and cursor setting stay in your own browser, and anime data is fetched server-side from AniList.",
 };
 
 // Bump this whenever the policy text changes.

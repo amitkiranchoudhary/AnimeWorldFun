@@ -11,6 +11,7 @@ import AboutHero from "@/components/info/AboutHero";
 import FeatureDeck from "@/components/info/FeatureDeck";
 import AboutOutro from "@/components/info/AboutOutro";
 import MapReveal from "@/components/info/MapReveal";
+import Faq from "@/components/info/Faq";
 
 export const metadata: Metadata = {
   title: "About Us",
@@ -163,6 +164,8 @@ export default function AboutPage() {
           ]}
         />
       </ScrollScene>
+
+      <Faq />
 
       <AboutOutro />
     </div>

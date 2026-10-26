@@ -6,7 +6,7 @@ export default function SiteBackground() {
       <div
         className="absolute -inset-[6%] bg-cover bg-center opacity-45"
         style={{
-          backgroundImage: "url(/images/bg-dark.png)",
+          backgroundImage: "url(/images/bg-dark.webp)",
           animation: "bg-drift 60s ease-in-out infinite alternate",
         }}
       />

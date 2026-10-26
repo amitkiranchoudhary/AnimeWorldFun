@@ -40,6 +40,7 @@ const COLUMNS = [
     jp: "案内",
     links: [
       { href: "/about", label: "About Us" },
+      { href: "/about#faq", label: "FAQ" },
       { href: "/contact", label: "Contact" },
       { href: "/privacy", label: "Privacy Policy" },
     ],
