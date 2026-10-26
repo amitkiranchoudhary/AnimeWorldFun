@@ -11,13 +11,9 @@ Replacing every piece of copyrighted anime character art with **the Captain**, y
 | 3. Logo and hero | ✅ Done | see log |
 | 4. Backgrounds, cursor, decorations | ✅ Done | see log |
 | 5. Poster credits and cleanup | ✅ Done | see log |
-| 6. Test and report | ⏳ Next | |
+| 6. Test and report | ✅ Done | "Mascot swap complete" |
 
-**Exact next step:** Phase 6.
-1. Check every page at desktop (1280px) and mobile (375px) widths: no overflow, chibis showing.
-2. Run the link crawler.
-3. Write `MASCOT-REPORT.md`.
-4. Final commit: "Mascot swap complete".
+**All phases done.** See `MASCOT-REPORT.md` for the summary and what needs your attention. Nothing is pushed to GitHub yet.
 
 ---
 
@@ -84,3 +80,4 @@ These are official covers and banners loaded from AniList (`s4.anilist.co`), alw
   - **Deleted** `public/images/hero-landing.png`, `logo.png`, `bg-dark.png`, `bg-dark.webp`, `cursor-hat.png` and `cursor-hand.png`. They're still in git history.
   - **Removed** the unused hat cursor keyframes from `globals.css`.
   - No references to the old files remain; the build passes.
+- Phase 6: tested desktop (1280px) and phone (375px) widths and all links; wrote `MASCOT-REPORT.md`.
