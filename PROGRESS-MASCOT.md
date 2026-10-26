@@ -7,16 +7,19 @@ Replacing every piece of copyrighted anime character art with **the Captain**, y
 | Phase | Status | Commit |
 |---|---|---|
 | 1. Audit | ✅ Done | `3b5327b` "Before mascot swap" + this file |
-| 2. Prepare images | ⏳ Next | |
-| 3. Logo and hero | ⬜ | |
+| 2. Prepare images | ✅ Done | see log |
+| 3. Logo and hero | ⏳ Next | |
 | 4. Backgrounds, cursor, decorations | ⬜ | |
 | 5. Poster credits and cleanup | ⬜ | |
 | 6. Test and report | ⬜ | |
 
-**Exact next step:** Phase 2. Make optimized WebP and PNG versions from `mascot/` into `web/public/images/captain/`:
-- From the logo: a circular navbar logo and a favicon (`web/src/app/icon.png`).
-- From the hero: a desktop version and a mobile crop.
-- Split `chibi-poses` into waving, reading, cheering and sleeping, with transparent backgrounds, and remove the "Hi!" from the waving one.
+**Exact next step:** Phase 3.
+1. In `web/src/components/Logo.tsx`, swap `public/images/logo.png` for `/images/captain/logo-256.webp` (circular).
+2. Rebuild the homepage hero in `web/src/app/page.tsx`:
+   - Desktop: `hero-desktop` as a full-bleed background, with the Captain on the left and the text, search bar and buttons in a column on the right.
+   - Mobile: `hero-mobile` on top, text stacked below.
+   - Keep the sakura layer (SkyScene) and update the image alt text.
+3. Point the link-preview alt text in `web/src/app/layout.tsx` at the Captain. (`og.jpg` itself was already regenerated from the Captain hero.)
 
 ---
 
@@ -53,3 +56,13 @@ These are official covers and banners loaded from AniList (`s4.anilist.co`), alw
 
 ## Changes log
 - Phase 1: committed `mascot/` untouched (the "Before mascot swap" commit) and wrote this audit. No site changes yet.
+- Phase 2: `web/scripts/make-captain-images.mjs` (rerunnable: `cd web && node scripts/make-captain-images.mjs`) wrote `web/public/images/captain/`:
+  - **logo-256 / logo-512**: the logo portrait masked to a circle (WebP + PNG).
+  - **hero-desktop** (1920px) and **hero-mobile** (900px portrait crop centred on the Captain): WebP + **JPEG** fallback. A PNG of this painting would be about 4 MB, so JPEG is the sensible fallback.
+  - **chibi-waving / reading / cheering / sleeping**: 640px, transparent background (white removed by flood fill), pale ground shadow turned into a soft dark shadow, and the "Hi!" and its sparkle removed from waving (WebP + palette PNG).
+  - **Favicon** `web/src/app/icon.png`: the Captain's head in a gold ring. Already live, because Next.js picks it up automatically.
+  - **Link preview** `web/public/images/og.jpg`: regenerated from the Captain hero (1200×630).
+  - The hero's AI-generator sparkle watermark (bottom-right) is patched over with nearby sea.
+- **For you to know:**
+  - The katana can't be cut out of the chibi sheet cleanly (in every pose it touches the Captain), so the Phase 4 cursor will be a hand-drawn SVG of his katana in the same colours.
+  - `master-character-sheet.jpg` also has the generator sparkle; it isn't used on the site.
